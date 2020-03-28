@@ -1,5 +1,12 @@
-temp = 4
+registery =
+{
+	"Transform",
+	"Camera"
+}
 
+print ("run")
+
+--[[
 function Update()
 	v = game.GetVector()
 	game.printMessage(v.x)
@@ -7,4 +14,4 @@ function Update()
 	game.printMessage(v.z)
 	v.x = 2;
 	v.y = temp
-end
+end]]
