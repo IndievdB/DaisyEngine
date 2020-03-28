@@ -6,6 +6,8 @@ Input* Input::s_Instance;
 GLFWwindow* Input::activeWindow;
 glm::vec2 Input::mousePosition;
 float Input::scrollDelta;
+float Input::deltaTime = -1;
+float Input::previousTime;
 
 void WindowCloseCallback(GLFWwindow* window);
 void SetCursorPosCallback(GLFWwindow* window, double x, double y);
@@ -15,11 +17,16 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 Input::Input()
 {
 	Input::s_Instance = this;
+	previousTime = glfwGetTime();
 }
 
 void Input::Update()
 {
 	glfwPollEvents();
+
+	float currentTime = glfwGetTime();
+	deltaTime = (deltaTime == -1) ? 0.0f : currentTime - previousTime;
+	previousTime = currentTime;
 
 	std::map<int, int>::iterator it;
 
@@ -51,6 +58,11 @@ void Input::Update()
 
 	windowCloseButtonClicked = false;
 	mouseDidScroll = false;
+}
+
+float Input::GetDeltaTime()
+{
+	return deltaTime;
 }
 
 void Input::SetActiveWindow(GLFWwindow* window)

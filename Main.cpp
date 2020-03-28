@@ -20,16 +20,10 @@ int main()
 
 	LoadScene(registry);
 
-	float currentTime, deltaTime, previousTime;
-	previousTime = currentTime = glfwGetTime();
-
 	while (window.isOpen)
 	{
-		float currentTime = glfwGetTime();
-		deltaTime = currentTime - previousTime;
-		previousTime = currentTime;
-
 		inputSystem.Update();
+		std::cout << inputSystem.GetDeltaTime() << std::endl;
 		window.ProcessInput();
 		window.Clear();
 

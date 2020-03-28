@@ -12,6 +12,7 @@ public:
 	Input();
 	static void SetActiveWindow(GLFWwindow* window);
 
+	static float GetDeltaTime();
 	static bool GetKey(KeyCode keycode);
 	static bool GetKeyDown(KeyCode keycode);
 	static bool GetKeyUp(KeyCode keycode);
@@ -29,6 +30,7 @@ public:
 	void Update();
 
 private:
+	static float deltaTime, previousTime;
 	static Input* s_Instance;
 	static GLFWwindow* activeWindow;
 	std::map<int, int> keyStatus;
