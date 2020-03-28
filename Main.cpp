@@ -1,18 +1,14 @@
 #include <glad/glad.h>
 #include <GLFW\glfw3.h>
-#include <iostream>
-#include "entt/entt.hpp"
-#include <glm/glm.hpp>
 
 #include "Renderer/Window.hpp"
-#include "Core/Input.hpp"
-#include "Renderer/Camera.hpp"
-#include "Core/ResourceManager.hpp"
-
 #include "Renderer/RenderSystem.hpp"
-#include "Demo.hpp"
 #include "Physics/PhysicsSystem.hpp"
-#include "Physics/cycloneMath.hpp"
+#include "Core/ResourceManager.hpp"
+#include "Core/Input.hpp"
+#include "Vendor/entt/entt.hpp"
+
+#include "Demo.hpp"
 
 int main()
 {

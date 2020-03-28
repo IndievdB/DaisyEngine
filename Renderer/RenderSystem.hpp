@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../entt/entt.hpp"
+#include "../Vendor/entt/entt.hpp"
 #include "MeshRenderer.hpp"
 #include "../Core/Transform.hpp"
 #include "Camera.hpp"
