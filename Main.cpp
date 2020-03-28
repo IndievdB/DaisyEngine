@@ -9,6 +9,7 @@
 #include "Vendor/entt/entt.hpp"
 
 #include "Demo.hpp"
+#include "Behaviour/LuaBehaviour.hpp"
 
 int main()
 {
@@ -20,10 +21,13 @@ int main()
 
 	LoadScene(registry);
 
+	LuaBehaviour testBehaviour("Resources/testing.lua");
+	testBehaviour.Update();
+
+	/*
 	while (window.isOpen)
 	{
 		inputSystem.Update();
-		std::cout << inputSystem.GetDeltaTime() << std::endl;
 		window.ProcessInput();
 		window.Clear();
 
@@ -33,5 +37,5 @@ int main()
 			physicsSystem.RunPhysics(registry);
 
 		window.SwapBuffers();
-	}
+	}*/
 }
