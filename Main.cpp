@@ -7,29 +7,29 @@
 #include "Core/ResourceManager.hpp"
 #include "Core/Input.hpp"
 #include "Vendor/entt/entt.hpp"
+#include "Behaviour/LuaSystem.hpp"
 
 #include "Demo.hpp"
-#include "Behaviour/LuaBehaviour.hpp"
+
 
 int main()
 {
 	ResourceManager resourceManager;
 	Input inputSystem;
 	Window window("Daisy", 800, 600);
-	entt::registry registry;
+	auto registry = std::make_shared<entt::registry>();
 	PhysicsSystem physicsSystem;
+	LuaSystem luaSystem(registry);
 
 	LoadScene(registry);
 
-	LuaBehaviour testBehaviour("Resources/testing.lua");
-	testBehaviour.Update();
-
-	/*
 	while (window.isOpen)
 	{
 		inputSystem.Update();
 		window.ProcessInput();
 		window.Clear();
+
+		luaSystem.UpdateAllLuaScripts();
 
 		RenderAll(registry);
 
@@ -37,5 +37,5 @@ int main()
 			physicsSystem.RunPhysics(registry);
 
 		window.SwapBuffers();
-	}*/
+	}
 }

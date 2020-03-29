@@ -135,6 +135,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Behaviour\LuaBehaviour.cpp" />
+    <ClCompile Include="Behaviour\LuaSystem.cpp" />
     <ClCompile Include="Physics\ContactResolver.cpp" />
     <ClCompile Include="Physics\CollisionDetector.cpp" />
     <ClCompile Include="Physics\IntersectionTests.cpp" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Behaviour\LuaBehaviour.hpp" />
+    <ClInclude Include="Behaviour\LuaSystem.hpp" />
     <ClInclude Include="Vendor\LuaBridge\detail\CFunctions.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\ClassInfo.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\Config.h" />

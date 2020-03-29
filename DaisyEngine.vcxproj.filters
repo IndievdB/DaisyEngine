@@ -81,6 +81,9 @@
     <ClCompile Include="Behaviour\LuaBehaviour.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Behaviour\LuaSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer\Shader.hpp">
@@ -348,6 +351,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Behaviour\LuaBehaviour.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Behaviour\LuaSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

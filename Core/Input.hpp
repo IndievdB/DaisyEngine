@@ -5,13 +5,14 @@
 #include <map>
 #include "Keycodes.hpp"
 #include <glm/glm.hpp>
+#include <string>
 
 class Input
 {
 public:
 	Input();
 	static void SetActiveWindow(GLFWwindow* window);
-
+	static KeyCode StringToKeyCode(std::string input);
 	static float GetDeltaTime();
 	static bool GetKey(KeyCode keycode);
 	static bool GetKeyDown(KeyCode keycode);
@@ -30,6 +31,7 @@ public:
 	void Update();
 
 private:
+	static std::map<std::string, KeyCode> stringToKeyCodeMap;
 	static float deltaTime, previousTime;
 	static Input* s_Instance;
 	static GLFWwindow* activeWindow;

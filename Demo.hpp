@@ -6,8 +6,9 @@
 #include "Physics/SphereCollider.hpp"
 #include "Physics/PlaneCollider.hpp"
 #include "Renderer/Camera.hpp"
+#include "Behaviour/LuaBehaviour.hpp"
 
-void LoadScene(entt::registry& registry)
+void LoadScene(std::shared_ptr<entt::registry> registry)
 {
 	auto material = ResourceManager::GetInstance()->GetMaterial("WhiteMat", "Resources/transform.shader");
 	material->SetTexture("mainTex", "Resources/Prototype White.png");
@@ -17,17 +18,18 @@ void LoadScene(entt::registry& registry)
 	material->SetTexture("mainTex", "Resources/Prototype Gray.png");
 
 	{
-		auto entity = registry.create();
+		auto entity = registry->create();
 		glm::quat rotation = glm::quat(1, 0, 0, 0);
-		registry.assign<Transform>(entity, glm::vec3(0.0f, 5.0f, -25.0f), glm::vec3(1, 1, 1), rotation);
-		registry.assign<Camera>(entity);
+		registry->assign<Transform>(entity, glm::vec3(0.0f, 5.0f, -25.0f), glm::vec3(1, 1, 1), rotation);
+		registry->assign<Camera>(entity);
+		registry->assign<LuaBehaviour>(entity, "Resources/testing.lua");
 	}
 
 	{
-		auto entity = registry.create();
-		registry.assign<Transform>(entity, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::quat(1,0,0,0));
-		registry.assign<MeshRenderer>(entity, "GrayMat", "Resources/plane.obj");
-		PlaneCollider& collider = registry.assign<PlaneCollider>(entity);
+		auto entity = registry->create();
+		registry->assign<Transform>(entity, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::quat(1,0,0,0));
+		registry->assign<MeshRenderer>(entity, "GrayMat", "Resources/plane.obj");
+		PlaneCollider& collider = registry->assign<PlaneCollider>(entity);
 		collider.normal = glm::vec3(0, 1, 0);
 		collider.offset = 0;
 	}
@@ -36,15 +38,15 @@ void LoadScene(entt::registry& registry)
 	
 	for (int i = 0; i < 5; i++)
 	{
-		auto entity = registry.create();
+		auto entity = registry->create();
 		glm::vec3 position = glm::vec3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
 		float diameter = rand() % 2 + 1.0f;
 		glm::vec3 scale = glm::vec3(diameter);
 		glm::quat rotation = glm::quat(rand(), rand(), rand(), rand()); rotation = Normalize(rotation);
-		registry.assign<Transform>(entity, position, scale, rotation);
-		registry.assign<MeshRenderer>(entity, "BlueMat", "Resources/sphere.obj");
+		registry->assign<Transform>(entity, position, scale, rotation);
+		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/sphere.obj");
 
-		RigidBody& rb = registry.assign<RigidBody>(entity);
+		RigidBody& rb = registry->assign<RigidBody>(entity);
 		rb.setPosition(position);
 		rb.setOrientation(rotation);
 		rb.setVelocity(glm::vec3());
@@ -60,23 +62,20 @@ void LoadScene(entt::registry& registry)
 		rb.setAwake();
 		rb.calculateDerivedData();
 		
-		SphereCollider& collider = registry.assign<SphereCollider>(entity);
+		SphereCollider& collider = registry->assign<SphereCollider>(entity);
 		collider.radius = 0.5f;
 	}
 	
 	for (int i = 0; i < 5; i++)
 	{
-		auto entity = registry.create();
+		auto entity = registry->create();
 		glm::vec3 position = glm::vec3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
-
-		//std::cout << position.x << "   " << position.y << "   " << position.z << std::endl;
-
 		glm::vec3 scale = glm::vec3(rand() % 8 + 1.0f, rand() % 2 + 1.0f, rand() % 2 + 1.0f);
 		glm::quat rotation = glm::quat(rand(), rand(), rand(), rand()); rotation = Normalize(rotation);
-		registry.assign<Transform>(entity, position, scale, rotation);
-		registry.assign<MeshRenderer>(entity, "BlueMat", "Resources/cube.obj");
+		registry->assign<Transform>(entity, position, scale, rotation);
+		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/cube.obj");
 
-		RigidBody& rb = registry.assign<RigidBody>(entity);
+		RigidBody& rb = registry->assign<RigidBody>(entity);
 		rb.setPosition(position);
 		rb.setOrientation(rotation);
 		rb.setVelocity(glm::vec3());
@@ -91,7 +90,7 @@ void LoadScene(entt::registry& registry)
 		rb.setAwake();
 		rb.calculateDerivedData();
 
-		BoxCollider& collider = registry.assign<BoxCollider>(entity);
+		BoxCollider& collider = registry->assign<BoxCollider>(entity);
 		collider.halfSize = glm::vec3(0.5f);
 	}
 }
