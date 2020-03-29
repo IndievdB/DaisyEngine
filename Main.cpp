@@ -33,8 +33,7 @@ int main()
 
 		RenderAll(registry);
 
-		if (Input::GetKey(KeyCode::Space))
-			physicsSystem.RunPhysics(registry);
+		physicsSystem.RunPhysics(registry);
 
 		window.SwapBuffers();
 	}

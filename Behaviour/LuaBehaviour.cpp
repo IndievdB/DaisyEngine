@@ -25,11 +25,17 @@ static bool GetKey(std::string input)
 	return Input::GetKey(Input::StringToKeyCode(input));
 }
 
-
 void RegisterAll(lua_State* L)
 {
 	getGlobalNamespace(L)
 		.beginClass < entt::entity >("entity")
+		.endClass();
+
+	getGlobalNamespace(L)
+		.beginClass < glm::vec2 >("Vector2")
+		.addConstructor<void(*)(void)>()
+		.addProperty("x", &glm::vec2::x)
+		.addProperty("y", &glm::vec2::y)
 		.endClass();
 
 	getGlobalNamespace(L)
@@ -55,6 +61,10 @@ void RegisterAll(lua_State* L)
 		.addProperty("position", &Transform::position)
 		.addProperty("scale", &Transform::scale)
 		.addProperty("rotation", &Transform::rotation)
+		.addFunction("SetRotation", &Transform::SetRotation)
+		.addFunction("GetForward", &Transform::GetForward)
+		.addFunction("GetUp", &Transform::GetUp)
+		.addFunction("GetRight", &Transform::GetRight)
 		.endClass();
 
 	getGlobalNamespace(L)
@@ -63,6 +73,7 @@ void RegisterAll(lua_State* L)
 	getGlobalNamespace(L)
 		.beginNamespace("Input")
 		.addFunction("GetKey", GetKey)
+		.addFunction("GetMouseDelta", Input::GetMousePositionDelta)
 		.endNamespace();
 }
 
@@ -86,7 +97,6 @@ LuaBehaviour::~LuaBehaviour()
 
 void LuaBehaviour::Update(entt::entity& entity)
 {
-	//std::cout << (Input::GetKey(KeyCode(84)) == true) << std::endl;
 	LuaRef updateFunction = getGlobal(L, "Update");
 	updateFunction(&entity);
 }

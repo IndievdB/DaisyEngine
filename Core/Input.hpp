@@ -19,6 +19,7 @@ public:
 	static bool GetKeyUp(KeyCode keycode);
 	static bool GetWindowCloseButton();
 	static float GetScrollDelta();
+	static glm::vec2 GetMousePositionDelta();
 	static glm::vec2 GetMousePosition();
 
 	void RegisterWindowCloseCallback();
@@ -38,6 +39,7 @@ private:
 	std::map<int, int> keyStatus;
 	int windowCloseButtonClicked;
 	static glm::vec2 mousePosition;
+	static glm::vec2 prevMousePosition;
 	static float scrollDelta;
 	bool mouseDidScroll;
 };
