@@ -94,7 +94,7 @@ unsigned CollisionDetector::BoxAndHalfSpace(const BoxCollider& box, const Transf
 		//vertexPos = box.trans.transform(vertexPos);
 		
 
-		vertexPos = TransformVector(Transform::ToMatrixGLM(boxTransform), vertexPos);
+		vertexPos = TransformVector(Transform::ToMatrixDSY(boxTransform), vertexPos);
 
 		// Calculate the distance from the plane
 		float vertexDistance = Vector3::Dot(vertexPos, plane.normal);
@@ -190,7 +190,7 @@ static void fillPointFaceBoxBox(const BoxCollider& one, const Transform& oneTran
 	// Create the contact data
 	data.contactArray[data.currentContact].contactNormal = normal;
 	data.contactArray[data.currentContact].penetration = pen;
-	data.contactArray[data.currentContact].contactPoint = TransformVector(Transform::ToMatrixGLM(twoTransform), vertex);
+	data.contactArray[data.currentContact].contactPoint = TransformVector(Transform::ToMatrixDSY(twoTransform), vertex);
 	data.contactArray[data.currentContact].setBodyData(oneRigidBody, twoRigidBody, data.friction, data.restitution);
 }
 
@@ -272,8 +272,6 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, const Transform& o
 	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 1)), toCentre, (13), pen, best)) return 0;
 	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 2)), toCentre, (14), pen, best)) return 0;
 
-	assert(best != 0xffffff);
-
 	// We now know there's a collision, and we know which
 	// of the axes gave the smallest penetration. We now
 	// can deal with it in different ways depending on
@@ -328,8 +326,8 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, const Transform& o
 
 		// Move them into world coordinates (they are already oriented
 		// correctly, since they have been derived from the axes).
-		ptOnOneEdge = TransformVector(Transform::ToMatrixGLM(oneTransform), ptOnOneEdge);
-		ptOnTwoEdge = TransformVector(Transform::ToMatrixGLM(twoTransform), ptOnTwoEdge);
+		ptOnOneEdge = TransformVector(Transform::ToMatrixDSY(oneTransform), ptOnOneEdge);
+		ptOnTwoEdge = TransformVector(Transform::ToMatrixDSY(twoTransform), ptOnTwoEdge);
 
 		// So we have a point and a direction for the colliding edges.
 		// We need to find out point of closest approach of the two
@@ -357,7 +355,7 @@ unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, const Transform
 	// Transform the centre of the sphere into box coordinates
 	Vector3 centre = Transform::GetAxisVector(sphereTransform, 3);
 
-	cyMatrix4 cyMatrix(Transform::ToMatrixGLMNoScale(boxTransform));
+	cyMatrix4 cyMatrix(Transform::ToMatrixDSYNoScale(boxTransform));
 	Vector3 relCentre = cyMatrix.transformInverse(centre);
 
 	float radius = sphere.radius * sphereTransform.scale.MaxComponent();
@@ -396,14 +394,7 @@ unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, const Transform
 	if (dist > radius * radius) return 0;
 
 	// Compile the contact
-	Vector3 closestPtWorld = TransformVector(Transform::ToMatrixGLMNoScale(boxTransform), closestPt);
-
-	/*Vector3 temp = glm::normalize(closestPtWorld - centre);
-	Vector3 temp2 = closestPtWorld - centre;
-	std::cout << "cptw | " << closestPtWorld.x << ", " << closestPtWorld.y << ", " << closestPtWorld.z << std::endl;
-	std::cout << "cntr | " << centre.x << ", " << centre.y << ", " << centre.z << std::endl;
-	std::cout << "tmp2 | " << temp2.x << ", " << temp2.y << ", " << temp2.z << std::endl;
-	std::cout << "temp | " << temp.x << ", " << temp.y << ", " << temp.z << std::endl;*/
+	Vector3 closestPtWorld = TransformVector(Transform::ToMatrixDSYNoScale(boxTransform), closestPt);
 
 	data.contactArray[data.currentContact].contactNormal = Normalize(closestPtWorld - centre);
 	data.contactArray[data.currentContact].contactPoint = closestPtWorld;

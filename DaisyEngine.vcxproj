@@ -147,7 +147,6 @@
     <ClCompile Include="Physics\IntersectionTests.cpp" />
     <ClCompile Include="Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
-    <ClCompile Include="Physics\BoxCollider.cpp" />
     <ClCompile Include="Physics\cycloneMath.cpp" />
     <ClCompile Include="Physics\PlaneCollider.cpp" />
     <ClCompile Include="Vendor\glad\glad.c" />

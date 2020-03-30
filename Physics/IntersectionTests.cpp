@@ -1,6 +1,4 @@
 #include "IntersectionTests.hpp"
-#include <glm/glm.hpp>
-
 
 bool IntersectionTests::SphereAndHalfSpace(const SphereCollider& sphere, const Transform& sphereTransform, const PlaneCollider& plane)
 {

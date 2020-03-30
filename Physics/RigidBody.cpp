@@ -145,8 +145,8 @@ void RigidBody::integrate(float duration)
 	rotation += angularAcceleration * duration;
 
 	// Impose drag.
-	velocity *= glm::pow(linearDamping, duration);
-	rotation *= glm::pow(angularDamping, duration);
+	velocity *= pow(linearDamping, duration);
+	rotation *= pow(angularDamping, duration);
 
 	//velocity = Vector3(); // TEMP
 
@@ -175,7 +175,7 @@ void RigidBody::integrate(float duration)
 	if (canSleep) {
 		float currentMotion = Vector3::Dot(velocity, velocity) + Vector3::Dot(rotation, rotation);
 
-		float bias = glm::pow(0.5, duration);
+		float bias = pow(0.5, duration);
 		motion = bias * motion + (1 - bias) * currentMotion;
 
 		if (motion < sleepEpsilon) setAwake(false);
@@ -185,7 +185,6 @@ void RigidBody::integrate(float duration)
 
 void RigidBody::setMass(const float mass)
 {
-	assert(mass != 0);
 	RigidBody::inverseMass = ((float)1.0) / mass;
 }
 

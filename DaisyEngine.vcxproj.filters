@@ -45,9 +45,6 @@
     <ClCompile Include="Physics\cycloneMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\BoxCollider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\SphereCollider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

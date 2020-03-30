@@ -4,9 +4,6 @@
 #include <string>
 #include <map>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include "../Core/Math/Matrix4x4.hpp"
 
 class Shader
@@ -19,7 +16,6 @@ public:
 	void SetFloat(std::string name, float value) const;
 	void SetVector3(std::string name, float x, float y, float z) const;
 	void SetVector4(std::string name, float x, float y, float z, float w) const;
-	void SetMatrix4x4(std::string name, glm::mat4 matrix) const;
 	void SetMatrix4x4(std::string name, Matrix4x4 matrix) const;
 	int GetTextureUnit(std::string name);
 	bool HasUniform(std::string name);

@@ -20,17 +20,17 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	{
 		auto entity = registry->create();
 		Quaternion rotation = Quaternion(1, 0, 0, 0);
-		registry->assign<Transform>(entity, Vector3(0.0f, 5.0f, -25.0f), Vector3(1, 1, 1), rotation);
+		registry->assign<Transform>(entity, Vector3(0.0f, 5.0f, -25.0f), Vector3::one, rotation);
 		registry->assign<Camera>(entity);
-		registry->assign<LuaBehaviour>(entity, "Resources/testing.lua");
+		registry->assign<LuaBehaviour>(entity, "Resources/FreeCam.lua");
 	}
 
 	{
 		auto entity = registry->create();
-		registry->assign<Transform>(entity, Vector3(0, 0, 0), Vector3(1, 1, 1), Quaternion(1,0,0,0));
+		registry->assign<Transform>(entity, Vector3::zero, Vector3::one, Quaternion::identity);
 		registry->assign<MeshRenderer>(entity, "GrayMat", "Resources/plane.obj");
 		PlaneCollider& collider = registry->assign<PlaneCollider>(entity);
-		collider.normal = Vector3(0, 1, 0);
+		collider.normal = Vector3::up;
 		collider.offset = 0;
 	}
 
@@ -42,12 +42,12 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Vector3 position = Vector3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
 		float diameter = rand() % 2 + 1.0f;
 		Vector3 scale (diameter, diameter, diameter);
-		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation = Normalize(rotation);
+		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
 		registry->assign<Transform>(entity, position, scale, rotation);
 		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/sphere.obj");
 
 		RigidBody& rb = registry->assign<RigidBody>(entity);
-		rb.setPosition(Vector3(position.x, position.y, position.z));
+		rb.setPosition(position);
 		rb.setOrientation(rotation);
 		rb.setVelocity(Vector3());
 		rb.setRotation(Vector3());
@@ -71,12 +71,12 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		auto entity = registry->create();
 		Vector3 position = Vector3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
 		Vector3 scale = Vector3(rand() % 8 + 1.0f, rand() % 2 + 1.0f, rand() % 2 + 1.0f);
-		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation = Normalize(rotation);
+		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
 		registry->assign<Transform>(entity, position, scale, rotation);
 		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/cube.obj");
 
 		RigidBody& rb = registry->assign<RigidBody>(entity);
-		rb.setPosition(Vector3(position.x, position.y, position.z));
+		rb.setPosition(position);
 		rb.setOrientation(rotation);
 		rb.setVelocity(Vector3());
 		rb.setRotation(Vector3());

@@ -176,13 +176,6 @@ void Shader::SetVector4(std::string name, float x, float y, float z, float w) co
 	glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), x, y, z, w);
 }
 
-void Shader::SetMatrix4x4(std::string name, glm::mat4 matrix) const
-{
-	glUseProgram(shaderProgramID);
-	unsigned int transformLoc = glGetUniformLocation(shaderProgramID, name.c_str());
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(matrix));
-}
-
 void Shader::SetMatrix4x4(std::string name, Matrix4x4 matrix) const
 {
 	glUseProgram(shaderProgramID);

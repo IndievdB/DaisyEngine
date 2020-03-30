@@ -1,5 +1,4 @@
 #include "ContactResolver.hpp"
-#include <glm/vec3.hpp>
 
 ContactResolver::ContactResolver(unsigned iterations, float velocityEpsilon, float positionEpsilon)
 {

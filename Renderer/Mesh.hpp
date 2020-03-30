@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <iostream>
 #include <vector>
 
@@ -10,6 +9,7 @@
 
 #include "../Core/Math/Vector2.hpp"
 #include "../Core/Math/Vector3.hpp"
+#include "../Core/Math/Matrix4x4.hpp"
 
 struct Vertex
 {
@@ -33,7 +33,7 @@ public:
 	uint32_t MaterialIndex;
 	uint32_t IndexCount;
 
-	glm::mat4 Transform;
+	Matrix4x4 Transform;
 };
 
 class Mesh

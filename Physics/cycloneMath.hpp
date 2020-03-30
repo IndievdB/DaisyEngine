@@ -1,25 +1,25 @@
 #pragma once
 
-#include <glm/vec3.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include "../Core/Math/Vector3.hpp"
 #include "../Core/Math/Quaternion.hpp"
 
-static Vector3 TransformVector(glm::mat4 matrix, Vector3 vector)
+#include "../Core/Math/Matrix4x4.hpp"
+
+static Vector3 TransformVector(Matrix4x4 matrix, Vector3 vector)
 {
 	return Vector3
 	(
-		vector.x * matrix[0][0] +
-		vector.y * matrix[1][0] +
-		vector.z * matrix[2][0] + matrix[3][0],
+		vector.x * matrix[0] +
+		vector.y * matrix[4] +
+		vector.z * matrix[8] + matrix[12],
 
-		vector.x * matrix[0][1] +
-		vector.y * matrix[1][1] +
-		vector.z * matrix[2][1] + matrix[3][1],
+		vector.x * matrix[1] +
+		vector.y * matrix[5] +
+		vector.z * matrix[9] + matrix[13],
 
-		vector.x * matrix[0][2] +
-		vector.y * matrix[1][2] +
-		vector.z * matrix[2][2] + matrix[3][2]
+		vector.x * matrix[2] +
+		vector.y * matrix[6] +
+		vector.z * matrix[10] + matrix[14]
 	);
 }
 
@@ -51,22 +51,22 @@ public:
 		data[0] = data[5] = data[10] = 1;
 	}
 
-	cyMatrix4(glm::mat4 glmMatrix)
+	cyMatrix4(Matrix4x4 dsyMatrix)
 	{
-		data[0] = glmMatrix[0][0];
-		data[1] = glmMatrix[1][0];
-		data[2] = glmMatrix[2][0];
-		data[3] = glmMatrix[3][0];
+		data[0] = dsyMatrix[0];
+		data[1] = dsyMatrix[4];
+		data[2] = dsyMatrix[8];
+		data[3] = dsyMatrix[12];
 
-		data[4] = glmMatrix[0][1];
-		data[5] = glmMatrix[1][1];
-		data[6] = glmMatrix[2][1];
-		data[7] = glmMatrix[3][1];
+		data[4] = dsyMatrix[1];
+		data[5] = dsyMatrix[5];
+		data[6] = dsyMatrix[9];
+		data[7] = dsyMatrix[13];
 
-		data[8] = glmMatrix[0][2];
-		data[9] = glmMatrix[1][2];
-		data[10] = glmMatrix[2][2];
-		data[11] = glmMatrix[3][2];
+		data[8] = dsyMatrix[2];
+		data[9] = dsyMatrix[6];
+		data[10] = dsyMatrix[10];
+		data[11] = dsyMatrix[14];
 	}
 
 	/*
