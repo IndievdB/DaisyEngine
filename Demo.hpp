@@ -36,7 +36,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	srand(time(NULL));
 	
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 15; i++)
 	{
 		auto entity = registry->create();
 		Vector3 position = Vector3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
@@ -65,7 +65,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	for (int i = 0; i < 5; i++)
 	{
 		auto entity = registry->create();
-		Vector3 position = Vector3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
+		Vector3 position = Vector3(rand() % 10 - 5, rand() % 5 + 15, rand() % 10 - 5);
 		Vector3 scale = Vector3(rand() % 8 + 1.0f, rand() % 2 + 1.0f, rand() % 2 + 1.0f);
 		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
 		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);

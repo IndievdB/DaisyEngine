@@ -4,6 +4,8 @@
 
 unsigned CollisionDetector::SphereAndHalfSpace(const SphereCollider& sphere, Transform& sphereTransform, RigidBody* sphereRigidBody, const PlaneCollider& plane, CollisionData& data)
 {
+	if (sphereRigidBody == nullptr) return 0;
+
 	// Make sure we have contacts
 	if (data.contactsLeft <= 0) return 0;
 
@@ -28,6 +30,8 @@ unsigned CollisionDetector::SphereAndHalfSpace(const SphereCollider& sphere, Tra
 
 unsigned CollisionDetector::SphereAndSphere(const SphereCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const SphereCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data)
 {
+	if (oneRigidBody == nullptr && twoRigidBody == nullptr) return 0;
+
 	// Make sure we have contacts
 	if (data.contactsLeft <= 0) return 0;
 
@@ -60,6 +64,8 @@ unsigned CollisionDetector::SphereAndSphere(const SphereCollider& one, Transform
 
 unsigned CollisionDetector::BoxAndHalfSpace(const BoxCollider& box, Transform& boxTransform, RigidBody* boxRigidBody, const PlaneCollider& plane, CollisionData& data)
 {
+	if (boxRigidBody == nullptr) return 0;
+
 	// Make sure we have contacts
 	if (data.contactsLeft <= 0) return 0;
 
@@ -228,6 +234,10 @@ static Vector3 contactPoint(Vector3 pOne, Vector3 dOne, float oneSize, Vector3 p
 
 unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const BoxCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data)
 {
+	if (oneRigidBody == nullptr && twoRigidBody == nullptr) return 0;
+
+	if (data.contactsLeft <= 0) return 0;
+
 	// Find the vector between the two centres
 	Vector3 toCentre = twoTransform.position - oneTransform.position;
 
@@ -341,6 +351,8 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTran
 
 unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, Transform& boxTransform, RigidBody* boxRigidBody, const SphereCollider& sphere, Transform& sphereTransform, RigidBody* sphereRigidBody, CollisionData& data)
 {
+	if (boxRigidBody == nullptr && sphereRigidBody == nullptr) return 0;
+
 	// Transform the centre of the sphere into box coordinates
 	Vector3 relCentre = Matrix4x4::AffineInverse(Matrix4x4::Transformation(boxTransform.position, boxTransform.rotation)).TransformPoint(sphereTransform.position);
 
