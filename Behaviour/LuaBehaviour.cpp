@@ -44,6 +44,10 @@ void RegisterAll(lua_State* L)
 		.addProperty("x", &Vector3::x)
 		.addProperty("y", &Vector3::y)
 		.addProperty("z", &Vector3::z)
+		.addFunction("__add", &Vector3::operator+=)
+		.addFunction("__sub", &Vector3::operator-=)
+		.addFunction("__mul", &Vector3::operator*=)
+		.addFunction("__unm", &Vector3::operator-)
 		.endClass();
 
 	getGlobalNamespace(L)
