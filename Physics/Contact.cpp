@@ -63,10 +63,7 @@ inline void Contact::calculateContactBasis()
 		contactTangent[1].z = contactNormal.x * contactTangent[0].y;
 	}
 
-	contactToWorld.setComponents(
-		contactNormal,
-		contactTangent[0],
-		contactTangent[1]);
+	contactToWorld.SetColumns(contactNormal,contactTangent[0],contactTangent[1]);
 }
 
 Vector3 Contact::calculateLocalVelocity(unsigned bodyIndex, float duration)
@@ -74,9 +71,9 @@ Vector3 Contact::calculateLocalVelocity(unsigned bodyIndex, float duration)
 	RigidBody* thisBody = body[bodyIndex];
 	Vector3 velocity = Vector3::Cross(thisBody->getRotation(), relativeContactPosition[bodyIndex]);
 	velocity += thisBody->getVelocity();
-	Vector3 contactVelocity = contactToWorld.transformTranspose(velocity);
+	Vector3 contactVelocity = Matrix3x3::Transpose(contactToWorld) * velocity; //contactToWorld.transformTranspose(velocity);
 	Vector3 accVelocity = thisBody->getLastFrameAcceleration() * duration;
-	accVelocity = contactToWorld.transformTranspose(accVelocity);
+	accVelocity = Matrix3x3::Transpose(contactToWorld) * accVelocity; //contactToWorld.transformTranspose(accVelocity);
 	accVelocity.x = 0;
 	contactVelocity += accVelocity;
 	return contactVelocity;
@@ -139,7 +136,7 @@ void Contact::applyVelocityChange(Vector3 velocityChange[2],
 {
 	// Get hold of the inverse mass and inverse inertia tensor, both in
 	// world coordinates.
-	cyMatrix3 inverseInertiaTensor[2];
+	Matrix3x3 inverseInertiaTensor[2];
 	body[0]->getInverseInertiaTensorWorld(inverseInertiaTensor[0]);
 	if (body[1])
 		body[1]->getInverseInertiaTensorWorld(inverseInertiaTensor[1]);
@@ -160,11 +157,11 @@ void Contact::applyVelocityChange(Vector3 velocityChange[2],
 	}
 
 	// Convert impulse to world coordinates
-	Vector3 impulse = contactToWorld.transform(impulseContact);
+	Vector3 impulse = contactToWorld * impulseContact; //contactToWorld.transform(impulseContact);
 
 	// Split in the impulse into linear and rotational components
 	Vector3 impulsiveTorque = Vector3::Cross(relativeContactPosition[0], impulse);
-	rotationChange[0] = inverseInertiaTensor[0].transform(impulsiveTorque);
+	rotationChange[0] = inverseInertiaTensor[0] * impulsiveTorque;
 	velocityChange[0] = Vector3();
 	velocityChange[0] += impulse * body[0]->getInverseMass();
 
@@ -176,7 +173,7 @@ void Contact::applyVelocityChange(Vector3 velocityChange[2],
 	{
 		// Work out body one's linear and angular changes
 		Vector3 impulsiveTorque = Vector3::Cross(impulse, relativeContactPosition[1]);
-		rotationChange[1] = inverseInertiaTensor[1].transform(impulsiveTorque);
+		rotationChange[1] = inverseInertiaTensor[1] * impulsiveTorque;
 		velocityChange[1] = Vector3();
 		velocityChange[1] += impulse * -body[1]->getInverseMass();
 
@@ -187,7 +184,7 @@ void Contact::applyVelocityChange(Vector3 velocityChange[2],
 }
 
 inline
-Vector3 Contact::calculateFrictionlessImpulse(cyMatrix3* inverseInertiaTensor)
+Vector3 Contact::calculateFrictionlessImpulse(Matrix3x3* inverseInertiaTensor)
 {
 	Vector3 impulseContact;
 
@@ -195,7 +192,7 @@ Vector3 Contact::calculateFrictionlessImpulse(cyMatrix3* inverseInertiaTensor)
 	// world space for a unit impulse in the direction of the contact
 	// normal.
 	Vector3 deltaVelWorld = Vector3::Cross(relativeContactPosition[0], contactNormal);
-	deltaVelWorld = inverseInertiaTensor[0].transform(deltaVelWorld);
+	deltaVelWorld = inverseInertiaTensor[0] * deltaVelWorld;
 	deltaVelWorld = Vector3::Cross(deltaVelWorld, relativeContactPosition[0]);
 
 	// Work out the change in velocity in contact coordiantes.
@@ -209,7 +206,7 @@ Vector3 Contact::calculateFrictionlessImpulse(cyMatrix3* inverseInertiaTensor)
 	{
 		// Go through the same transformation sequence again
 		Vector3 deltaVelWorld = Vector3::Cross(relativeContactPosition[1], contactNormal);
-		deltaVelWorld = inverseInertiaTensor[1].transform(deltaVelWorld);
+		deltaVelWorld = inverseInertiaTensor[1] * deltaVelWorld;
 		deltaVelWorld = Vector3::Cross(deltaVelWorld, relativeContactPosition[1]);
 
 		// Add the change in velocity due to rotation
@@ -227,7 +224,7 @@ Vector3 Contact::calculateFrictionlessImpulse(cyMatrix3* inverseInertiaTensor)
 }
 
 inline
-Vector3 Contact::calculateFrictionImpulse(cyMatrix3* inverseInertiaTensor)
+Vector3 Contact::calculateFrictionImpulse(Matrix3x3* inverseInertiaTensor)
 {
 	Vector3 impulseContact;
 	float inverseMass = body[0]->getInverseMass();
@@ -235,12 +232,13 @@ Vector3 Contact::calculateFrictionImpulse(cyMatrix3* inverseInertiaTensor)
 	// The equivalent of a cross product in matrices is multiplication
 	// by a skew symmetric cyMatrix - we build the cyMatrix for converting
 	// between linear and angular quantities.
-	cyMatrix3 impulseToTorque;
-	impulseToTorque.setSkewSymmetric(relativeContactPosition[0]);
+
+	Matrix3x3 impulseToTorque = Matrix3x3::SkewSymmetric(relativeContactPosition[0]);
+
 
 	// Build the cyMatrix to convert contact impulse to change in velocity
 	// in world coordinates.
-	cyMatrix3 deltaVelWorld = impulseToTorque;
+	Matrix3x3 deltaVelWorld = impulseToTorque;
 	deltaVelWorld *= inverseInertiaTensor[0];
 	deltaVelWorld *= impulseToTorque;
 	deltaVelWorld *= -1;
@@ -249,10 +247,10 @@ Vector3 Contact::calculateFrictionImpulse(cyMatrix3* inverseInertiaTensor)
 	if (body[1])
 	{
 		// Set the cross product cyMatrix
-		impulseToTorque.setSkewSymmetric(relativeContactPosition[1]);
+		impulseToTorque = Matrix3x3::SkewSymmetric(relativeContactPosition[1]);
 
 		// Calculate the velocity change cyMatrix
-		cyMatrix3 deltaVelWorld2 = impulseToTorque;
+		Matrix3x3 deltaVelWorld2 = impulseToTorque;
 		deltaVelWorld2 *= inverseInertiaTensor[1];
 		deltaVelWorld2 *= impulseToTorque;
 		deltaVelWorld2 *= -1;
@@ -265,30 +263,26 @@ Vector3 Contact::calculateFrictionImpulse(cyMatrix3* inverseInertiaTensor)
 	}
 
 	// Do a change of basis to convert into contact coordinates.
-	cyMatrix3 deltaVelocity = contactToWorld.transpose();
+	Matrix3x3 deltaVelocity = Matrix3x3::Transpose(contactToWorld);
 	deltaVelocity *= deltaVelWorld;
 	deltaVelocity *= contactToWorld;
 
 	// Add in the linear velocity change
-	deltaVelocity.data[0] += inverseMass;
-	deltaVelocity.data[4] += inverseMass;
-	deltaVelocity.data[8] += inverseMass;
+	deltaVelocity[0] += inverseMass;
+	deltaVelocity[4] += inverseMass;
+	deltaVelocity[8] += inverseMass;
 
 	// Invert to get the impulse needed per unit velocity
-	cyMatrix3 impulsecyMatrix = deltaVelocity.inverse();
+	Matrix3x3 impulsecyMatrix = Matrix3x3::Inverse(deltaVelocity);
 
 	// Find the target velocities to kill
-	Vector3 velKill(desiredDeltaVelocity,
-		-contactVelocity.y,
-		-contactVelocity.z);
+	Vector3 velKill(desiredDeltaVelocity, -contactVelocity.y, -contactVelocity.z);
 
 	// Find the impulse to kill target velocities
-	impulseContact = impulsecyMatrix.transform(velKill);
+	impulseContact = impulsecyMatrix * velKill;
 
 	// Check for exceeding friction
-	float planarImpulse = sqrt(
-		impulseContact.y * impulseContact.y +
-		impulseContact.z * impulseContact.z
+	float planarImpulse = sqrt( impulseContact.y * impulseContact.y + impulseContact.z * impulseContact.z
 	);
 	if (planarImpulse > impulseContact.x * friction)
 	{
@@ -296,9 +290,8 @@ Vector3 Contact::calculateFrictionImpulse(cyMatrix3* inverseInertiaTensor)
 		impulseContact.y /= planarImpulse;
 		impulseContact.z /= planarImpulse;
 
-		impulseContact.x = deltaVelocity.data[0] +
-			deltaVelocity.data[1] * friction * impulseContact.y +
-			deltaVelocity.data[2] * friction * impulseContact.z;
+		impulseContact.x = deltaVelocity[0] + deltaVelocity[3] * friction * impulseContact.y + deltaVelocity[6] * friction * impulseContact.z;
+
 		impulseContact.x = desiredDeltaVelocity / impulseContact.x;
 		impulseContact.y *= friction * impulseContact.x;
 		impulseContact.z *= friction * impulseContact.x;
@@ -322,7 +315,7 @@ void Contact::applyPositionChange(Vector3 linearChange[2],
 	// of the contact normal, due to angular inertia only.
 	for (unsigned i = 0; i < 2; i++) if (body[i])
 	{
-		cyMatrix3 inverseInertiaTensor;
+		Matrix3x3 inverseInertiaTensor;
 		body[i]->getInverseInertiaTensorWorld(inverseInertiaTensor);
 
 		// Use the same procedure as for calculating frictionless
@@ -330,7 +323,7 @@ void Contact::applyPositionChange(Vector3 linearChange[2],
 		Vector3 angularInertiaWorld =
 			Vector3::Cross(relativeContactPosition[i], contactNormal);
 		angularInertiaWorld =
-			inverseInertiaTensor.transform(angularInertiaWorld);
+			inverseInertiaTensor * angularInertiaWorld;
 		angularInertiaWorld =
 			Vector3::Cross(angularInertiaWorld, relativeContactPosition[i]);
 		angularInertia[i] = Vector3::Dot(angularInertiaWorld, contactNormal);
@@ -393,12 +386,12 @@ void Contact::applyPositionChange(Vector3 linearChange[2],
 			// Work out the direction we'd like to rotate in.
 			Vector3 targetAngularDirection = Vector3::Cross(relativeContactPosition[i], contactNormal);
 
-			cyMatrix3 inverseInertiaTensor;
+			Matrix3x3 inverseInertiaTensor;
 			body[i]->getInverseInertiaTensorWorld(inverseInertiaTensor);
 
 			// Work out the direction we'd need to rotate to achieve that
 			angularChange[i] =
-				inverseInertiaTensor.transform(targetAngularDirection) *
+				inverseInertiaTensor * targetAngularDirection *
 				(angularMove[i] / angularInertia[i]);
 		}
 

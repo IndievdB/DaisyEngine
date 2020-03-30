@@ -214,6 +214,13 @@ void Matrix3x3::SetColumns( const Vector3& col1, const Vector3& col2, const Vect
     mV[8] = col3.z;
 }
 
+void Matrix3x3::SetDiagonal(float a, float b, float c)
+{
+	mV[0] = a;
+	mV[4] = b;
+	mV[8] = c;
+}
+
 void Matrix3x3::SetRows( const Vector3& row1, const Vector3& row2, const Vector3& row3 )
 {
     mV[0] = row1.x;
@@ -456,6 +463,38 @@ Matrix3x3 Matrix3x3::Scaling( const Vector3& factors )
     result[8] = factors.z;
     
     return result;
+}
+
+Matrix3x3 Matrix3x3::SkewSymmetric(const Vector3& vector)
+{
+	Matrix3x3 result;
+
+	result[0] = result[4] = result[8] = 0;
+	result[1] = -vector.z;
+	result[2] = vector.y;
+	result[3] = vector.z;
+	result[5] = -vector.x;
+	result[6] = -vector.y;
+	result[7] = vector.x;
+
+	return result;
+}
+
+Matrix3x3 Matrix3x3::Transpose(const Matrix3x3& mat)
+{
+	Matrix3x3 result;
+
+	result[0] = mat[0];
+	result[1] = mat[3];
+	result[2] = mat[6];
+	result[3] = mat[1];
+	result[4] = mat[4];
+	result[5] = mat[7];
+	result[6] = mat[2];
+	result[7] = mat[5];
+	result[8] = mat[8];
+
+	return result;
 }
 
 // ========================================================================

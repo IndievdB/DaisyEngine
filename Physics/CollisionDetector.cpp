@@ -94,7 +94,7 @@ unsigned CollisionDetector::BoxAndHalfSpace(const BoxCollider& box, const Transf
 		//vertexPos = box.trans.transform(vertexPos);
 		
 
-		vertexPos = TransformVector(Transform::ToMatrixDSY(boxTransform), vertexPos);
+		vertexPos = Transform::ToMatrixDSY(boxTransform).TransformPoint(vertexPos);
 
 		// Calculate the distance from the plane
 		float vertexDistance = Vector3::Dot(vertexPos, plane.normal);
@@ -156,7 +156,7 @@ static inline bool tryAxis(const BoxCollider& one, const Transform& oneTransform
 {
 	// Make sure we have a normalized axis, and don't check almost parallel axes
 	if (axis.LengthSquared() < 0.0001) return true;
-	axis = Normalize(axis);
+	axis.Normalize();
 
 	float penetration = penetrationOnAxis(one, oneTransform, two, twoTransform, axis, toCentre);
 
@@ -190,7 +190,7 @@ static void fillPointFaceBoxBox(const BoxCollider& one, const Transform& oneTran
 	// Create the contact data
 	data.contactArray[data.currentContact].contactNormal = normal;
 	data.contactArray[data.currentContact].penetration = pen;
-	data.contactArray[data.currentContact].contactPoint = TransformVector(Transform::ToMatrixDSY(twoTransform), vertex);
+	data.contactArray[data.currentContact].contactPoint = Transform::ToMatrixDSY(twoTransform).TransformPoint(vertex);
 	data.contactArray[data.currentContact].setBodyData(oneRigidBody, twoRigidBody, data.friction, data.restitution);
 }
 
@@ -302,7 +302,7 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, const Transform& o
 		Vector3 oneAxis = Transform::GetAxisVector(oneTransform, oneAxisIndex);
 		Vector3 twoAxis = Transform::GetAxisVector(twoTransform, twoAxisIndex);
 		Vector3 axis = Vector3::Cross(oneAxis, twoAxis);
-		axis = Normalize(axis);
+		axis.Normalize();
 
 		// The axis should point from box one to box two.
 		if (Vector3::Dot(axis, toCentre) > 0) axis = axis * -1.0f;
@@ -326,8 +326,8 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, const Transform& o
 
 		// Move them into world coordinates (they are already oriented
 		// correctly, since they have been derived from the axes).
-		ptOnOneEdge = TransformVector(Transform::ToMatrixDSY(oneTransform), ptOnOneEdge);
-		ptOnTwoEdge = TransformVector(Transform::ToMatrixDSY(twoTransform), ptOnTwoEdge);
+		ptOnOneEdge = Transform::ToMatrixDSY(oneTransform).TransformPoint(ptOnOneEdge);
+		ptOnTwoEdge = Transform::ToMatrixDSY(twoTransform).TransformPoint(ptOnTwoEdge);
 
 		// So we have a point and a direction for the colliding edges.
 		// We need to find out point of closest approach of the two
@@ -355,8 +355,7 @@ unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, const Transform
 	// Transform the centre of the sphere into box coordinates
 	Vector3 centre = Transform::GetAxisVector(sphereTransform, 3);
 
-	cyMatrix4 cyMatrix(Transform::ToMatrixDSYNoScale(boxTransform));
-	Vector3 relCentre = cyMatrix.transformInverse(centre);
+	Vector3 relCentre = Matrix4x4::AffineInverse(Transform::ToMatrixDSYNoScale(boxTransform)).TransformPoint(centre);
 
 	float radius = sphere.radius * sphereTransform.scale.MaxComponent();
 	Vector3 boxHalfSize(box.halfSize.x * boxTransform.scale.x, box.halfSize.y * boxTransform.scale.y, box.halfSize.z * boxTransform.scale.z);
@@ -394,9 +393,9 @@ unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, const Transform
 	if (dist > radius * radius) return 0;
 
 	// Compile the contact
-	Vector3 closestPtWorld = TransformVector(Transform::ToMatrixDSYNoScale(boxTransform), closestPt);
+	Vector3 closestPtWorld = Transform::ToMatrixDSYNoScale(boxTransform).TransformPoint(closestPt);
 
-	data.contactArray[data.currentContact].contactNormal = Normalize(closestPtWorld - centre);
+	data.contactArray[data.currentContact].contactNormal = (closestPtWorld - centre).Normalized();
 	data.contactArray[data.currentContact].contactPoint = closestPtWorld;
 	data.contactArray[data.currentContact].penetration = radius - sqrt(dist);
 	data.contactArray[data.currentContact].setBodyData(boxRigidBody, sphereRigidBody, data.friction, data.restitution);

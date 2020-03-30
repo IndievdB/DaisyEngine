@@ -42,7 +42,7 @@ public:
     bool IsZero() const;
     void SetColumns( const Vector4& col1, const Vector4& col2, const Vector4& col3, const Vector4& col4 );
     void SetRows( const Vector4& row1, const Vector4& row2, const Vector4& row3, const Vector4& row4 );
-    Vector3 Transform( const Vector3& vector ) const;
+    Vector3 TransformVector( const Vector3& vector ) const;
     Vector3 TransformPoint( const Vector3& point ) const;
     Matrix4x4& Transpose();
 

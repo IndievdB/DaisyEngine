@@ -2,6 +2,7 @@
 
 #include "RigidBody.hpp"
 #include "../Core/Math/Vector3.hpp"
+#include "../Core/Math/Matrix3x3.hpp"
 
 class Contact
 {
@@ -19,7 +20,7 @@ public:
 
 //protected:
 
-	cyMatrix3 contactToWorld;
+	Matrix3x3 contactToWorld;
 	Vector3 contactVelocity;
 	float desiredDeltaVelocity;
 	Vector3 relativeContactPosition[2];
@@ -35,6 +36,6 @@ protected:
 	void applyImpulse(const Vector3& impulse, RigidBody& body, Vector3& velocityChange, Vector3& rotationChange);
 	void applyVelocityChange(Vector3 velocityChange[2], Vector3 rotationChange[2]);
 	void applyPositionChange(Vector3 linearChange[2], Vector3 angularChange[2], float penetration);
-	Vector3 calculateFrictionlessImpulse(cyMatrix3* inverseInertiaTensor);
-	Vector3 calculateFrictionImpulse(cyMatrix3* inverseInertiaTensor);
+	Vector3 calculateFrictionlessImpulse(Matrix3x3* inverseInertiaTensor);
+	Vector3 calculateFrictionImpulse(Matrix3x3* inverseInertiaTensor);
 };

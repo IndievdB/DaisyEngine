@@ -258,7 +258,7 @@ void Matrix4x4::SetRows( const Vector4& row1, const Vector4& row2, const Vector4
     mV[15] = row4.w;
 }
 
-Vector3 Matrix4x4::Transform( const Vector3& vector ) const
+Vector3 Matrix4x4::TransformVector( const Vector3& vector ) const
 {
     Vector3 result;
     

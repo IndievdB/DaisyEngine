@@ -147,7 +147,6 @@
     <ClCompile Include="Physics\IntersectionTests.cpp" />
     <ClCompile Include="Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
-    <ClCompile Include="Physics\cycloneMath.cpp" />
     <ClCompile Include="Physics\PlaneCollider.cpp" />
     <ClCompile Include="Vendor\glad\glad.c" />
     <ClCompile Include="Core\Input.cpp" />
@@ -203,7 +202,6 @@
     <ClInclude Include="Physics\BoxCollider.hpp" />
     <ClInclude Include="Core\Transform.hpp" />
     <ClInclude Include="Physics\CollisionData.hpp" />
-    <ClInclude Include="Physics\cycloneMath.hpp" />
     <ClInclude Include="Physics\PlaneCollider.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Vendor\entt\config\config.h" />

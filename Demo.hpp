@@ -53,8 +53,8 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		rb.setRotation(Vector3());
 		float radius = diameter * 0.5f;
 		float mass = 4.0f * 0.3333f * 3.1415f * radius * radius * radius; rb.setMass(mass);
-		cyMatrix3 tensor; float coeff = 0.4f * mass * radius * radius;
-		tensor.setInertiaTensorCoeffs(coeff, coeff, coeff); rb.setInertiaTensor(tensor);
+		Matrix3x3 tensor; float coeff = 0.4f * mass * radius * radius;
+		tensor.SetDiagonal(coeff, coeff, coeff); rb.setInertiaTensor(tensor);
 		rb.setLinearDamping(0.95f);
 		rb.setAngularDamping(0.8f);
 		rb.clearAccumulators();
@@ -82,7 +82,12 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		rb.setRotation(Vector3());
 		Vector3 halfSize = Vector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f);
 		float mass = halfSize.x * halfSize.y * halfSize.z * 8.0f; rb.setMass(mass);
-		cyMatrix3 tensor; tensor.setBlockInertiaTensor(halfSize, mass); rb.setInertiaTensor(tensor);
+
+		Matrix3x3 tensor;
+		Vector3 squares = Vector3(halfSize.x * halfSize.x, halfSize.y * halfSize.y, halfSize.z * halfSize.z);
+		tensor.SetDiagonal(0.3f * mass * (squares.y + squares.z), 0.3f * mass * (squares.x + squares.z), 0.3f * mass * (squares.x + squares.y));
+		rb.setInertiaTensor(tensor);
+
 		rb.setLinearDamping(0.95f);
 		rb.setAngularDamping(0.8f);
 		rb.clearAccumulators();

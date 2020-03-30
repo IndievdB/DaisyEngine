@@ -103,7 +103,7 @@ void ContactResolver::adjustVelocities(Contact* c, unsigned numContacts, float d
 
 						// The sign of the change is negative if we're dealing
 						// with the second body in a contact.
-						c[i].contactVelocity += c[i].contactToWorld.transformTranspose(deltaVel) * (b ? -1.0f : 1.0f);
+						c[i].contactVelocity += (Matrix3x3::Transpose(c[i].contactToWorld) * deltaVel) * (b ? -1.0f : 1.0f);
 						c[i].calculateDesiredDeltaVelocity(duration);
 					}
 				}

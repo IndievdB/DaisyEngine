@@ -4,118 +4,62 @@
 
 static float sleepEpsilon = 0.3f;
 
-static inline void _checkInverseInertiaTensor(const cyMatrix3& iitWorld)
+static inline void _checkInverseInertiaTensor(const Matrix3x3& iitWorld)
 {
 	// TODO: Perform a validity check in an assert.
 }
 
-bool madeContact = false;
-
-
-static inline void _transformInertiaTensor(cyMatrix3& iitWorld,
-	const Quaternion& q,
-	const cyMatrix3& iitBody,
-	const cyMatrix4& rotmat)
+static inline void _transformInertiaTensor(Matrix3x3& iitWorld, const Quaternion& q, const Matrix3x3& iitBody, const Matrix4x4& rotmat)
 {
-	float t4 = rotmat.data[0] * iitBody.data[0] +
-		rotmat.data[1] * iitBody.data[3] +
-		rotmat.data[2] * iitBody.data[6];
-	float t9 = rotmat.data[0] * iitBody.data[1] +
-		rotmat.data[1] * iitBody.data[4] +
-		rotmat.data[2] * iitBody.data[7];
-	float t14 = rotmat.data[0] * iitBody.data[2] +
-		rotmat.data[1] * iitBody.data[5] +
-		rotmat.data[2] * iitBody.data[8];
-	float t28 = rotmat.data[4] * iitBody.data[0] +
-		rotmat.data[5] * iitBody.data[3] +
-		rotmat.data[6] * iitBody.data[6];
-	float t33 = rotmat.data[4] * iitBody.data[1] +
-		rotmat.data[5] * iitBody.data[4] +
-		rotmat.data[6] * iitBody.data[7];
-	float t38 = rotmat.data[4] * iitBody.data[2] +
-		rotmat.data[5] * iitBody.data[5] +
-		rotmat.data[6] * iitBody.data[8];
-	float t52 = rotmat.data[8] * iitBody.data[0] +
-		rotmat.data[9] * iitBody.data[3] +
-		rotmat.data[10] * iitBody.data[6];
-	float t57 = rotmat.data[8] * iitBody.data[1] +
-		rotmat.data[9] * iitBody.data[4] +
-		rotmat.data[10] * iitBody.data[7];
-	float t62 = rotmat.data[8] * iitBody.data[2] +
-		rotmat.data[9] * iitBody.data[5] +
-		rotmat.data[10] * iitBody.data[8];
+	float t4 = rotmat[0] * iitBody[0] + rotmat[4] * iitBody[1] + rotmat[8] * iitBody[2];
+	float t9 = rotmat[0] * iitBody[3] + rotmat[4] * iitBody[4] + rotmat[8] * iitBody[5];
+	float t14 = rotmat[0] * iitBody[6] + rotmat[4] * iitBody[7] + rotmat[8] * iitBody[8];
+	float t28 = rotmat[1] * iitBody[0] + rotmat[5] * iitBody[1] + rotmat[9] * iitBody[2];
+	float t33 = rotmat[1] * iitBody[3] + rotmat[5] * iitBody[4] + rotmat[9] * iitBody[5];
+	float t38 = rotmat[1] * iitBody[6] + rotmat[5] * iitBody[7] + rotmat[9] * iitBody[8];
+	float t52 = rotmat[2] * iitBody[0] + rotmat[6] * iitBody[1] + rotmat[10] * iitBody[2];
+	float t57 = rotmat[2] * iitBody[3] + rotmat[6] * iitBody[4] + rotmat[10] * iitBody[5];
+	float t62 = rotmat[2] * iitBody[6] + rotmat[6] * iitBody[7] + rotmat[10] * iitBody[8];
 
-	iitWorld.data[0] = t4 * rotmat.data[0] +
-		t9 * rotmat.data[1] +
-		t14 * rotmat.data[2];
-	iitWorld.data[1] = t4 * rotmat.data[4] +
-		t9 * rotmat.data[5] +
-		t14 * rotmat.data[6];
-	iitWorld.data[2] = t4 * rotmat.data[8] +
-		t9 * rotmat.data[9] +
-		t14 * rotmat.data[10];
-	iitWorld.data[3] = t28 * rotmat.data[0] +
-		t33 * rotmat.data[1] +
-		t38 * rotmat.data[2];
-	iitWorld.data[4] = t28 * rotmat.data[4] +
-		t33 * rotmat.data[5] +
-		t38 * rotmat.data[6];
-	iitWorld.data[5] = t28 * rotmat.data[8] +
-		t33 * rotmat.data[9] +
-		t38 * rotmat.data[10];
-	iitWorld.data[6] = t52 * rotmat.data[0] +
-		t57 * rotmat.data[1] +
-		t62 * rotmat.data[2];
-	iitWorld.data[7] = t52 * rotmat.data[4] +
-		t57 * rotmat.data[5] +
-		t62 * rotmat.data[6];
-	iitWorld.data[8] = t52 * rotmat.data[8] +
-		t57 * rotmat.data[9] +
-		t62 * rotmat.data[10];
+	iitWorld[0] = t4 * rotmat[0] + t9 * rotmat[4] + t14 * rotmat[8];
+	iitWorld[3] = t4 * rotmat[1] + t9 * rotmat[5] + t14 * rotmat[9];
+	iitWorld[6] = t4 * rotmat[2] + t9 * rotmat[6] + t14 * rotmat[10];
+	iitWorld[1] = t28 * rotmat[0] + t33 * rotmat[4] + t38 * rotmat[8];
+	iitWorld[4] = t28 * rotmat[1] + t33 * rotmat[5] + t38 * rotmat[9];
+	iitWorld[7] = t28 * rotmat[2] + t33 * rotmat[6] + t38 * rotmat[10];
+	iitWorld[2] = t52 * rotmat[0] + t57 * rotmat[4] + t62 * rotmat[8];
+	iitWorld[5] = t52 * rotmat[1] + t57 * rotmat[5] + t62 * rotmat[9];
+	iitWorld[8] = t52 * rotmat[2] + t57 * rotmat[6] + t62 * rotmat[10];
 }
 
-static inline void _calculateTransformcyMatrix(cyMatrix4& transformcyMatrix,
-	const Vector3& position,
-	const Quaternion& orientation)
+static inline void _calculateTransformcyMatrix(Matrix4x4& transformcyMatrix, const Vector3& position, const Quaternion& orientation)
 {
-	transformcyMatrix.data[0] = 1 - 2 * orientation.y * orientation.y -
-		2 * orientation.z * orientation.z;
-	transformcyMatrix.data[1] = 2 * orientation.x * orientation.y -
-		2 * orientation.w * orientation.z;
-	transformcyMatrix.data[2] = 2 * orientation.x * orientation.z +
-		2 * orientation.w * orientation.y;
-	transformcyMatrix.data[3] = position.x;
+	transformcyMatrix[0] = 1 - 2 * orientation.y * orientation.y - 2 * orientation.z * orientation.z;
+	transformcyMatrix[4] = 2 * orientation.x * orientation.y - 2 * orientation.w * orientation.z;
+	transformcyMatrix[8] = 2 * orientation.x * orientation.z + 2 * orientation.w * orientation.y;
+	transformcyMatrix[12] = position.x;
 
-	transformcyMatrix.data[4] = 2 * orientation.x * orientation.y +
-		2 * orientation.w * orientation.z;
-	transformcyMatrix.data[5] = 1 - 2 * orientation.x * orientation.x -
-		2 * orientation.z * orientation.z;
-	transformcyMatrix.data[6] = 2 * orientation.y * orientation.z -
-		2 * orientation.w * orientation.x;
-	transformcyMatrix.data[7] = position.y;
+	transformcyMatrix[1] = 2 * orientation.x * orientation.y + 2 * orientation.w * orientation.z;
+	transformcyMatrix[5] = 1 - 2 * orientation.x * orientation.x - 2 * orientation.z * orientation.z;
+	transformcyMatrix[9] = 2 * orientation.y * orientation.z - 2 * orientation.w * orientation.x;
+	transformcyMatrix[13] = position.y;
 
-	transformcyMatrix.data[8] = 2 * orientation.x * orientation.z -
-		2 * orientation.w * orientation.y;
-	transformcyMatrix.data[9] = 2 * orientation.y * orientation.z +
-		2 * orientation.w * orientation.x;
-	transformcyMatrix.data[10] = 1 - 2 * orientation.x * orientation.x -
-		2 * orientation.y * orientation.y;
-	transformcyMatrix.data[11] = position.z;
+	transformcyMatrix[2] = 2 * orientation.x * orientation.z - 2 * orientation.w * orientation.y;
+	transformcyMatrix[6] = 2 * orientation.y * orientation.z + 2 * orientation.w * orientation.x;
+	transformcyMatrix[10] = 1 - 2 * orientation.x * orientation.x - 2 * orientation.y * orientation.y;
+	transformcyMatrix[14] = position.z;
 }
 
 
 void RigidBody::calculateDerivedData()
 {
-	orientation = Normalize(orientation);
+	orientation.Normalize();
 
 	// Calculate the transform cyMatrix for the body.
 	_calculateTransformcyMatrix(transformcyMatrix, position, orientation);
 
 	// Calculate the inertiaTensor in world space.
-	_transformInertiaTensor(inverseInertiaTensorWorld,
-		orientation,
-		inverseInertiaTensor,
-		transformcyMatrix);
+	_transformInertiaTensor(inverseInertiaTensorWorld, orientation, inverseInertiaTensor, transformcyMatrix);
 
 }
 
@@ -123,19 +67,13 @@ void RigidBody::integrate(float duration)
 {
 	if (!isAwake) return;
 
-	if (madeContact)
-	{
-        //PrintVec3(rotation);
-		//std::cout << "here" << std::endl;
-	}
-
 	// Calculate linear acceleration from force inputs.
 	lastFrameAcceleration = acceleration;
 	//lastFrameAcceleration.addScaledVector(forceAccum, inverseMass);
 	lastFrameAcceleration += forceAccum * inverseMass;
 
 	// Calculate angular acceleration from torque inputs.
-	Vector3 angularAcceleration = inverseInertiaTensorWorld.transform(torqueAccum);
+	Vector3 angularAcceleration = inverseInertiaTensorWorld * torqueAccum;
 
 	// Adjust velocities
 	// Update linear velocity from both acceleration and impulse.
@@ -213,58 +151,58 @@ bool RigidBody::hasFiniteMass() const
 	return inverseMass >= 0.0f;
 }
 
-void RigidBody::setInertiaTensor(const cyMatrix3& inertiaTensor)
+void RigidBody::setInertiaTensor(const Matrix3x3& inertiaTensor)
 {
-	inverseInertiaTensor.setInverse(inertiaTensor);
+	inverseInertiaTensor = Matrix3x3::Inverse(inertiaTensor);
 	_checkInverseInertiaTensor(inverseInertiaTensor);
 }
 
-void RigidBody::getInertiaTensor(cyMatrix3& inertiaTensor) const
+void RigidBody::getInertiaTensor(Matrix3x3& inertiaTensor) const
 {
-	inertiaTensor.setInverse(inverseInertiaTensor);
+	inertiaTensor= Matrix3x3::Inverse(inverseInertiaTensor);
 }
 
-cyMatrix3 RigidBody::getInertiaTensor() const
+Matrix3x3 RigidBody::getInertiaTensor() const
 {
-	cyMatrix3 it;
+	Matrix3x3 it;
 	getInertiaTensor(it);
 	return it;
 }
 
-void RigidBody::getInertiaTensorWorld(cyMatrix3& inertiaTensor) const
+void RigidBody::getInertiaTensorWorld(Matrix3x3& inertiaTensor) const
 {
-	inertiaTensor.setInverse(inverseInertiaTensorWorld);
+	inertiaTensor = Matrix3x3::Inverse(inverseInertiaTensorWorld);
 }
 
-cyMatrix3 RigidBody::getInertiaTensorWorld() const
+Matrix3x3 RigidBody::getInertiaTensorWorld() const
 {
-	cyMatrix3 it;
+	Matrix3x3 it;
 	getInertiaTensorWorld(it);
 	return it;
 }
 
-void RigidBody::setInverseInertiaTensor(const cyMatrix3& inverseInertiaTensor)
+void RigidBody::setInverseInertiaTensor(const Matrix3x3& inverseInertiaTensor)
 {
 	_checkInverseInertiaTensor(inverseInertiaTensor);
 	RigidBody::inverseInertiaTensor = inverseInertiaTensor;
 }
 
-void RigidBody::getInverseInertiaTensor(cyMatrix3& inverseInertiaTensor) const
+void RigidBody::getInverseInertiaTensor(Matrix3x3& inverseInertiaTensor) const
 {
 	inverseInertiaTensor = RigidBody::inverseInertiaTensor;
 }
 
-cyMatrix3 RigidBody::getInverseInertiaTensor() const
+Matrix3x3 RigidBody::getInverseInertiaTensor() const
 {
 	return inverseInertiaTensor;
 }
 
-void RigidBody::getInverseInertiaTensorWorld(cyMatrix3& inverseInertiaTensor) const
+void RigidBody::getInverseInertiaTensorWorld(Matrix3x3& inverseInertiaTensor) const
 {
 	inverseInertiaTensor = inverseInertiaTensorWorld;
 }
 
-cyMatrix3 RigidBody::getInverseInertiaTensorWorld() const
+Matrix3x3 RigidBody::getInverseInertiaTensorWorld() const
 {
 	return inverseInertiaTensorWorld;
 }
@@ -313,8 +251,7 @@ Vector3 RigidBody::getPosition() const
 
 void RigidBody::setOrientation(const Quaternion& orientation)
 {
-	RigidBody::orientation = orientation;
-	RigidBody::orientation = Normalize(RigidBody::orientation);
+	RigidBody::orientation = orientation.Normalized();
 }
 
 void RigidBody::setOrientation(const float r, const float i,
@@ -324,7 +261,7 @@ void RigidBody::setOrientation(const float r, const float i,
 	orientation.x = i;
 	orientation.y = j;
 	orientation.z = k;
-	orientation = Normalize(orientation);
+	orientation.Normalize();
 }
 
 void RigidBody::getOrientation(Quaternion& orientation) const
@@ -337,87 +274,66 @@ Quaternion RigidBody::getOrientation() const
 	return orientation;
 }
 
-void RigidBody::getOrientation(cyMatrix3& cyMatrix) const
+
+void RigidBody::getTransform(Matrix4x4& transform) const
 {
-	getOrientation(cyMatrix.data);
+	memcpy(transform.mV, transformcyMatrix.mV, sizeof(Matrix4x4));
 }
 
-void RigidBody::getOrientation(float cyMatrix[9]) const
+void RigidBody::getTransform(float matrixValues[16]) const
 {
-	cyMatrix[0] = transformcyMatrix.data[0];
-	cyMatrix[1] = transformcyMatrix.data[1];
-	cyMatrix[2] = transformcyMatrix.data[2];
-
-	cyMatrix[3] = transformcyMatrix.data[4];
-	cyMatrix[4] = transformcyMatrix.data[5];
-	cyMatrix[5] = transformcyMatrix.data[6];
-
-	cyMatrix[6] = transformcyMatrix.data[8];
-	cyMatrix[7] = transformcyMatrix.data[9];
-	cyMatrix[8] = transformcyMatrix.data[10];
+	memcpy(matrixValues, transformcyMatrix.mV, sizeof(float) * 12);
+	matrixValues[3] = matrixValues[7] = matrixValues[11] = 0;
+	matrixValues[15] = 1;
 }
 
-void RigidBody::getTransform(cyMatrix4& transform) const
+void RigidBody::getGLTransform(float matrixValues[16]) const
 {
-	memcpy(transform.data, transformcyMatrix.data, sizeof(cyMatrix4));
+	matrixValues[0] = (float)transformcyMatrix[0];
+	matrixValues[4] = (float)transformcyMatrix[1];
+	matrixValues[8] = (float)transformcyMatrix[2];
+	matrixValues[12] = 0;
+
+	matrixValues[1] = (float)transformcyMatrix[4];
+	matrixValues[5] = (float)transformcyMatrix[5];
+	matrixValues[9] = (float)transformcyMatrix[6];
+	matrixValues[13] = 0;
+
+	matrixValues[2] = (float)transformcyMatrix[8];
+	matrixValues[6] = (float)transformcyMatrix[9];
+	matrixValues[10] = (float)transformcyMatrix[10];
+	matrixValues[14] = 0;
+
+	matrixValues[3] = (float)transformcyMatrix[12];
+	matrixValues[7] = (float)transformcyMatrix[13];
+	matrixValues[11] = (float)transformcyMatrix[14];
+	matrixValues[15] = 1;
 }
 
-void RigidBody::getTransform(float cyMatrix[16]) const
-{
-	memcpy(cyMatrix, transformcyMatrix.data, sizeof(float) * 12);
-	cyMatrix[12] = cyMatrix[13] = cyMatrix[14] = 0;
-	cyMatrix[15] = 1;
-}
-
-void RigidBody::getGLTransform(float cyMatrix[16]) const
-{
-	cyMatrix[0] = (float)transformcyMatrix.data[0];
-	cyMatrix[1] = (float)transformcyMatrix.data[4];
-	cyMatrix[2] = (float)transformcyMatrix.data[8];
-	cyMatrix[3] = 0;
-
-	cyMatrix[4] = (float)transformcyMatrix.data[1];
-	cyMatrix[5] = (float)transformcyMatrix.data[5];
-	cyMatrix[6] = (float)transformcyMatrix.data[9];
-	cyMatrix[7] = 0;
-
-	cyMatrix[8] = (float)transformcyMatrix.data[2];
-	cyMatrix[9] = (float)transformcyMatrix.data[6];
-	cyMatrix[10] = (float)transformcyMatrix.data[10];
-	cyMatrix[11] = 0;
-
-	cyMatrix[12] = (float)transformcyMatrix.data[3];
-	cyMatrix[13] = (float)transformcyMatrix.data[7];
-	cyMatrix[14] = (float)transformcyMatrix.data[11];
-	cyMatrix[15] = 1;
-}
-
-cyMatrix4 RigidBody::getTransform() const
+Matrix4x4 RigidBody::getTransform() const
 {
 	return transformcyMatrix;
 }
 
-
 Vector3 RigidBody::getPointInLocalSpace(const Vector3& point) const
 {
-	return transformcyMatrix.transformInverse(point);
+	return Matrix4x4::AffineInverse(transformcyMatrix).TransformPoint(point);
 }
 
 Vector3 RigidBody::getPointInWorldSpace(const Vector3& point) const
 {
-	return transformcyMatrix.transform(point);
+	return transformcyMatrix.TransformPoint(point);
 }
 
 Vector3 RigidBody::getDirectionInLocalSpace(const Vector3& direction) const
 {
-	return transformcyMatrix.transformInverseDirection(direction);
+	return Matrix4x4::AffineInverse(transformcyMatrix).TransformVector(direction);
 }
 
 Vector3 RigidBody::getDirectionInWorldSpace(const Vector3& direction) const
 {
-	return transformcyMatrix.transformDirection(direction);
+	return transformcyMatrix.TransformVector(direction);
 }
-
 
 void RigidBody::setVelocity(const Vector3& velocity)
 {
@@ -471,8 +387,6 @@ Vector3 RigidBody::getRotation() const
 void RigidBody::addRotation(const Vector3& deltaRotation)
 {
 	rotation += deltaRotation;
-
-	madeContact = true;
 }
 
 void RigidBody::setAwake(const bool awake)

@@ -40,6 +40,7 @@ public:
     bool IsIdentity() const;
     bool IsZero() const;
     void SetColumns( const Vector3& col1, const Vector3& col2, const Vector3& col3 );
+	void SetDiagonal(float a, float b, float c);
     void SetRows( const Vector3& row1, const Vector3& row2, const Vector3& row3 );
     float Trace() const;
     Matrix3x3& Transpose();
@@ -55,7 +56,9 @@ public:
     static Matrix3x3 RotationX( float angle );
     static Matrix3x3 RotationY( float angle );
     static Matrix3x3 RotationZ( float angle );
-    static Matrix3x3 Scaling( const Vector3& factors );
+	static Matrix3x3 Scaling( const Vector3& factors );
+	static Matrix3x3 SkewSymmetric( const Vector3& vector );
+	static Matrix3x3 Transpose(const Matrix3x3& mat);
     
     // ========================================================================
     // FRIEND OPERATORS

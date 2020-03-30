@@ -1,24 +1,27 @@
 #pragma once
 
-#include "cycloneMath.hpp"
+#include "../Core/Math/Vector3.hpp"
+#include "../Core/Math/Quaternion.hpp"
+#include "../Core/Math/Matrix3x3.hpp"
+#include "../Core/Math/Matrix4x4.hpp"
 
 class RigidBody
 {
 protected:
 
 	float inverseMass;
-	cyMatrix3 inverseInertiaTensor;
+	Matrix3x3 inverseInertiaTensor;
 	float linearDamping;
 	float angularDamping;
 	Vector3 position;
 	Quaternion orientation;
 	Vector3 velocity;
 	Vector3 rotation;
-	cyMatrix3 inverseInertiaTensorWorld;
+	Matrix3x3 inverseInertiaTensorWorld;
 	float motion;
 	bool isAwake;
 	bool canSleep;
-	cyMatrix4 transformcyMatrix;
+	Matrix4x4 transformcyMatrix;
 	Vector3 forceAccum;
 	Vector3 torqueAccum;
 	Vector3 acceleration;
@@ -33,16 +36,16 @@ public:
 	void setInverseMass(const float inverseMass);
 	float getInverseMass() const;
 	bool hasFiniteMass() const;
-	void setInertiaTensor(const cyMatrix3& inertiaTensor);
-	void getInertiaTensor(cyMatrix3& inertiaTensor) const;
-	cyMatrix3 getInertiaTensor() const;
-	void getInertiaTensorWorld(cyMatrix3& inertiaTensor) const;
-	cyMatrix3 getInertiaTensorWorld() const;
-	void setInverseInertiaTensor(const cyMatrix3& inverseInertiaTensor);
-	void getInverseInertiaTensor(cyMatrix3& inverseInertiaTensor) const;
-	cyMatrix3 getInverseInertiaTensor() const;
-	void getInverseInertiaTensorWorld(cyMatrix3& inverseInertiaTensor) const;
-	cyMatrix3 getInverseInertiaTensorWorld() const;
+	void setInertiaTensor(const Matrix3x3& inertiaTensor);
+	void getInertiaTensor(Matrix3x3& inertiaTensor) const;
+	Matrix3x3 getInertiaTensor() const;
+	void getInertiaTensorWorld(Matrix3x3& inertiaTensor) const;
+	Matrix3x3 getInertiaTensorWorld() const;
+	void setInverseInertiaTensor(const Matrix3x3& inverseInertiaTensor);
+	void getInverseInertiaTensor(Matrix3x3& inverseInertiaTensor) const;
+	Matrix3x3 getInverseInertiaTensor() const;
+	void getInverseInertiaTensorWorld(Matrix3x3& inverseInertiaTensor) const;
+	Matrix3x3 getInverseInertiaTensorWorld() const;
 	void setDamping(const float linearDamping, const float angularDamping);
 	void setLinearDamping(const float linearDamping);
 	float getLinearDamping() const;
@@ -55,12 +58,10 @@ public:
 	void setOrientation(const float r, const float i, const float j, const float k);
 	void getOrientation(Quaternion& orientation) const;
 	Quaternion getOrientation() const;
-	void getOrientation(cyMatrix3& cyMatrix) const;
-	void getOrientation(float cyMatrix[9]) const;
-	void getTransform(cyMatrix4& transform) const;
+	void getTransform(Matrix4x4& transform) const;
 	void getTransform(float cyMatrix[16]) const;
 	void getGLTransform(float cyMatrix[16]) const;
-	cyMatrix4 getTransform() const;
+	Matrix4x4 getTransform() const;
 	Vector3 getPointInLocalSpace(const Vector3& point) const;
 	Vector3 getPointInWorldSpace(const Vector3& point) const;
 	Vector3 getDirectionInLocalSpace(const Vector3& direction) const;
