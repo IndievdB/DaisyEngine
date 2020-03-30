@@ -1,10 +1,10 @@
 #pragma once
 
-#include<glm/vec3.hpp>
+#include "../Core/Math/Vector3.hpp"
 
 class PlaneCollider
 {
 public:
-	glm::vec3 normal;
+	Vector3 normal;
 	float offset;
 };

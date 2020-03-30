@@ -4,8 +4,8 @@
 
 Input* Input::s_Instance;
 GLFWwindow* Input::activeWindow;
-glm::vec2 Input::mousePosition;
-glm::vec2 Input::prevMousePosition;
+Vector2 Input::mousePosition;
+Vector2 Input::prevMousePosition;
 float Input::scrollDelta;
 float Input::deltaTime = -1;
 float Input::previousTime;
@@ -278,15 +278,15 @@ void SetCursorPosCallback(GLFWwindow* window, double x, double y)
 
 void Input::RegisterSetCursorPosCallback(double x, double y)
 {
-	Input::mousePosition = glm::vec2(x, y);
+	Input::mousePosition = Vector2(x, y);
 }
 
-glm::vec2 Input::GetMousePositionDelta()
+Vector2 Input::GetMousePositionDelta()
 {
 	return mousePosition - prevMousePosition;
 }
 
-glm::vec2 Input::GetMousePosition()
+Vector2 Input::GetMousePosition()
 {
 	return mousePosition;
 }

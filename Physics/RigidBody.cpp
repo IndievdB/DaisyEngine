@@ -13,7 +13,7 @@ bool madeContact = false;
 
 
 static inline void _transformInertiaTensor(cyMatrix3& iitWorld,
-	const glm::quat& q,
+	const Quaternion& q,
 	const cyMatrix3& iitBody,
 	const cyMatrix4& rotmat)
 {
@@ -75,8 +75,8 @@ static inline void _transformInertiaTensor(cyMatrix3& iitWorld,
 }
 
 static inline void _calculateTransformcyMatrix(cyMatrix4& transformcyMatrix,
-	const glm::vec3& position,
-	const glm::quat& orientation)
+	const Vector3& position,
+	const Quaternion& orientation)
 {
 	transformcyMatrix.data[0] = 1 - 2 * orientation.y * orientation.y -
 		2 * orientation.z * orientation.z;
@@ -135,7 +135,7 @@ void RigidBody::integrate(float duration)
 	lastFrameAcceleration += forceAccum * inverseMass;
 
 	// Calculate angular acceleration from torque inputs.
-	glm::vec3 angularAcceleration = inverseInertiaTensorWorld.transform(torqueAccum);
+	Vector3 angularAcceleration = inverseInertiaTensorWorld.transform(torqueAccum);
 
 	// Adjust velocities
 	// Update linear velocity from both acceleration and impulse.
@@ -148,7 +148,7 @@ void RigidBody::integrate(float duration)
 	velocity *= glm::pow(linearDamping, duration);
 	rotation *= glm::pow(angularDamping, duration);
 
-	//velocity = glm::vec3(); // TEMP
+	//velocity = Vector3(); // TEMP
 
 	// Adjust positions
 	// Update linear position.
@@ -156,7 +156,7 @@ void RigidBody::integrate(float duration)
 
 	// Update angular position.
 	//orientation.addScaledVector(rotation, duration);
-	glm::quat q(0, rotation.x* duration, rotation.y*duration, rotation.z*duration);
+	Quaternion q(0, rotation.x* duration, rotation.y*duration, rotation.z*duration);
 	q *= orientation;
 	orientation.w += q.w * 0.5f;
 	orientation.x += q.x * 0.5f;
@@ -173,7 +173,7 @@ void RigidBody::integrate(float duration)
 	// Update the kinetic energy store, and possibly put the body to
 	// sleep.
 	if (canSleep) {
-		float currentMotion = glm::dot(velocity, velocity) + glm::dot(rotation, rotation);
+		float currentMotion = Vector3::Dot(velocity, velocity) + Vector3::Dot(rotation, rotation);
 
 		float bias = glm::pow(0.5, duration);
 		motion = bias * motion + (1 - bias) * currentMotion;
@@ -297,22 +297,22 @@ float RigidBody::getAngularDamping() const
 	return angularDamping;
 }
 
-void RigidBody::setPosition(const glm::vec3& position)
+void RigidBody::setPosition(const Vector3& position)
 {
 	RigidBody::position = position;
 }
 
-void RigidBody::getPosition(glm::vec3& position) const
+void RigidBody::getPosition(Vector3& position) const
 {
 	position = RigidBody::position;
 }
 
-glm::vec3 RigidBody::getPosition() const
+Vector3 RigidBody::getPosition() const
 {
 	return position;
 }
 
-void RigidBody::setOrientation(const glm::quat& orientation)
+void RigidBody::setOrientation(const Quaternion& orientation)
 {
 	RigidBody::orientation = orientation;
 	RigidBody::orientation = Normalize(RigidBody::orientation);
@@ -328,12 +328,12 @@ void RigidBody::setOrientation(const float r, const float i,
 	orientation = Normalize(orientation);
 }
 
-void RigidBody::getOrientation(glm::quat& orientation) const
+void RigidBody::getOrientation(Quaternion& orientation) const
 {
 	orientation = RigidBody::orientation;
 }
 
-glm::quat RigidBody::getOrientation() const
+Quaternion RigidBody::getOrientation() const
 {
 	return orientation;
 }
@@ -399,28 +399,28 @@ cyMatrix4 RigidBody::getTransform() const
 }
 
 
-glm::vec3 RigidBody::getPointInLocalSpace(const glm::vec3& point) const
+Vector3 RigidBody::getPointInLocalSpace(const Vector3& point) const
 {
 	return transformcyMatrix.transformInverse(point);
 }
 
-glm::vec3 RigidBody::getPointInWorldSpace(const glm::vec3& point) const
+Vector3 RigidBody::getPointInWorldSpace(const Vector3& point) const
 {
 	return transformcyMatrix.transform(point);
 }
 
-glm::vec3 RigidBody::getDirectionInLocalSpace(const glm::vec3& direction) const
+Vector3 RigidBody::getDirectionInLocalSpace(const Vector3& direction) const
 {
 	return transformcyMatrix.transformInverseDirection(direction);
 }
 
-glm::vec3 RigidBody::getDirectionInWorldSpace(const glm::vec3& direction) const
+Vector3 RigidBody::getDirectionInWorldSpace(const Vector3& direction) const
 {
 	return transformcyMatrix.transformDirection(direction);
 }
 
 
-void RigidBody::setVelocity(const glm::vec3& velocity)
+void RigidBody::setVelocity(const Vector3& velocity)
 {
 	RigidBody::velocity = velocity;
 }
@@ -432,22 +432,22 @@ void RigidBody::setVelocity(const float x, const float y, const float z)
 	velocity.z = z;
 }
 
-void RigidBody::getVelocity(glm::vec3& velocity) const
+void RigidBody::getVelocity(Vector3& velocity) const
 {
 	velocity = RigidBody::velocity;
 }
 
-glm::vec3 RigidBody::getVelocity() const
+Vector3 RigidBody::getVelocity() const
 {
 	return velocity;
 }
 
-void RigidBody::addVelocity(const glm::vec3& deltaVelocity)
+void RigidBody::addVelocity(const Vector3& deltaVelocity)
 {
 	velocity += deltaVelocity;
 }
 
-void RigidBody::setRotation(const glm::vec3& rotation)
+void RigidBody::setRotation(const Vector3& rotation)
 {
 	RigidBody::rotation = rotation;
 }
@@ -459,17 +459,17 @@ void RigidBody::setRotation(const float x, const float y, const float z)
 	rotation.z = z;
 }
 
-void RigidBody::getRotation(glm::vec3& rotation) const
+void RigidBody::getRotation(Vector3& rotation) const
 {
 	rotation = RigidBody::rotation;
 }
 
-glm::vec3 RigidBody::getRotation() const
+Vector3 RigidBody::getRotation() const
 {
 	return rotation;
 }
 
-void RigidBody::addRotation(const glm::vec3& deltaRotation)
+void RigidBody::addRotation(const Vector3& deltaRotation)
 {
 	rotation += deltaRotation;
 
@@ -486,8 +486,8 @@ void RigidBody::setAwake(const bool awake)
 	}
 	else {
 		isAwake = false;
-		velocity = glm::vec3();
-		rotation = glm::vec3();
+		velocity = Vector3();
+		rotation = Vector3();
 	}
 }
 
@@ -499,56 +499,56 @@ void RigidBody::setCanSleep(const bool canSleep)
 }
 
 
-void RigidBody::getLastFrameAcceleration(glm::vec3& acceleration) const
+void RigidBody::getLastFrameAcceleration(Vector3& acceleration) const
 {
 	acceleration = lastFrameAcceleration;
 }
 
-glm::vec3 RigidBody::getLastFrameAcceleration() const
+Vector3 RigidBody::getLastFrameAcceleration() const
 {
 	return lastFrameAcceleration;
 }
 
 void RigidBody::clearAccumulators()
 {
-	forceAccum = glm::vec3();
-	torqueAccum = glm::vec3();
+	forceAccum = Vector3();
+	torqueAccum = Vector3();
 }
 
-void RigidBody::addForce(const glm::vec3& force)
+void RigidBody::addForce(const Vector3& force)
 {
 	forceAccum += force;
 	isAwake = true;
 }
 
-void RigidBody::addForceAtBodyPoint(const glm::vec3& force,
-	const glm::vec3& point)
+void RigidBody::addForceAtBodyPoint(const Vector3& force,
+	const Vector3& point)
 {
 	// Convert to coordinates relative to center of mass.
-	glm::vec3 pt = getPointInWorldSpace(point);
+	Vector3 pt = getPointInWorldSpace(point);
 	addForceAtPoint(force, pt);
 
 }
 
-void RigidBody::addForceAtPoint(const glm::vec3& force, const glm::vec3& point)
+void RigidBody::addForceAtPoint(const Vector3& force, const Vector3& point)
 {
 	// Convert to coordinates relative to center of mass.
-	glm::vec3 pt = point;
+	Vector3 pt = point;
 	pt -= position;
 
 	forceAccum += force;
-	torqueAccum += glm::vec3(pt.y * force.z - pt.z * force.y, pt.z * force.x - pt.x * force.z, pt.x * force.y - pt.y * force.x);
+	torqueAccum += Vector3(pt.y * force.z - pt.z * force.y, pt.z * force.x - pt.x * force.z, pt.x * force.y - pt.y * force.x);
 
 	isAwake = true;
 }
 
-void RigidBody::addTorque(const glm::vec3& torque)
+void RigidBody::addTorque(const Vector3& torque)
 {
 	torqueAccum += torque;
 	isAwake = true;
 }
 
-void RigidBody::setAcceleration(const glm::vec3& acceleration)
+void RigidBody::setAcceleration(const Vector3& acceleration)
 {
 	RigidBody::acceleration = acceleration;
 }
@@ -560,12 +560,12 @@ void RigidBody::setAcceleration(const float x, const float y, const float z)
 	acceleration.z = z;
 }
 
-void RigidBody::getAcceleration(glm::vec3& acceleration) const
+void RigidBody::getAcceleration(Vector3& acceleration) const
 {
 	acceleration = RigidBody::acceleration;
 }
 
-glm::vec3 RigidBody::getAcceleration() const
+Vector3 RigidBody::getAcceleration() const
 {
 	return acceleration;
 }

@@ -8,14 +8,16 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "../Core/Math/Vector2.hpp"
+#include "../Core/Math/Vector3.hpp"
 
 struct Vertex
 {
-	glm::vec3 Position;
-	glm::vec3 Normal;
-	glm::vec3 Tangent;
-	glm::vec3 Binormal;
-	glm::vec2 Texcoord;
+	Vector3 Position;
+	Vector3 Normal;
+	Vector3 Tangent;
+	Vector3 Binormal;
+	Vector2 Texcoord;
 };
 
 struct Triangle
@@ -48,4 +50,3 @@ private:
 	std::string m_FilePath;
 	uint32_t vertexArrayObjectID = -1;
 };
-

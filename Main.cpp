@@ -11,7 +11,6 @@
 
 #include "Demo.hpp"
 
-
 int main()
 {
 	ResourceManager resourceManager;

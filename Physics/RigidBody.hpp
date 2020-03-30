@@ -10,19 +10,19 @@ protected:
 	cyMatrix3 inverseInertiaTensor;
 	float linearDamping;
 	float angularDamping;
-	glm::vec3 position;
-	glm::quat orientation;
-	glm::vec3 velocity;
-	glm::vec3 rotation;
+	Vector3 position;
+	Quaternion orientation;
+	Vector3 velocity;
+	Vector3 rotation;
 	cyMatrix3 inverseInertiaTensorWorld;
 	float motion;
 	bool isAwake;
 	bool canSleep;
 	cyMatrix4 transformcyMatrix;
-	glm::vec3 forceAccum;
-	glm::vec3 torqueAccum;
-	glm::vec3 acceleration;
-	glm::vec3 lastFrameAcceleration;
+	Vector3 forceAccum;
+	Vector3 torqueAccum;
+	Vector3 acceleration;
+	Vector3 lastFrameAcceleration;
 
 public:
 
@@ -48,33 +48,33 @@ public:
 	float getLinearDamping() const;
 	void setAngularDamping(const float angularDamping);
 	float getAngularDamping() const;
-	void setPosition(const glm::vec3& position);
-	void getPosition(glm::vec3& position) const;
-	glm::vec3 getPosition() const;
-	void setOrientation(const glm::quat& orientation);
+	void setPosition(const Vector3& position);
+	void getPosition(Vector3& position) const;
+	Vector3 getPosition() const;
+	void setOrientation(const Quaternion& orientation);
 	void setOrientation(const float r, const float i, const float j, const float k);
-	void getOrientation(glm::quat& orientation) const;
-	glm::quat getOrientation() const;
+	void getOrientation(Quaternion& orientation) const;
+	Quaternion getOrientation() const;
 	void getOrientation(cyMatrix3& cyMatrix) const;
 	void getOrientation(float cyMatrix[9]) const;
 	void getTransform(cyMatrix4& transform) const;
 	void getTransform(float cyMatrix[16]) const;
 	void getGLTransform(float cyMatrix[16]) const;
 	cyMatrix4 getTransform() const;
-	glm::vec3 getPointInLocalSpace(const glm::vec3& point) const;
-	glm::vec3 getPointInWorldSpace(const glm::vec3& point) const;
-	glm::vec3 getDirectionInLocalSpace(const glm::vec3& direction) const;
-	glm::vec3 getDirectionInWorldSpace(const glm::vec3& direction) const;
-	void setVelocity(const glm::vec3& velocity);
+	Vector3 getPointInLocalSpace(const Vector3& point) const;
+	Vector3 getPointInWorldSpace(const Vector3& point) const;
+	Vector3 getDirectionInLocalSpace(const Vector3& direction) const;
+	Vector3 getDirectionInWorldSpace(const Vector3& direction) const;
+	void setVelocity(const Vector3& velocity);
 	void setVelocity(const float x, const float y, const float z);
-	void getVelocity(glm::vec3& velocity) const;
-	glm::vec3 getVelocity() const;
-	void addVelocity(const glm::vec3& deltaVelocity);
-	void setRotation(const glm::vec3& rotation);
+	void getVelocity(Vector3& velocity) const;
+	Vector3 getVelocity() const;
+	void addVelocity(const Vector3& deltaVelocity);
+	void setRotation(const Vector3& rotation);
 	void setRotation(const float x, const float y, const float z);
-	void getRotation(glm::vec3& rotation) const;
-	glm::vec3 getRotation() const;
-	void addRotation(const glm::vec3& deltaRotation);
+	void getRotation(Vector3& rotation) const;
+	Vector3 getRotation() const;
+	void addRotation(const Vector3& deltaRotation);
 
 	bool getAwake() const
 	{
@@ -89,15 +89,15 @@ public:
 	}
 
 	void setCanSleep(const bool canSleep = true);
-	void getLastFrameAcceleration(glm::vec3& linearAcceleration) const;
-	glm::vec3 getLastFrameAcceleration() const;
+	void getLastFrameAcceleration(Vector3& linearAcceleration) const;
+	Vector3 getLastFrameAcceleration() const;
 	void clearAccumulators();
-	void addForce(const glm::vec3& force);
-	void addForceAtPoint(const glm::vec3& force, const glm::vec3& point);
-	void addForceAtBodyPoint(const glm::vec3& force, const glm::vec3& point);
-	void addTorque(const glm::vec3& torque);
-	void setAcceleration(const glm::vec3& acceleration);
+	void addForce(const Vector3& force);
+	void addForceAtPoint(const Vector3& force, const Vector3& point);
+	void addForceAtBodyPoint(const Vector3& force, const Vector3& point);
+	void addTorque(const Vector3& torque);
+	void setAcceleration(const Vector3& acceleration);
 	void setAcceleration(const float x, const float y, const float z);
-	void getAcceleration(glm::vec3& acceleration) const;
-	glm::vec3 getAcceleration() const;
+	void getAcceleration(Vector3& acceleration) const;
+	Vector3 getAcceleration() const;
 };

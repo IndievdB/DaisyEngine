@@ -2,6 +2,7 @@
 
 #include "../Vendor/entt/entt.hpp"
 #include <string>
+
 class lua_State;
 
 class LuaBehaviour

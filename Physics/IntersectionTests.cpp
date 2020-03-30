@@ -6,7 +6,7 @@ bool IntersectionTests::SphereAndHalfSpace(const SphereCollider& sphere, const T
 {
 	// Find the distance from the origin
 	float ballDistance =
-		glm::dot(plane.normal,
+		Vector3::Dot(plane.normal,
 		Transform::GetAxisVector(sphereTransform, 3)) -
 		sphere.radius;
 
@@ -17,28 +17,28 @@ bool IntersectionTests::SphereAndHalfSpace(const SphereCollider& sphere, const T
 bool IntersectionTests::SphereAndSphere(const SphereCollider& one, const Transform& oneTransform, const SphereCollider& two, const Transform& twoTransform)
 {
 	// Find the vector between the objects
-	glm::vec3 midline = Transform::GetAxisVector(oneTransform, 3) - Transform::GetAxisVector(twoTransform, 3);
+	Vector3 midline = Transform::GetAxisVector(oneTransform, 3) - Transform::GetAxisVector(twoTransform, 3);
 
 	// See if it is large enough.
-	return (glm::length(midline)* glm::length(midline)) < (one.radius + two.radius) * (one.radius + two.radius);
+	return (midline.LengthSquared()) < (one.radius + two.radius) * (one.radius + two.radius);
 }
 
-static inline float transformToAxis(const BoxCollider& box, const Transform& boxTransform, const glm::vec3& axis)
+static inline float transformToAxis(const BoxCollider& box, const Transform& boxTransform, const Vector3& axis)
 {
 	return
-		box.halfSize.x * abs(glm::dot(axis, Transform::GetAxisVector(boxTransform, 0))) +
-		box.halfSize.y * abs(glm::dot(axis, Transform::GetAxisVector(boxTransform, 1))) +
-		box.halfSize.z * abs(glm::dot(axis, Transform::GetAxisVector(boxTransform, 2)));
+		box.halfSize.x * abs(Vector3::Dot(axis, Transform::GetAxisVector(boxTransform, 0))) +
+		box.halfSize.y * abs(Vector3::Dot(axis, Transform::GetAxisVector(boxTransform, 1))) +
+		box.halfSize.z * abs(Vector3::Dot(axis, Transform::GetAxisVector(boxTransform, 2)));
 }
 
-static inline bool overlapOnAxis(const BoxCollider& one, const Transform& oneTransform, const BoxCollider& two, const Transform& twoTransform, const glm::vec3& axis, const glm::vec3& toCentre)
+static inline bool overlapOnAxis(const BoxCollider& one, const Transform& oneTransform, const BoxCollider& two, const Transform& twoTransform, const Vector3& axis, const Vector3& toCentre)
 {
 	// Project the half-size of one onto axis
 	float oneProject = transformToAxis(one, oneTransform, axis);
 	float twoProject = transformToAxis(two, twoTransform, axis);
 
 	// Project this onto the axis
-	float distance = abs(glm::dot(toCentre, axis));
+	float distance = abs(Vector3::Dot(toCentre, axis));
 
 	// Check for overlap
 	return (distance < oneProject + twoProject);
@@ -51,7 +51,7 @@ static inline bool overlapOnAxis(const BoxCollider& one, const Transform& oneTra
 bool IntersectionTests::BoxAndBox(const BoxCollider& one, const Transform& oneTransform, const BoxCollider& two, const Transform& twoTransform)
 {
 	// Find the vector between the two centres
-	glm::vec3 toCentre = Transform::GetAxisVector(twoTransform, 3) - Transform::GetAxisVector(oneTransform, 3);
+	Vector3 toCentre = Transform::GetAxisVector(twoTransform, 3) - Transform::GetAxisVector(oneTransform, 3);
 
 	return (
 		// Check on box one's axes first
@@ -65,15 +65,15 @@ bool IntersectionTests::BoxAndBox(const BoxCollider& one, const Transform& oneTr
 		TEST_OVERLAP(Transform::GetAxisVector(twoTransform, 2)) &&
 
 		// Now on the cross products
-		TEST_OVERLAP(glm::cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 0))) &&
-		TEST_OVERLAP(glm::cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 1))) &&
-		TEST_OVERLAP(glm::cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 2))) &&
-		TEST_OVERLAP(glm::cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 0))) &&
-		TEST_OVERLAP(glm::cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 1))) &&
-		TEST_OVERLAP(glm::cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 2))) &&
-		TEST_OVERLAP(glm::cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 0))) &&
-		TEST_OVERLAP(glm::cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 1))) &&
-		TEST_OVERLAP(glm::cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 2)))
+		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 0))) &&
+		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 1))) &&
+		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 2))) &&
+		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 0))) &&
+		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 1))) &&
+		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 2))) &&
+		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 0))) &&
+		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 1))) &&
+		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 2)))
 		);
 }
 #undef TEST_OVERLAP
@@ -85,7 +85,7 @@ bool IntersectionTests::BoxAndHalfSpace(const BoxCollider& box, const Transform&
 
 	// Work out how far the box is from the origin
 	float boxDistance =
-		glm::dot(plane.normal, Transform::GetAxisVector(boxTransform, 3)) -
+		Vector3::Dot(plane.normal, Transform::GetAxisVector(boxTransform, 3)) -
 		projectedRadius;
 
 	// Check for the intersection

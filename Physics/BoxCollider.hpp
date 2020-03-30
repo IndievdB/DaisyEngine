@@ -1,10 +1,10 @@
 #pragma once
 
-#include<glm/vec3.hpp>
+#include "../Core/Math/Vector3.hpp"
 
 class BoxCollider
 {
 public:
-	glm::vec3 halfSize;
+	Vector3 halfSize;
 };
 

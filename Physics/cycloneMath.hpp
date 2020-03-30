@@ -2,10 +2,12 @@
 
 #include <glm/vec3.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "../Core/Math/Vector3.hpp"
+#include "../Core/Math/Quaternion.hpp"
 
-static glm::vec3 TransformVector(glm::mat4 matrix, glm::vec3 vector)
+static Vector3 TransformVector(glm::mat4 matrix, Vector3 vector)
 {
-	return glm::vec3
+	return Vector3
 	(
 		vector.x * matrix[0][0] +
 		vector.y * matrix[1][0] +
@@ -21,20 +23,20 @@ static glm::vec3 TransformVector(glm::mat4 matrix, glm::vec3 vector)
 	);
 }
 
-static glm::vec3 Normalize(glm::vec3 vector)
+static Vector3 Normalize(Vector3 vector)
 {
-	if (glm::length2(vector) == 0)
+	if (vector.LengthSquared() == 0)
 		return vector;
 
-	return glm::normalize(vector);
+	return vector.Normalized();
 }
 
-static glm::quat Normalize(glm::quat quaternion)
+static Quaternion Normalize(Quaternion quaternion)
 {
-	if (glm::length2(quaternion) == 0)
+	if (quaternion.MagnitudeSquared() == 0)
 		return quaternion;
 
-	return glm::normalize(quaternion);
+	return quaternion.Normalized();
 }
 
 class cyMatrix4
@@ -108,9 +110,9 @@ public:
 	 *
 	 * @param vector The vector to transform.
 	 */
-	glm::vec3 operator*(const glm::vec3& vector) const
+	Vector3 operator*(const Vector3& vector) const
 	{
-		return glm::vec3(
+		return Vector3(
 			vector.x * data[0] +
 			vector.y * data[1] +
 			vector.z * data[2] + data[3],
@@ -130,7 +132,7 @@ public:
 	 *
 	 * @param vector The vector to transform.
 	 */
-	glm::vec3 transform(const glm::vec3& vector) const
+	Vector3 transform(const Vector3& vector) const
 	{
 		return (*this) * vector;
 	}
@@ -171,9 +173,9 @@ public:
 	 *
 	 * @param vector The vector to transform.
 	 */
-	glm::vec3 transformDirection(const glm::vec3& vector) const
+	Vector3 transformDirection(const Vector3& vector) const
 	{
-		return glm::vec3(
+		return Vector3(
 			vector.x * data[0] +
 			vector.y * data[1] +
 			vector.z * data[2],
@@ -204,9 +206,9 @@ public:
 	 *
 	 * @param vector The vector to transform.
 	 */
-	glm::vec3 transformInverseDirection(const glm::vec3& vector) const
+	Vector3 transformInverseDirection(const Vector3& vector) const
 	{
-		return glm::vec3(
+		return Vector3(
 			vector.x * data[0] +
 			vector.y * data[4] +
 			vector.z * data[8],
@@ -234,13 +236,13 @@ public:
 	 *
 	 * @param vector The vector to transform.
 	 */
-	glm::vec3 transformInverse(const glm::vec3& vector) const
+	Vector3 transformInverse(const Vector3& vector) const
 	{
-		glm::vec3 tmp = vector;
+		Vector3 tmp = vector;
 		tmp.x -= data[3];
 		tmp.y -= data[7];
 		tmp.z -= data[11];
-		return glm::vec3(
+		return Vector3(
 			tmp.x * data[0] +
 			tmp.y * data[4] +
 			tmp.z * data[8],
@@ -263,16 +265,16 @@ public:
 	 *
 	 * @return The vector.
 	 */
-	glm::vec3 getAxisVector(int i) const
+	Vector3 getAxisVector(int i) const
 	{
-		return glm::vec3(data[i], data[i + 4], data[i + 8]);
+		return Vector3(data[i], data[i + 4], data[i + 8]);
 	}
 
 	/**
 	 * Sets this cyMatrix to be the rotation cyMatrix corresponding to
-	 * the given glm::quat.
+	 * the given Quaternion.
 	 */
-	void setOrientationAndPos(const glm::quat& q, const glm::vec3& pos)
+	void setOrientationAndPos(const Quaternion& q, const Vector3& pos)
 	{
 		data[0] = 1 - (2 * q.y * q.y + 2 * q.z * q.z);
 		data[1] = 2 * q.x * q.y + 2 * q.z * q.w;
@@ -343,8 +345,8 @@ public:
 	 * Creates a new cyMatrix with the given three vectors making
 	 * up its columns.
 	 */
-	cyMatrix3(const glm::vec3& compOne, const glm::vec3& compTwo,
-		const glm::vec3& compThree)
+	cyMatrix3(const Vector3& compOne, const Vector3& compTwo,
+		const Vector3& compThree)
 	{
 		setComponents(compOne, compTwo, compThree);
 	}
@@ -388,9 +390,9 @@ public:
 	 * a rectangular block aligned with the body's coordinate
 	 * system with the given axis half-sizes and mass.
 	 */
-	void setBlockInertiaTensor(const glm::vec3& halfSizes, float mass)
+	void setBlockInertiaTensor(const Vector3& halfSizes, float mass)
 	{
-		glm::vec3 squares = glm::vec3(halfSizes.x*halfSizes.x, halfSizes.y * halfSizes.y, halfSizes.z * halfSizes.z);
+		Vector3 squares = Vector3(halfSizes.x*halfSizes.x, halfSizes.y * halfSizes.y, halfSizes.z * halfSizes.z);
 		setInertiaTensorCoeffs(0.3f * mass * (squares.y + squares.z),
 			0.3f * mass * (squares.x + squares.z),
 			0.3f * mass * (squares.x + squares.y));
@@ -402,7 +404,7 @@ public:
 	 * of the vector product. So if a,b are vectors. a x b = A_s b
 	 * where A_s is the skew symmetric form of a.
 	 */
-	void setSkewSymmetric(const glm::vec3 vector)
+	void setSkewSymmetric(const Vector3 vector)
 	{
 		data[0] = data[4] = data[8] = 0;
 		data[1] = -vector.z;
@@ -417,8 +419,8 @@ public:
 	 * Sets the cyMatrix values from the given three vector components.
 	 * These are arranged as the three columns of the vector.
 	 */
-	void setComponents(const glm::vec3& compOne, const glm::vec3& compTwo,
-		const glm::vec3& compThree)
+	void setComponents(const Vector3& compOne, const Vector3& compTwo,
+		const Vector3& compThree)
 	{
 		data[0] = compOne.x;
 		data[1] = compTwo.x;
@@ -437,9 +439,9 @@ public:
 	 *
 	 * @param vector The vector to transform.
 	 */
-	glm::vec3 operator*(const glm::vec3& vector) const
+	Vector3 operator*(const Vector3& vector) const
 	{
-		return glm::vec3(
+		return Vector3(
 			vector.x * data[0] + vector.y * data[1] + vector.z * data[2],
 			vector.x * data[3] + vector.y * data[4] + vector.z * data[5],
 			vector.x * data[6] + vector.y * data[7] + vector.z * data[8]
@@ -451,7 +453,7 @@ public:
 	 *
 	 * @param vector The vector to transform.
 	 */
-	glm::vec3 transform(const glm::vec3& vector) const
+	Vector3 transform(const Vector3& vector) const
 	{
 		return (*this) * vector;
 	}
@@ -461,9 +463,9 @@ public:
 	 *
 	 * @param vector The vector to transform.
 	 */
-	glm::vec3 transformTranspose(const glm::vec3& vector) const
+	Vector3 transformTranspose(const Vector3& vector) const
 	{
-		return glm::vec3(
+		return Vector3(
 			vector.x * data[0] + vector.y * data[3] + vector.z * data[6],
 			vector.x * data[1] + vector.y * data[4] + vector.z * data[7],
 			vector.x * data[2] + vector.y * data[5] + vector.z * data[8]
@@ -475,9 +477,9 @@ public:
 	 *
 	 * @param i The row to return.
 	 */
-	glm::vec3 getRowVector(int i) const
+	Vector3 getRowVector(int i) const
 	{
-		return glm::vec3(data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
+		return Vector3(data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
 	}
 
 	/**
@@ -487,9 +489,9 @@ public:
 	 *
 	 * @return The vector.
 	 */
-	glm::vec3 getAxisVector(int i) const
+	Vector3 getAxisVector(int i) const
 	{
-		return glm::vec3(data[i], data[i + 3], data[i + 6]);
+		return Vector3(data[i], data[i + 3], data[i + 6]);
 	}
 
 	/**
@@ -642,9 +644,9 @@ public:
 
 	/**
 	 * Sets this cyMatrix to be the rotation cyMatrix corresponding to
-	 * the given glm::quat.
+	 * the given Quaternion.
 	 */
-	void setOrientation(const glm::quat& q)
+	void setOrientation(const Quaternion& q)
 	{
 		data[0] = 1 - (2 * q.z * q.y + 2 * q.z * q.z);
 		data[1] = 2 * q.x * q.y + 2 * q.z * q.w;

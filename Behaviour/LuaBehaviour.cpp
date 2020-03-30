@@ -32,27 +32,27 @@ void RegisterAll(lua_State* L)
 		.endClass();
 
 	getGlobalNamespace(L)
-		.beginClass < glm::vec2 >("Vector2")
+		.beginClass < Vector2 >("Vector2")
 		.addConstructor<void(*)(void)>()
-		.addProperty("x", &glm::vec2::x)
-		.addProperty("y", &glm::vec2::y)
+		.addProperty("x", &Vector2::x)
+		.addProperty("y", &Vector2::y)
 		.endClass();
 
 	getGlobalNamespace(L)
-		.beginClass < glm::vec3 >("Vector3")
+		.beginClass < Vector3 >("Vector3")
 		.addConstructor<void(*)(void)>()
-		.addProperty("x", &glm::vec3::x)
-		.addProperty("y", &glm::vec3::y)
-		.addProperty("z", &glm::vec3::z)
+		.addProperty("x", &Vector3::x)
+		.addProperty("y", &Vector3::y)
+		.addProperty("z", &Vector3::z)
 		.endClass();
 
 	getGlobalNamespace(L)
-		.beginClass < glm::quat >("Quaternion")
+		.beginClass < Quaternion >("Quaternion")
 		.addConstructor<void(*)(void)>()
-		.addProperty("x", &glm::quat::x)
-		.addProperty("y", &glm::quat::y)
-		.addProperty("z", &glm::quat::z)
-		.addProperty("w", &glm::quat::w)
+		.addProperty("x", &Quaternion::x)
+		.addProperty("y", &Quaternion::y)
+		.addProperty("z", &Quaternion::z)
+		.addProperty("w", &Quaternion::w)
 		.endClass();
 
 	getGlobalNamespace(L)

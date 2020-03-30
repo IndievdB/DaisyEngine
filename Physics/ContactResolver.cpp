@@ -60,8 +60,8 @@ void ContactResolver::prepareContacts(Contact* contacts, unsigned numContacts, f
 
 void ContactResolver::adjustVelocities(Contact* c, unsigned numContacts, float duration)
 {
-	glm::vec3 velocityChange[2], rotationChange[2];
-	glm::vec3 deltaVel;
+	Vector3 velocityChange[2], rotationChange[2];
+	Vector3 deltaVel;
 
 	// iteratively handle impacts in order of severity.
 	velocityIterationsUsed = 0;
@@ -100,7 +100,7 @@ void ContactResolver::adjustVelocities(Contact* c, unsigned numContacts, float d
 				{
 					if (c[i].body[b] == c[index].body[d])
 					{
-						deltaVel = velocityChange[d] + glm::cross(rotationChange[d], c[i].relativeContactPosition[b]);
+						deltaVel = velocityChange[d] + Vector3::Cross(rotationChange[d], c[i].relativeContactPosition[b]);
 
 						// The sign of the change is negative if we're dealing
 						// with the second body in a contact.
@@ -117,9 +117,9 @@ void ContactResolver::adjustVelocities(Contact* c, unsigned numContacts, float d
 void ContactResolver::adjustPositions(Contact* c, unsigned numContacts, float duration)
 {
 	unsigned i, index;
-	glm::vec3 linearChange[2], angularChange[2];
+	Vector3 linearChange[2], angularChange[2];
 	float max;
-	glm::vec3 deltaPosition;
+	Vector3 deltaPosition;
 
 	// iteratively resolve interpenetrations in order of severity.
 	positionIterationsUsed = 0;
@@ -160,13 +160,13 @@ void ContactResolver::adjustPositions(Contact* c, unsigned numContacts, float du
 				{
 					if (c[i].body[b] == c[index].body[d])
 					{
-						deltaPosition = linearChange[d] + glm::cross(angularChange[d], c[i].relativeContactPosition[b]);
+						deltaPosition = linearChange[d] + Vector3::Cross(angularChange[d], c[i].relativeContactPosition[b]);
 
 						// The sign of the change is positive if we're
 						// dealing with the second body in a contact
 						// and negative otherwise (because we're
 						// subtracting the resolution)..
-						c[i].penetration += glm::dot(deltaPosition, c[i].contactNormal) * (b ? 1.0f : -1.0f);
+						c[i].penetration += Vector3::Dot(deltaPosition, c[i].contactNormal) * (b ? 1.0f : -1.0f);
 					}
 				}
 			}

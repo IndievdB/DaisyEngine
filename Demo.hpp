@@ -19,18 +19,18 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	{
 		auto entity = registry->create();
-		glm::quat rotation = glm::quat(1, 0, 0, 0);
-		registry->assign<Transform>(entity, glm::vec3(0.0f, 5.0f, -25.0f), glm::vec3(1, 1, 1), rotation);
+		Quaternion rotation = Quaternion(1, 0, 0, 0);
+		registry->assign<Transform>(entity, Vector3(0.0f, 5.0f, -25.0f), Vector3(1, 1, 1), rotation);
 		registry->assign<Camera>(entity);
 		registry->assign<LuaBehaviour>(entity, "Resources/testing.lua");
 	}
 
 	{
 		auto entity = registry->create();
-		registry->assign<Transform>(entity, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::quat(1,0,0,0));
+		registry->assign<Transform>(entity, Vector3(0, 0, 0), Vector3(1, 1, 1), Quaternion(1,0,0,0));
 		registry->assign<MeshRenderer>(entity, "GrayMat", "Resources/plane.obj");
 		PlaneCollider& collider = registry->assign<PlaneCollider>(entity);
-		collider.normal = glm::vec3(0, 1, 0);
+		collider.normal = Vector3(0, 1, 0);
 		collider.offset = 0;
 	}
 
@@ -39,18 +39,18 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	for (int i = 0; i < 5; i++)
 	{
 		auto entity = registry->create();
-		glm::vec3 position = glm::vec3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
+		Vector3 position = Vector3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
 		float diameter = rand() % 2 + 1.0f;
-		glm::vec3 scale = glm::vec3(diameter);
-		glm::quat rotation = glm::quat(rand(), rand(), rand(), rand()); rotation = Normalize(rotation);
+		Vector3 scale (diameter, diameter, diameter);
+		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation = Normalize(rotation);
 		registry->assign<Transform>(entity, position, scale, rotation);
 		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/sphere.obj");
 
 		RigidBody& rb = registry->assign<RigidBody>(entity);
-		rb.setPosition(position);
+		rb.setPosition(Vector3(position.x, position.y, position.z));
 		rb.setOrientation(rotation);
-		rb.setVelocity(glm::vec3());
-		rb.setRotation(glm::vec3());
+		rb.setVelocity(Vector3());
+		rb.setRotation(Vector3());
 		float radius = diameter * 0.5f;
 		float mass = 4.0f * 0.3333f * 3.1415f * radius * radius * radius; rb.setMass(mass);
 		cyMatrix3 tensor; float coeff = 0.4f * mass * radius * radius;
@@ -69,18 +69,18 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	for (int i = 0; i < 5; i++)
 	{
 		auto entity = registry->create();
-		glm::vec3 position = glm::vec3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
-		glm::vec3 scale = glm::vec3(rand() % 8 + 1.0f, rand() % 2 + 1.0f, rand() % 2 + 1.0f);
-		glm::quat rotation = glm::quat(rand(), rand(), rand(), rand()); rotation = Normalize(rotation);
+		Vector3 position = Vector3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
+		Vector3 scale = Vector3(rand() % 8 + 1.0f, rand() % 2 + 1.0f, rand() % 2 + 1.0f);
+		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation = Normalize(rotation);
 		registry->assign<Transform>(entity, position, scale, rotation);
 		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/cube.obj");
 
 		RigidBody& rb = registry->assign<RigidBody>(entity);
-		rb.setPosition(position);
+		rb.setPosition(Vector3(position.x, position.y, position.z));
 		rb.setOrientation(rotation);
-		rb.setVelocity(glm::vec3());
-		rb.setRotation(glm::vec3());
-		glm::vec3 halfSize = scale * 0.5f;
+		rb.setVelocity(Vector3());
+		rb.setRotation(Vector3());
+		Vector3 halfSize = Vector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f);
 		float mass = halfSize.x * halfSize.y * halfSize.z * 8.0f; rb.setMass(mass);
 		cyMatrix3 tensor; tensor.setBlockInertiaTensor(halfSize, mass); rb.setInertiaTensor(tensor);
 		rb.setLinearDamping(0.95f);
@@ -91,7 +91,6 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		rb.calculateDerivedData();
 
 		BoxCollider& collider = registry->assign<BoxCollider>(entity);
-		collider.halfSize = glm::vec3(0.5f);
+		collider.halfSize = Vector3(0.5f, 0.5f, 0.5f);
 	}
 }
-

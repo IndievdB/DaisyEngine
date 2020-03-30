@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <map>
 #include "Keycodes.hpp"
-#include <glm/glm.hpp>
+#include "Math/Vector2.hpp"
 #include <string>
 
 class Input
@@ -19,8 +19,8 @@ public:
 	static bool GetKeyUp(KeyCode keycode);
 	static bool GetWindowCloseButton();
 	static float GetScrollDelta();
-	static glm::vec2 GetMousePositionDelta();
-	static glm::vec2 GetMousePosition();
+	static Vector2 GetMousePositionDelta();
+	static Vector2 GetMousePosition();
 
 	void RegisterWindowCloseCallback();
 	void RegisterSetCursorPosCallback();
@@ -38,8 +38,8 @@ private:
 	static GLFWwindow* activeWindow;
 	std::map<int, int> keyStatus;
 	int windowCloseButtonClicked;
-	static glm::vec2 mousePosition;
-	static glm::vec2 prevMousePosition;
+	static Vector2 mousePosition;
+	static Vector2 prevMousePosition;
 	static float scrollDelta;
 	bool mouseDidScroll;
 };

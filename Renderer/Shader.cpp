@@ -183,6 +183,13 @@ void Shader::SetMatrix4x4(std::string name, glm::mat4 matrix) const
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
+void Shader::SetMatrix4x4(std::string name, Matrix4x4 matrix) const
+{
+	glUseProgram(shaderProgramID);
+	unsigned int transformLoc = glGetUniformLocation(shaderProgramID, name.c_str());
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, matrix.mV);
+}
+
 bool Shader::HasUniform(std::string name)
 {
 	return glGetUniformLocation(shaderProgramID, name.c_str()) != -1;

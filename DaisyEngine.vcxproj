@@ -136,6 +136,12 @@
   <ItemGroup>
     <ClCompile Include="Behaviour\LuaBehaviour.cpp" />
     <ClCompile Include="Behaviour\LuaSystem.cpp" />
+    <ClCompile Include="Core\Math\Matrix3x3.cpp" />
+    <ClCompile Include="Core\Math\Matrix4x4.cpp" />
+    <ClCompile Include="Core\Math\Quaternion.cpp" />
+    <ClCompile Include="Core\Math\Vector2.cpp" />
+    <ClCompile Include="Core\Math\Vector3.cpp" />
+    <ClCompile Include="Core\Math\Vector4.cpp" />
     <ClCompile Include="Physics\ContactResolver.cpp" />
     <ClCompile Include="Physics\CollisionDetector.cpp" />
     <ClCompile Include="Physics\IntersectionTests.cpp" />
@@ -144,7 +150,6 @@
     <ClCompile Include="Physics\BoxCollider.cpp" />
     <ClCompile Include="Physics\cycloneMath.cpp" />
     <ClCompile Include="Physics\PlaneCollider.cpp" />
-    <ClCompile Include="Renderer\Camera.cpp" />
     <ClCompile Include="Vendor\glad\glad.c" />
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -161,6 +166,13 @@
   <ItemGroup>
     <ClInclude Include="Behaviour\LuaBehaviour.hpp" />
     <ClInclude Include="Behaviour\LuaSystem.hpp" />
+    <ClInclude Include="Core\Math\Mathf.hpp" />
+    <ClInclude Include="Core\Math\Matrix3x3.hpp" />
+    <ClInclude Include="Core\Math\Matrix4x4.hpp" />
+    <ClInclude Include="Core\Math\Quaternion.hpp" />
+    <ClInclude Include="Core\Math\Vector2.hpp" />
+    <ClInclude Include="Core\Math\Vector3.hpp" />
+    <ClInclude Include="Core\Math\Vector4.hpp" />
     <ClInclude Include="Vendor\LuaBridge\detail\CFunctions.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\ClassInfo.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\Config.h" />
