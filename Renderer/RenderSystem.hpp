@@ -26,7 +26,7 @@ void RenderAll(std::shared_ptr<entt::registry> registry)
 
 	registry->view<Transform, MeshRenderer>().each([projection, view](auto& transform, auto& meshRenderer)
 	{
-		Matrix4x4 model = Transform::ToMatrixDSY(transform);
+		Matrix4x4 model = Matrix4x4::Transformation(transform);
 
 		meshRenderer.material->GetShader()->Use();
 		meshRenderer.material->GetShader()->SetMatrix4x4("projection", projection);

@@ -9,11 +9,8 @@ unsigned CollisionDetector::SphereAndHalfSpace(const SphereCollider& sphere, Tra
 
 	float radius = sphere.radius * sphereTransform.scale.MaxComponent();
 
-	// Cache the sphere position
-	Vector3 position = sphereTransform.position;
-
 	// Find the distance from the plane
-	float ballDistance = Vector3::Dot(plane.normal, position) - radius - plane.offset;
+	float ballDistance = Vector3::Dot(plane.normal, sphereTransform.position) - radius - plane.offset;
 	
 	if (ballDistance >= 0) return 0;
 
@@ -21,7 +18,7 @@ unsigned CollisionDetector::SphereAndHalfSpace(const SphereCollider& sphere, Tra
 
 	data.contactArray[data.currentContact].contactNormal = plane.normal;
 	data.contactArray[data.currentContact].penetration = -ballDistance;
-	data.contactArray[data.currentContact].contactPoint = position - plane.normal * (ballDistance + sphere.radius);
+	data.contactArray[data.currentContact].contactPoint = sphereTransform.position - plane.normal * (ballDistance + sphere.radius);
 	data.contactArray[data.currentContact].setBodyData(sphereRigidBody, &sphereTransform, nullptr, nullptr, data.friction, data.restitution);
 
 	data.addContacts(1);
@@ -34,15 +31,11 @@ unsigned CollisionDetector::SphereAndSphere(const SphereCollider& one, Transform
 	// Make sure we have contacts
 	if (data.contactsLeft <= 0) return 0;
 
-	// Cache the sphere positions
-	Vector3 positionOne = oneTransform.position;
-	Vector3 positionTwo = twoTransform.position;
-
 	float radiusOne = one.radius * oneTransform.scale.MaxComponent();
 	float radiusTwo = two.radius *twoTransform.scale.MaxComponent();
 
 	// Find the vector between the objects
-	Vector3 midline = positionOne - positionTwo;
+	Vector3 midline = oneTransform.position - twoTransform.position;
 	float size = midline.Length();
 
 	// See if it is large enough.
@@ -56,7 +49,7 @@ unsigned CollisionDetector::SphereAndSphere(const SphereCollider& one, Transform
 	Vector3 normal = midline * (1.0f / size);
 
 	data.contactArray[data.currentContact].contactNormal = normal;
-	data.contactArray[data.currentContact].contactPoint = positionOne + midline * 0.5f;
+	data.contactArray[data.currentContact].contactPoint = oneTransform.position + midline * 0.5f;
 	data.contactArray[data.currentContact].penetration = (radiusOne + radiusTwo - size);
 	data.contactArray[data.currentContact].setBodyData(oneRigidBody, &oneTransform, twoRigidBody, &twoTransform, data.friction, data.restitution);
 
@@ -93,8 +86,7 @@ unsigned CollisionDetector::BoxAndHalfSpace(const BoxCollider& box, Transform& b
 		vertexPos.z *= box.halfSize.z;
 		//vertexPos = box.trans.transform(vertexPos);
 		
-
-		vertexPos = Transform::ToMatrixDSY(boxTransform).TransformPoint(vertexPos);
+		vertexPos = Matrix4x4::Transformation(boxTransform).TransformPoint(vertexPos);
 
 		// Calculate the distance from the plane
 		float vertexDistance = Vector3::Dot(vertexPos, plane.normal);
@@ -131,9 +123,9 @@ unsigned CollisionDetector::BoxAndHalfSpace(const BoxCollider& box, Transform& b
 static float transformToAxis(const BoxCollider& box, const Transform& boxTransform, const Vector3& axis)
 {
 	return
-		box.halfSize.x * abs(Vector3::Dot(axis, Transform::GetAxisVector(boxTransform, 0))) +
-		box.halfSize.y * abs(Vector3::Dot(axis, Transform::GetAxisVector(boxTransform, 1))) +
-		box.halfSize.z * abs(Vector3::Dot(axis, Transform::GetAxisVector(boxTransform, 2)));
+		box.halfSize.x * abs(Vector3::Dot(axis, Matrix4x4::Transformation(boxTransform).GetColumn(0))) +
+		box.halfSize.y * abs(Vector3::Dot(axis, Matrix4x4::Transformation(boxTransform).GetColumn(1))) +
+		box.halfSize.z * abs(Vector3::Dot(axis, Matrix4x4::Transformation(boxTransform).GetColumn(2)));
 }
 
 static float penetrationOnAxis(const BoxCollider& one, const Transform& oneTransform, const BoxCollider& two, const Transform& twoTransform, const Vector3& axis, const Vector3& toCentre)
@@ -149,8 +141,6 @@ static float penetrationOnAxis(const BoxCollider& one, const Transform& oneTrans
 	// overlap, negative indicates separation).
 	return oneProject + twoProject - distance;
 }
-
-
 
 static inline bool tryAxis(const BoxCollider& one, const Transform& oneTransform, const BoxCollider& two, const Transform& twoTransform, Vector3 axis, const Vector3& toCentre, unsigned index, float& smallestPenetration, unsigned& smallestCase)
 {
@@ -174,8 +164,8 @@ static void fillPointFaceBoxBox(const BoxCollider& one, Transform& oneTransform,
 	// We know which axis the collision is on (i.e. best),
 	// but we need to work out which of the two faces on
 	// this axis.
-	Vector3 normal = Transform::GetAxisVector(oneTransform, best);
-	if (Vector3::Dot(Transform::GetAxisVector(oneTransform, best), toCentre) > 0)
+	Vector3 normal = Matrix4x4::Transformation(oneTransform).GetColumn(best);
+	if (Vector3::Dot(Matrix4x4::Transformation(oneTransform).GetColumn(best), toCentre) > 0)
 	{
 		normal = normal * -1.0f;
 	}
@@ -183,14 +173,14 @@ static void fillPointFaceBoxBox(const BoxCollider& one, Transform& oneTransform,
 	// Work out which vertex of box two we're colliding with.
 	// Using toCentre doesn't work!
 	Vector3 vertex = two.halfSize;
-	if (Vector3::Dot(Transform::GetAxisVector(twoTransform, 0), normal) < 0) vertex.x = -vertex.x;
-	if (Vector3::Dot(Transform::GetAxisVector(twoTransform, 1), normal) < 0) vertex.y = -vertex.y;
-	if (Vector3::Dot(Transform::GetAxisVector(twoTransform, 2), normal) < 0) vertex.z = -vertex.z;
+	if (Vector3::Dot(Matrix4x4::Transformation(twoTransform).GetColumn(0), normal) < 0) vertex.x = -vertex.x;
+	if (Vector3::Dot(Matrix4x4::Transformation(twoTransform).GetColumn(1), normal) < 0) vertex.y = -vertex.y;
+	if (Vector3::Dot(Matrix4x4::Transformation(twoTransform).GetColumn(2), normal) < 0) vertex.z = -vertex.z;
 
 	// Create the contact data
 	data.contactArray[data.currentContact].contactNormal = normal;
 	data.contactArray[data.currentContact].penetration = pen;
-	data.contactArray[data.currentContact].contactPoint = Transform::ToMatrixDSY(twoTransform).TransformPoint(vertex);
+	data.contactArray[data.currentContact].contactPoint = Matrix4x4::Transformation(twoTransform).TransformPoint(vertex);
 	data.contactArray[data.currentContact].setBodyData(oneRigidBody, &oneTransform, twoRigidBody, &twoTransform, data.friction, data.restitution);
 }
 
@@ -201,7 +191,7 @@ static Vector3 contactPoint(Vector3 pOne, Vector3 dOne, float oneSize, Vector3 p
 	float denom, mua, mub;
 
 	smOne = dOne.LengthSquared();
-	smTwo =dTwo.LengthSquared();
+	smTwo = dTwo.LengthSquared();
 	dpOneTwo = Vector3::Dot(dTwo, dOne);
 
 	toSt = pOne - pTwo;
@@ -239,7 +229,7 @@ static Vector3 contactPoint(Vector3 pOne, Vector3 dOne, float oneSize, Vector3 p
 unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const BoxCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data)
 {
 	// Find the vector between the two centres
-	Vector3 toCentre = Transform::GetAxisVector(twoTransform, 3) - Transform::GetAxisVector(oneTransform, 3);
+	Vector3 toCentre = twoTransform.position - oneTransform.position;
 
 	//std::cout << toCentre.x << "   " << toCentre.y << "   " << toCentre.z << std::endl;
 
@@ -250,27 +240,27 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTran
 	// Now we check each axes, returning if it gives us
 	// a separating axis, and keeping track of the axis with
 	// the smallest penetration otherwise.
-	if (!tryAxis(one, oneTransform, two, twoTransform, Transform::GetAxisVector(oneTransform, 0), toCentre, (0), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Transform::GetAxisVector(oneTransform, 1), toCentre, (1), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Transform::GetAxisVector(oneTransform, 2), toCentre, (2), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Matrix4x4::Transformation(oneTransform).GetColumn(0), toCentre, (0), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Matrix4x4::Transformation(oneTransform).GetColumn(1), toCentre, (1), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Matrix4x4::Transformation(oneTransform).GetColumn(2), toCentre, (2), pen, best)) return 0;
 
-	if (!tryAxis(one, oneTransform, two, twoTransform, Transform::GetAxisVector(oneTransform, 0), toCentre, (3), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Transform::GetAxisVector(oneTransform, 1), toCentre, (4), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Transform::GetAxisVector(oneTransform, 2), toCentre, (5), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Matrix4x4::Transformation(oneTransform).GetColumn(0), toCentre, (3), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Matrix4x4::Transformation(oneTransform).GetColumn(1), toCentre, (4), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Matrix4x4::Transformation(oneTransform).GetColumn(2), toCentre, (5), pen, best)) return 0;
 
 	// Store the best axis-major, in case we run into almost
 	// parallel edge collisions later
 	int bestSingleAxis = best;
 
-	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 0)), toCentre, (6), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 1)), toCentre, (7), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 2)), toCentre, (8), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 0)), toCentre, (9), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 1)), toCentre, (10), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 2)), toCentre, (11), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 0)), toCentre, (12), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 1)), toCentre, (13), pen, best)) return 0;
-	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 2)), toCentre, (14), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(0), Matrix4x4::Transformation(twoTransform).GetColumn(0)), toCentre, (6), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(0), Matrix4x4::Transformation(twoTransform).GetColumn(1)), toCentre, (7), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(0), Matrix4x4::Transformation(twoTransform).GetColumn(2)), toCentre, (8), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(1), Matrix4x4::Transformation(twoTransform).GetColumn(0)), toCentre, (9), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(1), Matrix4x4::Transformation(twoTransform).GetColumn(1)), toCentre, (10), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(1), Matrix4x4::Transformation(twoTransform).GetColumn(2)), toCentre, (11), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(2), Matrix4x4::Transformation(twoTransform).GetColumn(0)), toCentre, (12), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(2), Matrix4x4::Transformation(twoTransform).GetColumn(1)), toCentre, (13), pen, best)) return 0;
+	if (!tryAxis(one, oneTransform, two, twoTransform, Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(2), Matrix4x4::Transformation(twoTransform).GetColumn(2)), toCentre, (14), pen, best)) return 0;
 
 	// We now know there's a collision, and we know which
 	// of the axes gave the smallest penetration. We now
@@ -299,8 +289,8 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTran
 		best -= 6;
 		int oneAxisIndex = best / 3;
 		int twoAxisIndex = best % 3;
-		Vector3 oneAxis = Transform::GetAxisVector(oneTransform, oneAxisIndex);
-		Vector3 twoAxis = Transform::GetAxisVector(twoTransform, twoAxisIndex);
+		Vector3 oneAxis = Matrix4x4::Transformation(oneTransform).GetColumn(oneAxisIndex);
+		Vector3 twoAxis = Matrix4x4::Transformation(twoTransform).GetColumn(twoAxisIndex);
 		Vector3 axis = Vector3::Cross(oneAxis, twoAxis);
 		axis.Normalize();
 
@@ -318,16 +308,16 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTran
 		for (int i = 0; i < 3; i++)
 		{
 			if (i == oneAxisIndex) ptOnOneEdge[i] = 0;
-			else if (Vector3::Dot(Transform::GetAxisVector(oneTransform, i), axis) > 0) ptOnOneEdge[i] = -ptOnOneEdge[i];
+			else if (Vector3::Dot(Matrix4x4::Transformation(oneTransform).GetColumn(i), axis) > 0) ptOnOneEdge[i] = -ptOnOneEdge[i];
 
 			if (i == twoAxisIndex) ptOnTwoEdge[i] = 0;
-			else if (Vector3::Dot(Transform::GetAxisVector(twoTransform, i), axis) < 0) ptOnTwoEdge[i] = -ptOnTwoEdge[i];
+			else if (Vector3::Dot(Matrix4x4::Transformation(twoTransform).GetColumn(i), axis) < 0) ptOnTwoEdge[i] = -ptOnTwoEdge[i];
 		}
 
 		// Move them into world coordinates (they are already oriented
 		// correctly, since they have been derived from the axes).
-		ptOnOneEdge = Transform::ToMatrixDSY(oneTransform).TransformPoint(ptOnOneEdge);
-		ptOnTwoEdge = Transform::ToMatrixDSY(twoTransform).TransformPoint(ptOnTwoEdge);
+		ptOnOneEdge = Matrix4x4::Transformation(oneTransform).TransformPoint(ptOnOneEdge);
+		ptOnTwoEdge = Matrix4x4::Transformation(twoTransform).TransformPoint(ptOnTwoEdge);
 
 		// So we have a point and a direction for the colliding edges.
 		// We need to find out point of closest approach of the two
@@ -352,13 +342,10 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTran
 unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, Transform& boxTransform, RigidBody* boxRigidBody, const SphereCollider& sphere, Transform& sphereTransform, RigidBody* sphereRigidBody, CollisionData& data)
 {
 	// Transform the centre of the sphere into box coordinates
-	Vector3 centre = Transform::GetAxisVector(sphereTransform, 3);
-
-	Vector3 relCentre = Matrix4x4::AffineInverse(Transform::ToMatrixDSYNoScale(boxTransform)).TransformPoint(centre);
+	Vector3 relCentre = Matrix4x4::AffineInverse(Matrix4x4::Transformation(boxTransform.position, boxTransform.rotation)).TransformPoint(sphereTransform.position);
 
 	float radius = sphere.radius * sphereTransform.scale.MaxComponent();
 	Vector3 boxHalfSize(box.halfSize.x * boxTransform.scale.x, box.halfSize.y * boxTransform.scale.y, box.halfSize.z * boxTransform.scale.z);
-
 
 	// Early out check to see if we can exclude the contact
 	if (abs(relCentre.x) - radius > boxHalfSize.x ||
@@ -392,9 +379,9 @@ unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, Transform& boxT
 	if (dist > radius * radius) return 0;
 
 	// Compile the contact
-	Vector3 closestPtWorld = Transform::ToMatrixDSYNoScale(boxTransform).TransformPoint(closestPt);
+	Vector3 closestPtWorld = Matrix4x4::Transformation(boxTransform.position, boxTransform.rotation).TransformPoint(closestPt);
 
-	data.contactArray[data.currentContact].contactNormal = (closestPtWorld - centre).Normalized();
+	data.contactArray[data.currentContact].contactNormal = (closestPtWorld - sphereTransform.position).Normalized();
 	data.contactArray[data.currentContact].contactPoint = closestPtWorld;
 	data.contactArray[data.currentContact].penetration = radius - sqrt(dist);
 	data.contactArray[data.currentContact].setBodyData(boxRigidBody, &boxTransform, sphereRigidBody, &sphereTransform, data.friction, data.restitution);

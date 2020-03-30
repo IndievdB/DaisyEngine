@@ -40,20 +40,4 @@ struct Transform
 		rotation.z = cos(pitch / 2.0f) * cos(yaw / 2.0f) * sin(roll / 2.0f) - sin(pitch / 2.0f) * sin(yaw / 2.0f) * cos(roll / 2.0f);
 		rotation.w = cos(pitch / 2.0f) * cos(yaw / 2.0f) * cos(roll / 2.0f) + sin(pitch / 2.0f) * sin(yaw / 2.0f) * sin(roll / 2.0f);
 	}
-
-	static Matrix4x4 ToMatrixDSY(Transform t)
-	{
-		return Matrix4x4::Translation(t.position) * Matrix4x4::Rotation(t.rotation) * Matrix4x4::Scaling(t.scale);
-	}
-
-	static Matrix4x4 ToMatrixDSYNoScale(Transform t)
-	{
-		return Matrix4x4::Translation(t.position) * Matrix4x4::Rotation(t.rotation);
-	}
-	
-	static Vector3 GetAxisVector(Transform t, int index)
-	{
-		Matrix4x4 matrix = ToMatrixDSY(t);
-		return Vector3(matrix[index*4], matrix[index*4+1], matrix[index*4+2]);
-	}
 };

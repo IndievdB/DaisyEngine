@@ -2,6 +2,7 @@
 #define Vector3_hpp
 
 #include <iostream>
+#include "Vector4.hpp"
 
 class Vector3
 {
@@ -23,6 +24,7 @@ public:
     // ========================================================================
     
     inline Vector3 () { Zero(); }
+	inline Vector3 ( Vector4 v ) : x(v.x), y(v.y), z(v.z) {}
     inline Vector3 ( float _x, float _y, float _z ) : x(_x), y(_y), z(_z) {}
     
     // ========================================================================

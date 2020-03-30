@@ -7,6 +7,7 @@ class Vector3;
 class Vector4;
 class Matrix3x3;
 class Quaternion;
+class Transform;
 
 class Matrix4x4
 {
@@ -61,6 +62,9 @@ public:
     static Matrix4x4 RotationY( float angle );
     static Matrix4x4 RotationZ( float angle );
     static Matrix4x4 Scaling( const Vector3& factors );
+	static Matrix4x4 Transformation( Vector3 translation, Vector3 scale, Quaternion rotation );
+	static Matrix4x4 Transformation( Vector3 translation, Quaternion rotation );
+	static Matrix4x4 Transformation ( Transform transform );
     static Matrix4x4 Translation( const Vector3& vector );
     
     // ========================================================================

@@ -3,10 +3,7 @@
 bool IntersectionTests::SphereAndHalfSpace(const SphereCollider& sphere, const Transform& sphereTransform, const PlaneCollider& plane)
 {
 	// Find the distance from the origin
-	float ballDistance =
-		Vector3::Dot(plane.normal,
-		Transform::GetAxisVector(sphereTransform, 3)) -
-		sphere.radius;
+	float ballDistance = Vector3::Dot(plane.normal, Matrix4x4::Transformation(sphereTransform).GetColumn(3)) - sphere.radius;
 
 	// Check for the intersection
 	return ballDistance <= plane.offset;
@@ -15,7 +12,7 @@ bool IntersectionTests::SphereAndHalfSpace(const SphereCollider& sphere, const T
 bool IntersectionTests::SphereAndSphere(const SphereCollider& one, const Transform& oneTransform, const SphereCollider& two, const Transform& twoTransform)
 {
 	// Find the vector between the objects
-	Vector3 midline = Transform::GetAxisVector(oneTransform, 3) - Transform::GetAxisVector(twoTransform, 3);
+	Vector3 midline = oneTransform.position - twoTransform.position;
 
 	// See if it is large enough.
 	return (midline.LengthSquared()) < (one.radius + two.radius) * (one.radius + two.radius);
@@ -24,9 +21,9 @@ bool IntersectionTests::SphereAndSphere(const SphereCollider& one, const Transfo
 static inline float transformToAxis(const BoxCollider& box, const Transform& boxTransform, const Vector3& axis)
 {
 	return
-		box.halfSize.x * abs(Vector3::Dot(axis, Transform::GetAxisVector(boxTransform, 0))) +
-		box.halfSize.y * abs(Vector3::Dot(axis, Transform::GetAxisVector(boxTransform, 1))) +
-		box.halfSize.z * abs(Vector3::Dot(axis, Transform::GetAxisVector(boxTransform, 2)));
+		box.halfSize.x * abs(Vector3::Dot(axis, Matrix4x4::Transformation(boxTransform).GetColumn(0))) +
+		box.halfSize.y * abs(Vector3::Dot(axis, Matrix4x4::Transformation(boxTransform).GetColumn(1))) +
+		box.halfSize.z * abs(Vector3::Dot(axis, Matrix4x4::Transformation(boxTransform).GetColumn(2)));
 }
 
 static inline bool overlapOnAxis(const BoxCollider& one, const Transform& oneTransform, const BoxCollider& two, const Transform& twoTransform, const Vector3& axis, const Vector3& toCentre)
@@ -49,29 +46,29 @@ static inline bool overlapOnAxis(const BoxCollider& one, const Transform& oneTra
 bool IntersectionTests::BoxAndBox(const BoxCollider& one, const Transform& oneTransform, const BoxCollider& two, const Transform& twoTransform)
 {
 	// Find the vector between the two centres
-	Vector3 toCentre = Transform::GetAxisVector(twoTransform, 3) - Transform::GetAxisVector(oneTransform, 3);
+	Vector3 toCentre = twoTransform.position - oneTransform.position;
 
 	return (
 		// Check on box one's axes first
-		TEST_OVERLAP(Transform::GetAxisVector(oneTransform, 0)) &&
-		TEST_OVERLAP(Transform::GetAxisVector(oneTransform, 1)) &&
-		TEST_OVERLAP(Transform::GetAxisVector(oneTransform, 2)) &&
+		TEST_OVERLAP(Matrix4x4::Transformation(oneTransform).GetColumn(0)) &&
+		TEST_OVERLAP(Matrix4x4::Transformation(oneTransform).GetColumn(1)) &&
+		TEST_OVERLAP(Matrix4x4::Transformation(oneTransform).GetColumn(2)) &&
 
 		// And on two's
-		TEST_OVERLAP(Transform::GetAxisVector(twoTransform, 0)) &&
-		TEST_OVERLAP(Transform::GetAxisVector(twoTransform, 1)) &&
-		TEST_OVERLAP(Transform::GetAxisVector(twoTransform, 2)) &&
+		TEST_OVERLAP(Matrix4x4::Transformation(twoTransform).GetColumn(0)) &&
+		TEST_OVERLAP(Matrix4x4::Transformation(twoTransform).GetColumn(1)) &&
+		TEST_OVERLAP(Matrix4x4::Transformation(twoTransform).GetColumn(2)) &&
 
 		// Now on the cross products
-		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 0))) &&
-		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 1))) &&
-		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 0), Transform::GetAxisVector(twoTransform, 2))) &&
-		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 0))) &&
-		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 1))) &&
-		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 1), Transform::GetAxisVector(twoTransform, 2))) &&
-		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 0))) &&
-		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 1))) &&
-		TEST_OVERLAP(Vector3::Cross(Transform::GetAxisVector(oneTransform, 2), Transform::GetAxisVector(twoTransform, 2)))
+		TEST_OVERLAP(Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(0), Matrix4x4::Transformation(twoTransform).GetColumn(0))) &&
+		TEST_OVERLAP(Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(0), Matrix4x4::Transformation(twoTransform).GetColumn(1))) &&
+		TEST_OVERLAP(Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(0), Matrix4x4::Transformation(twoTransform).GetColumn(2))) &&
+		TEST_OVERLAP(Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(1), Matrix4x4::Transformation(twoTransform).GetColumn(0))) &&
+		TEST_OVERLAP(Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(1), Matrix4x4::Transformation(twoTransform).GetColumn(1))) &&
+		TEST_OVERLAP(Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(1), Matrix4x4::Transformation(twoTransform).GetColumn(2))) &&
+		TEST_OVERLAP(Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(2), Matrix4x4::Transformation(twoTransform).GetColumn(0))) &&
+		TEST_OVERLAP(Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(2), Matrix4x4::Transformation(twoTransform).GetColumn(1))) &&
+		TEST_OVERLAP(Vector3::Cross(Matrix4x4::Transformation(oneTransform).GetColumn(2), Matrix4x4::Transformation(twoTransform).GetColumn(2)))
 		);
 }
 #undef TEST_OVERLAP
@@ -82,9 +79,7 @@ bool IntersectionTests::BoxAndHalfSpace(const BoxCollider& box, const Transform&
 	float projectedRadius = transformToAxis(box, boxTransform, plane.normal);
 
 	// Work out how far the box is from the origin
-	float boxDistance =
-		Vector3::Dot(plane.normal, Transform::GetAxisVector(boxTransform, 3)) -
-		projectedRadius;
+	float boxDistance = Vector3::Dot(plane.normal, boxTransform.position) - projectedRadius;
 
 	// Check for the intersection
 	return boxDistance <= plane.offset;

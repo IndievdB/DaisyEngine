@@ -4,6 +4,7 @@
 #include "Vector4.hpp"
 #include "Vector3.hpp"
 #include "Mathf.hpp"
+#include "../Transform.hpp"
 
 // ========================================================================
 // CONSTRUCTORS
@@ -673,6 +674,21 @@ Matrix4x4 Matrix4x4::Translation( const Vector3& vector )
     result.mV[15] = 1.0f;
     
     return result;
+}
+
+Matrix4x4 Matrix4x4::Transformation(Vector3 translation, Vector3 scale, Quaternion rotation)
+{
+	return Translation(translation)* Rotation(rotation)* Scaling(scale);
+}
+
+Matrix4x4 Matrix4x4::Transformation(Vector3 translation, Quaternion rotation)
+{
+	return Translation(translation) * Rotation(rotation);
+}
+
+Matrix4x4 Matrix4x4::Transformation(Transform transform)
+{
+	return Transformation(transform.position, transform.scale, transform.rotation);
 }
 
 // ========================================================================
