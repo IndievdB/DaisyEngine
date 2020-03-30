@@ -2,7 +2,7 @@
 #include "IntersectionTests.hpp"
 #include <iostream>
 
-unsigned CollisionDetector::SphereAndHalfSpace(const SphereCollider& sphere, const Transform& sphereTransform, RigidBody* sphereRigidBody, const PlaneCollider& plane, CollisionData& data)
+unsigned CollisionDetector::SphereAndHalfSpace(const SphereCollider& sphere, Transform& sphereTransform, RigidBody* sphereRigidBody, const PlaneCollider& plane, CollisionData& data)
 {
 	// Make sure we have contacts
 	if (data.contactsLeft <= 0) return 0;
@@ -22,14 +22,14 @@ unsigned CollisionDetector::SphereAndHalfSpace(const SphereCollider& sphere, con
 	data.contactArray[data.currentContact].contactNormal = plane.normal;
 	data.contactArray[data.currentContact].penetration = -ballDistance;
 	data.contactArray[data.currentContact].contactPoint = position - plane.normal * (ballDistance + sphere.radius);
-	data.contactArray[data.currentContact].setBodyData(sphereRigidBody, NULL, data.friction, data.restitution);
+	data.contactArray[data.currentContact].setBodyData(sphereRigidBody, &sphereTransform, nullptr, nullptr, data.friction, data.restitution);
 
 	data.addContacts(1);
 
 	return 1;
 }
 
-unsigned CollisionDetector::SphereAndSphere(const SphereCollider& one, const Transform& oneTransform, RigidBody* oneRigidBody, const SphereCollider& two, const Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data)
+unsigned CollisionDetector::SphereAndSphere(const SphereCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const SphereCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data)
 {
 	// Make sure we have contacts
 	if (data.contactsLeft <= 0) return 0;
@@ -58,14 +58,14 @@ unsigned CollisionDetector::SphereAndSphere(const SphereCollider& one, const Tra
 	data.contactArray[data.currentContact].contactNormal = normal;
 	data.contactArray[data.currentContact].contactPoint = positionOne + midline * 0.5f;
 	data.contactArray[data.currentContact].penetration = (radiusOne + radiusTwo - size);
-	data.contactArray[data.currentContact].setBodyData(oneRigidBody, twoRigidBody, data.friction, data.restitution);
+	data.contactArray[data.currentContact].setBodyData(oneRigidBody, &oneTransform, twoRigidBody, &twoTransform, data.friction, data.restitution);
 
 	data.addContacts(1);
 
 	return 1;
 }
 
-unsigned CollisionDetector::BoxAndHalfSpace(const BoxCollider& box, const Transform& boxTransform, RigidBody* boxRigidBody, const PlaneCollider& plane, CollisionData& data)
+unsigned CollisionDetector::BoxAndHalfSpace(const BoxCollider& box, Transform& boxTransform, RigidBody* boxRigidBody, const PlaneCollider& plane, CollisionData& data)
 {
 	// Make sure we have contacts
 	if (data.contactsLeft <= 0) return 0;
@@ -114,7 +114,7 @@ unsigned CollisionDetector::BoxAndHalfSpace(const BoxCollider& box, const Transf
 			data.contactArray[data.currentContact].penetration = plane.offset - vertexDistance;
 
 			// Write the appropriate data
-			data.contactArray[data.currentContact].setBodyData(boxRigidBody, NULL, data.friction, data.restitution);
+			data.contactArray[data.currentContact].setBodyData(boxRigidBody, &boxTransform, nullptr, nullptr, data.friction, data.restitution);
 
 			// Move onto the next contact
 			data.addContacts(1);
@@ -169,7 +169,7 @@ static inline bool tryAxis(const BoxCollider& one, const Transform& oneTransform
 	return true;
 }
 
-static void fillPointFaceBoxBox(const BoxCollider& one, const Transform& oneTransform, RigidBody* oneRigidBody, const BoxCollider& two, const Transform& twoTransform, RigidBody* twoRigidBody, const Vector3& toCentre, CollisionData& data, int best, float pen)
+static void fillPointFaceBoxBox(const BoxCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const BoxCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, const Vector3& toCentre, CollisionData& data, int best, float pen)
 {
 	// We know which axis the collision is on (i.e. best),
 	// but we need to work out which of the two faces on
@@ -191,7 +191,7 @@ static void fillPointFaceBoxBox(const BoxCollider& one, const Transform& oneTran
 	data.contactArray[data.currentContact].contactNormal = normal;
 	data.contactArray[data.currentContact].penetration = pen;
 	data.contactArray[data.currentContact].contactPoint = Transform::ToMatrixDSY(twoTransform).TransformPoint(vertex);
-	data.contactArray[data.currentContact].setBodyData(oneRigidBody, twoRigidBody, data.friction, data.restitution);
+	data.contactArray[data.currentContact].setBodyData(oneRigidBody, &oneTransform, twoRigidBody, &twoTransform, data.friction, data.restitution);
 }
 
 static Vector3 contactPoint(Vector3 pOne, Vector3 dOne, float oneSize, Vector3 pTwo, Vector3 dTwo, float twoSize, bool useOne)
@@ -236,7 +236,7 @@ static Vector3 contactPoint(Vector3 pOne, Vector3 dOne, float oneSize, Vector3 p
 	}
 }
 
-unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, const Transform& oneTransform, RigidBody* oneRigidBody, const BoxCollider& two, const Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data)
+unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const BoxCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data)
 {
 	// Find the vector between the two centres
 	Vector3 toCentre = Transform::GetAxisVector(twoTransform, 3) - Transform::GetAxisVector(oneTransform, 3);
@@ -341,8 +341,7 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, const Transform& o
 		data.contactArray[data.currentContact].penetration = pen;
 		data.contactArray[data.currentContact].contactNormal = axis;
 		data.contactArray[data.currentContact].contactPoint = vertex;
-		data.contactArray[data.currentContact].setBodyData(oneRigidBody, twoRigidBody,
-			data.friction, data.restitution);
+		data.contactArray[data.currentContact].setBodyData(oneRigidBody, &oneTransform, twoRigidBody, &twoTransform, data.friction, data.restitution);
 		data.addContacts(1);
 		return 1;
 	}
@@ -350,7 +349,7 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, const Transform& o
 	return 0;
 }
 
-unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, const Transform& boxTransform, RigidBody* boxRigidBody, const SphereCollider& sphere, const Transform& sphereTransform, RigidBody* sphereRigidBody, CollisionData& data)
+unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, Transform& boxTransform, RigidBody* boxRigidBody, const SphereCollider& sphere, Transform& sphereTransform, RigidBody* sphereRigidBody, CollisionData& data)
 {
 	// Transform the centre of the sphere into box coordinates
 	Vector3 centre = Transform::GetAxisVector(sphereTransform, 3);
@@ -398,7 +397,7 @@ unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, const Transform
 	data.contactArray[data.currentContact].contactNormal = (closestPtWorld - centre).Normalized();
 	data.contactArray[data.currentContact].contactPoint = closestPtWorld;
 	data.contactArray[data.currentContact].penetration = radius - sqrt(dist);
-	data.contactArray[data.currentContact].setBodyData(boxRigidBody, sphereRigidBody, data.friction, data.restitution);
+	data.contactArray[data.currentContact].setBodyData(boxRigidBody, &boxTransform, sphereRigidBody, &sphereTransform, data.friction, data.restitution);
 
 	data.addContacts(1);
 	

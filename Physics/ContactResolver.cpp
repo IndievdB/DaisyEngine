@@ -141,10 +141,7 @@ void ContactResolver::adjustPositions(Contact* c, unsigned numContacts, float du
 		c[index].matchAwakeState();
 
 		// Resolve the penetration.
-		c[index].applyPositionChange(
-			linearChange,
-			angularChange,
-			max);
+		c[index].applyPositionChange( linearChange, angularChange, max);
 
 		// Again this action may have changed the penetration of other
 		// bodies, so we update contacts.

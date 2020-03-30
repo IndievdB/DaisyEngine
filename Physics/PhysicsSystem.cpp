@@ -10,36 +10,18 @@
 
 void PhysicsSystem::RunPhysics(std::shared_ptr<entt::registry> registry)
 {
-	//if (cData.contactCount > 0)
-	//	return;
-		
 	UpdateRigidBodies(registry);
-
-	registry->view<Transform, RigidBody>().each([](auto& transform, auto& rigidBody)
-	{
-		transform.position = rigidBody.getPosition();
-		transform.rotation = rigidBody.getOrientation();
-	});
-
 	GenerateContacts(registry);
-
 	resolver.resolveContacts(cData.contactArray, cData.contactCount, 0.01f);
 
-	registry->view<Transform, RigidBody>().each([](auto& transform, auto& rigidBody)
-	{
-		transform.position = rigidBody.getPosition();
-		transform.rotation = rigidBody.getOrientation();
-	});
 }
 
 void PhysicsSystem::UpdateRigidBodies(std::shared_ptr<entt::registry> registry)
 {
 	registry->view<Transform, RigidBody>().each([](auto& transform, auto& rigidBody)
 	{
-		rigidBody.setPosition(transform.position);
-		rigidBody.setOrientation(transform.rotation);
-		rigidBody.calculateDerivedData();
-		rigidBody.integrate(0.01f);
+		rigidBody.calculateDerivedData(transform);
+		rigidBody.integrate(transform, 0.01f);
 	});
 }
 

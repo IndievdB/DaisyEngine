@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Core/Transform.hpp"
 #include "../Core/Math/Vector3.hpp"
 #include "../Core/Math/Quaternion.hpp"
 #include "../Core/Math/Matrix3x3.hpp"
@@ -13,10 +14,8 @@ protected:
 	Matrix3x3 inverseInertiaTensor;
 	float linearDamping;
 	float angularDamping;
-	Vector3 position;
-	Quaternion orientation;
 	Vector3 velocity;
-	Vector3 rotation;
+	Vector3 rotationVelocity;
 	Matrix3x3 inverseInertiaTensorWorld;
 	float motion;
 	bool isAwake;
@@ -29,8 +28,8 @@ protected:
 
 public:
 
-	void calculateDerivedData();
-	void integrate(float duration);
+	void calculateDerivedData(Transform& transform);
+	void integrate(Transform& transform, float duration);
 	void setMass(const float mass);
 	float getMass() const;
 	void setInverseMass(const float inverseMass);
@@ -51,13 +50,6 @@ public:
 	float getLinearDamping() const;
 	void setAngularDamping(const float angularDamping);
 	float getAngularDamping() const;
-	void setPosition(const Vector3& position);
-	void getPosition(Vector3& position) const;
-	Vector3 getPosition() const;
-	void setOrientation(const Quaternion& orientation);
-	void setOrientation(const float r, const float i, const float j, const float k);
-	void getOrientation(Quaternion& orientation) const;
-	Quaternion getOrientation() const;
 	void getTransform(Matrix4x4& transform) const;
 	void getTransform(float cyMatrix[16]) const;
 	void getGLTransform(float cyMatrix[16]) const;
@@ -94,8 +86,8 @@ public:
 	Vector3 getLastFrameAcceleration() const;
 	void clearAccumulators();
 	void addForce(const Vector3& force);
-	void addForceAtPoint(const Vector3& force, const Vector3& point);
-	void addForceAtBodyPoint(const Vector3& force, const Vector3& point);
+	void addForceAtPoint(const Transform& transform, const Vector3& force, const Vector3& point);
+	void addForceAtBodyPoint(const Transform& transform, const Vector3& force, const Vector3& point);
 	void addTorque(const Vector3& torque);
 	void setAcceleration(const Vector3& acceleration);
 	void setAcceleration(const float x, const float y, const float z);

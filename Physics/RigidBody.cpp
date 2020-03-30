@@ -1,7 +1,5 @@
 #include "RigidBody.hpp"
 
-#include <iostream>
-
 static float sleepEpsilon = 0.3f;
 
 static inline void _checkInverseInertiaTensor(const Matrix3x3& iitWorld)
@@ -51,19 +49,19 @@ static inline void _calculateTransformcyMatrix(Matrix4x4& transformcyMatrix, con
 }
 
 
-void RigidBody::calculateDerivedData()
+void RigidBody::calculateDerivedData(Transform& transform)
 {
-	orientation.Normalize();
+	transform.rotation.Normalize();
 
 	// Calculate the transform cyMatrix for the body.
-	_calculateTransformcyMatrix(transformcyMatrix, position, orientation);
+	_calculateTransformcyMatrix(transformcyMatrix, transform.position, transform.rotation);
 
 	// Calculate the inertiaTensor in world space.
-	_transformInertiaTensor(inverseInertiaTensorWorld, orientation, inverseInertiaTensor, transformcyMatrix);
+	_transformInertiaTensor(inverseInertiaTensorWorld, transform.rotation, inverseInertiaTensor, transformcyMatrix);
 
 }
 
-void RigidBody::integrate(float duration)
+void RigidBody::integrate(Transform& transform, float duration)
 {
 	if (!isAwake) return;
 
@@ -80,30 +78,30 @@ void RigidBody::integrate(float duration)
 	velocity += lastFrameAcceleration * duration;
 
 	// Update angular velocity from both acceleration and impulse.
-	rotation += angularAcceleration * duration;
+	rotationVelocity += angularAcceleration * duration;
 
 	// Impose drag.
 	velocity *= pow(linearDamping, duration);
-	rotation *= pow(angularDamping, duration);
+	rotationVelocity *= pow(angularDamping, duration);
 
 	//velocity = Vector3(); // TEMP
 
 	// Adjust positions
 	// Update linear position.
-	position += velocity * duration;
+	transform.position += velocity * duration;
 
 	// Update angular position.
 	//orientation.addScaledVector(rotation, duration);
-	Quaternion q(0, rotation.x* duration, rotation.y*duration, rotation.z*duration);
-	q *= orientation;
-	orientation.w += q.w * 0.5f;
-	orientation.x += q.x * 0.5f;
-	orientation.y += q.y * 0.5f;
-	orientation.z += q.z * 0.5f;
+	Quaternion q(0, rotationVelocity.x* duration, rotationVelocity.y*duration, rotationVelocity.z*duration);
+	q *= transform.rotation;
+	transform.rotation.w += q.w * 0.5f;
+	transform.rotation.x += q.x * 0.5f;
+	transform.rotation.y += q.y * 0.5f;
+	transform.rotation.z += q.z * 0.5f;
 
 	// Normalise the orientation, and update the matrices with the new
 	// position and orientation
-	calculateDerivedData();
+	calculateDerivedData(transform);
 
 	// Clear accumulators.
 	clearAccumulators();
@@ -111,7 +109,7 @@ void RigidBody::integrate(float duration)
 	// Update the kinetic energy store, and possibly put the body to
 	// sleep.
 	if (canSleep) {
-		float currentMotion = Vector3::Dot(velocity, velocity) + Vector3::Dot(rotation, rotation);
+		float currentMotion = Vector3::Dot(velocity, velocity) + Vector3::Dot(rotationVelocity, rotationVelocity);
 
 		float bias = pow(0.5, duration);
 		motion = bias * motion + (1 - bias) * currentMotion;
@@ -234,7 +232,7 @@ float RigidBody::getAngularDamping() const
 	return angularDamping;
 }
 
-void RigidBody::setPosition(const Vector3& position)
+/*void RigidBody::setPosition(const Vector3& position)
 {
 	RigidBody::position = position;
 }
@@ -272,7 +270,7 @@ void RigidBody::getOrientation(Quaternion& orientation) const
 Quaternion RigidBody::getOrientation() const
 {
 	return orientation;
-}
+}*/
 
 
 void RigidBody::getTransform(Matrix4x4& transform) const
@@ -364,29 +362,29 @@ void RigidBody::addVelocity(const Vector3& deltaVelocity)
 
 void RigidBody::setRotation(const Vector3& rotation)
 {
-	RigidBody::rotation = rotation;
+	RigidBody::rotationVelocity = rotation;
 }
 
 void RigidBody::setRotation(const float x, const float y, const float z)
 {
-	rotation.x = x;
-	rotation.y = y;
-	rotation.z = z;
+	rotationVelocity.x = x;
+	rotationVelocity.y = y;
+	rotationVelocity.z = z;
 }
 
 void RigidBody::getRotation(Vector3& rotation) const
 {
-	rotation = RigidBody::rotation;
+	rotation = RigidBody::rotationVelocity;
 }
 
 Vector3 RigidBody::getRotation() const
 {
-	return rotation;
+	return rotationVelocity;
 }
 
 void RigidBody::addRotation(const Vector3& deltaRotation)
 {
-	rotation += deltaRotation;
+	rotationVelocity += deltaRotation;
 }
 
 void RigidBody::setAwake(const bool awake)
@@ -400,7 +398,7 @@ void RigidBody::setAwake(const bool awake)
 	else {
 		isAwake = false;
 		velocity = Vector3();
-		rotation = Vector3();
+		rotationVelocity = Vector3();
 	}
 }
 
@@ -434,20 +432,19 @@ void RigidBody::addForce(const Vector3& force)
 	isAwake = true;
 }
 
-void RigidBody::addForceAtBodyPoint(const Vector3& force,
-	const Vector3& point)
+void RigidBody::addForceAtBodyPoint(const Transform& transform, const Vector3& force, const Vector3& point)
 {
 	// Convert to coordinates relative to center of mass.
 	Vector3 pt = getPointInWorldSpace(point);
-	addForceAtPoint(force, pt);
+	addForceAtPoint(transform, force, pt);
 
 }
 
-void RigidBody::addForceAtPoint(const Vector3& force, const Vector3& point)
+void RigidBody::addForceAtPoint(const Transform& transform, const Vector3& force, const Vector3& point)
 {
 	// Convert to coordinates relative to center of mass.
 	Vector3 pt = point;
-	pt -= position;
+	pt -= transform.position;
 
 	forceAccum += force;
 	torqueAccum += Vector3(pt.y * force.z - pt.z * force.y, pt.z * force.x - pt.x * force.z, pt.x * force.y - pt.y * force.x);

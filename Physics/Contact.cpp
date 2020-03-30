@@ -3,10 +3,12 @@
 #include <assert.h>
 #include <iostream>
 
-void Contact::setBodyData(RigidBody* one, RigidBody* two, float friction, float restitution)
+void Contact::setBodyData(RigidBody* oneBody, Transform* oneTransform, RigidBody* twoBody, Transform* twoTransform, float friction, float restitution)
 {
-	Contact::body[0] = one;
-	Contact::body[1] = two;
+	Contact::body[0] = oneBody;
+	Contact::body[1] = twoBody;
+	Contact::transform[0] = oneTransform;
+	Contact::transform[1] = twoTransform;
 	Contact::friction = friction;
 	Contact::restitution = restitution;
 }
@@ -18,7 +20,8 @@ void Contact::matchAwakeState()
 	bool body0awake = body[0]->getAwake();
 	bool body1awake = body[1]->getAwake();
 
-	if (body0awake ^ body1awake) {
+	if (body0awake ^ body1awake)
+	{
 		if (body0awake) body[1]->setAwake();
 		else body[0]->setAwake();
 	}
@@ -28,9 +31,13 @@ void Contact::swapBodies()
 {
 	contactNormal *= -1;
 
-	RigidBody* temp = body[0];
+	RigidBody* tempBody = body[0];
 	body[0] = body[1];
-	body[1] = temp;
+	body[1] = tempBody;
+
+	Transform* tempTransform = transform[0];
+	transform[0] = transform[1];
+	transform[1] = tempTransform;
 }
 
 inline void Contact::calculateContactBasis()
@@ -46,8 +53,7 @@ inline void Contact::calculateContactBasis()
 		contactTangent[0].z = -contactNormal.x * s;
 
 		contactTangent[1].x = contactNormal.y * contactTangent[0].x;
-		contactTangent[1].y = contactNormal.z * contactTangent[0].x -
-			contactNormal.x * contactTangent[0].z;
+		contactTangent[1].y = contactNormal.z * contactTangent[0].x - contactNormal.x * contactTangent[0].z;
 		contactTangent[1].z = -contactNormal.y * contactTangent[0].x;
 	}
 	else
@@ -101,9 +107,7 @@ void Contact::calculateDesiredDeltaVelocity(float duration)
 		thisRestitution = (float)0.0f;
 	}
 
-	desiredDeltaVelocity =
-		-contactVelocity.x
-		- thisRestitution * (contactVelocity.x - velocityFromAcc);
+	desiredDeltaVelocity = -contactVelocity.x - thisRestitution * (contactVelocity.x - velocityFromAcc);
 }
 
 void Contact::calculateInternals(float duration)
@@ -116,14 +120,16 @@ void Contact::calculateInternals(float duration)
 	calculateContactBasis();
 
 	// Store the relative position of the contact relative to each body
-	relativeContactPosition[0] = contactPoint - body[0]->getPosition();
-	if (body[1]) {
-		relativeContactPosition[1] = contactPoint - body[1]->getPosition();
+	relativeContactPosition[0] = contactPoint - transform[0]->position; //body[0]->getPosition();
+	if (body[1])
+	{
+		relativeContactPosition[1] = contactPoint - transform[1]->position;
 	}
 
 	// Find the relative velocity of the bodies at the contact point.
 	contactVelocity = calculateLocalVelocity(0, duration);
-	if (body[1]) {
+	if (body[1])
+	{
 		contactVelocity -= calculateLocalVelocity(1, duration);
 	}
 
@@ -299,9 +305,7 @@ Vector3 Contact::calculateFrictionImpulse(Matrix3x3* inverseInertiaTensor)
 	return impulseContact;
 }
 
-void Contact::applyPositionChange(Vector3 linearChange[2],
-	Vector3 angularChange[2],
-	float penetration)
+void Contact::applyPositionChange(Vector3 linearChange[2], Vector3 angularChange[2], float penetration)
 {
 	const float angularLimit = (float)0.2f;
 	float angularMove[2];
@@ -401,32 +405,31 @@ void Contact::applyPositionChange(Vector3 linearChange[2],
 
 		// Now we can start to apply the values we've calculated.
 		// Apply the linear movement
-		Vector3 pos;
-		body[i]->getPosition(pos);
-		//std::cout << "a " << pos.x << "  |  " << linearMove[i] << "  |  " << contactNormal.x << "   " << contactNormal.y << "   " << contactNormal.z << std::endl;
+		/*Vector3 pos; body[i]->getPosition(pos);
 		pos += contactNormal * linearMove[i];
-		//std::cout << "b " << pos.x << "   " << pos.y << "   " << pos.z << std::endl;
-		body[i]->setPosition(pos);
+		body[i]->setPosition(pos);*/
+
+		transform[i]->position += contactNormal * linearMove[i];
 
 		// And the change in orientation
-		Quaternion q;
-		body[i]->getOrientation(q);
+		//Quaternion q;
+		//body[i]->getOrientation(q);
 
 		Quaternion temp(0, angularChange[i].x, angularChange[i].y, angularChange[i].z);
-		temp *= q;
-		q.w += temp.w * 0.5f;
-		q.x += temp.x * 0.5f;
-		q.y += temp.y * 0.5f;
-		q.z += temp.z * 0.5f;
+		temp *= transform[i]->rotation;
+		transform[i]->rotation.w += temp.w * 0.5f;
+		transform[i]->rotation.x += temp.x * 0.5f;
+		transform[i]->rotation.y += temp.y * 0.5f;
+		transform[i]->rotation.z += temp.z * 0.5f;
 		
 		//q.addScaledVector(angularChange[i], ((float)1.0));
-		body[i]->setOrientation(q);
+		//body[i]->setOrientation(q);
 
 		// We need to calculate the derived data for any body that is
 		// asleep, so that the changes are reflected in the object's
 		// data. Otherwise the resolution will not change the position
 		// of the object, and the next collision detection round will
 		// have the same penetration.
-		if (!body[i]->getAwake()) body[i]->calculateDerivedData();
+		if (!body[i]->getAwake()) body[i]->calculateDerivedData(*transform[i]);
 	}
 }

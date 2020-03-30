@@ -43,14 +43,10 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		float diameter = rand() % 2 + 1.0f;
 		Vector3 scale (diameter, diameter, diameter);
 		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
-		registry->assign<Transform>(entity, position, scale, rotation);
+		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
 		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/sphere.obj");
 
 		RigidBody& rb = registry->assign<RigidBody>(entity);
-		rb.setPosition(position);
-		rb.setOrientation(rotation);
-		rb.setVelocity(Vector3());
-		rb.setRotation(Vector3());
 		float radius = diameter * 0.5f;
 		float mass = 4.0f * 0.3333f * 3.1415f * radius * radius * radius; rb.setMass(mass);
 		Matrix3x3 tensor; float coeff = 0.4f * mass * radius * radius;
@@ -60,7 +56,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		rb.clearAccumulators();
 		rb.setAcceleration(0, -10.0f, 0);
 		rb.setAwake();
-		rb.calculateDerivedData();
+		rb.calculateDerivedData(transform);
 		
 		SphereCollider& collider = registry->assign<SphereCollider>(entity);
 		collider.radius = 0.5f;
@@ -72,14 +68,10 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Vector3 position = Vector3(rand() % 10 - 5, rand() % 5 + 5, rand() % 10 - 5);
 		Vector3 scale = Vector3(rand() % 8 + 1.0f, rand() % 2 + 1.0f, rand() % 2 + 1.0f);
 		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
-		registry->assign<Transform>(entity, position, scale, rotation);
+		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
 		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/cube.obj");
 
 		RigidBody& rb = registry->assign<RigidBody>(entity);
-		rb.setPosition(position);
-		rb.setOrientation(rotation);
-		rb.setVelocity(Vector3());
-		rb.setRotation(Vector3());
 		Vector3 halfSize = Vector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f);
 		float mass = halfSize.x * halfSize.y * halfSize.z * 8.0f; rb.setMass(mass);
 
@@ -93,7 +85,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		rb.clearAccumulators();
 		rb.setAcceleration(0, -10.0f, 0);
 		rb.setAwake();
-		rb.calculateDerivedData();
+		rb.calculateDerivedData(transform);
 
 		BoxCollider& collider = registry->assign<BoxCollider>(entity);
 		collider.halfSize = Vector3(0.5f, 0.5f, 0.5f);
