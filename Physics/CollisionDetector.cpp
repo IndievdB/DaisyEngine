@@ -1,9 +1,18 @@
 #include "CollisionDetector.hpp"
 #include "IntersectionTests.hpp"
-#include <iostream>
 
 unsigned CollisionDetector::SphereAndHalfSpace(const SphereCollider& sphere, Transform& sphereTransform, RigidBody* sphereRigidBody, const PlaneCollider& plane, CollisionData& data)
 {
+	if (sphere.isTrigger || plane.isTrigger)
+	{
+		if (IntersectionTests::SphereAndHalfSpace(sphere, sphereTransform, plane))
+		{
+			std::cout << "COLLIDE" << std::endl;
+		}
+
+		return 0;
+	}
+
 	if (sphereRigidBody == nullptr) return 0;
 
 	// Make sure we have contacts
@@ -30,6 +39,16 @@ unsigned CollisionDetector::SphereAndHalfSpace(const SphereCollider& sphere, Tra
 
 unsigned CollisionDetector::SphereAndSphere(const SphereCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const SphereCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data)
 {
+	if (one.isTrigger || two.isTrigger)
+	{
+		if (IntersectionTests::SphereAndSphere(one, oneTransform, two, twoTransform))
+		{
+			std::cout << "COLLIDE" << std::endl;
+		}
+
+		return 0;
+	}
+
 	if (oneRigidBody == nullptr && twoRigidBody == nullptr) return 0;
 
 	// Make sure we have contacts
@@ -64,6 +83,16 @@ unsigned CollisionDetector::SphereAndSphere(const SphereCollider& one, Transform
 
 unsigned CollisionDetector::BoxAndHalfSpace(const BoxCollider& box, Transform& boxTransform, RigidBody* boxRigidBody, const PlaneCollider& plane, CollisionData& data)
 {
+	if (box.isTrigger || plane.isTrigger)
+	{
+		if (IntersectionTests::BoxAndHalfSpace(box, boxTransform, plane))
+		{
+			std::cout << "COLLIDE" << std::endl;
+		}
+
+		return 0;
+	}
+
 	if (boxRigidBody == nullptr) return 0;
 
 	// Make sure we have contacts
@@ -234,6 +263,16 @@ static Vector3 contactPoint(Vector3 pOne, Vector3 dOne, float oneSize, Vector3 p
 
 unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const BoxCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data)
 {
+	if (one.isTrigger || two.isTrigger)
+	{
+		if (IntersectionTests::BoxAndBox(one, oneTransform, two, twoTransform))
+		{
+			std::cout << "COLLIDE" << std::endl;
+		}
+
+		return 0;
+	}
+
 	if (oneRigidBody == nullptr && twoRigidBody == nullptr) return 0;
 
 	if (data.contactsLeft <= 0) return 0;
@@ -351,6 +390,16 @@ unsigned CollisionDetector::BoxAndBox(const BoxCollider& one, Transform& oneTran
 
 unsigned CollisionDetector::BoxAndSphere(const BoxCollider& box, Transform& boxTransform, RigidBody* boxRigidBody, const SphereCollider& sphere, Transform& sphereTransform, RigidBody* sphereRigidBody, CollisionData& data)
 {
+	if (box.isTrigger || sphere.isTrigger)
+	{
+		if (IntersectionTests::BoxAndSphere(box, boxTransform, sphere, sphereTransform))
+		{
+			std::cout << "COLLIDE" << std::endl;
+		}
+
+		return 0;
+	}
+
 	if (boxRigidBody == nullptr && sphereRigidBody == nullptr) return 0;
 
 	// Transform the centre of the sphere into box coordinates

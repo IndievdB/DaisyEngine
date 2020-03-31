@@ -84,3 +84,45 @@ bool IntersectionTests::BoxAndHalfSpace(const BoxCollider& box, const Transform&
 	// Check for the intersection
 	return boxDistance <= plane.offset;
 }
+
+bool IntersectionTests::BoxAndSphere(const BoxCollider& box, const Transform& boxTransform, const SphereCollider& sphere, const Transform& sphereTransform)
+{
+	// Transform the centre of the sphere into box coordinates
+	Vector3 relCentre = Matrix4x4::AffineInverse(Matrix4x4::Transformation(boxTransform.position, boxTransform.rotation)).TransformPoint(sphereTransform.position);
+
+	float radius = sphere.radius * sphereTransform.scale.MaxComponent();
+	Vector3 boxHalfSize(box.halfSize.x * boxTransform.scale.x, box.halfSize.y * boxTransform.scale.y, box.halfSize.z * boxTransform.scale.z);
+
+	// Early out check to see if we can exclude the contact
+	if (abs(relCentre.x) - radius > boxHalfSize.x ||
+		abs(relCentre.y) - radius > boxHalfSize.y ||
+		abs(relCentre.z) - radius > boxHalfSize.z)
+	{
+		return 0;
+	}
+
+	Vector3 closestPt;
+	float dist;
+
+	// Clamp each coordinate to the box.
+	dist = relCentre.x;
+	if (dist > boxHalfSize.x) dist = boxHalfSize.x;
+	if (dist < -boxHalfSize.x) dist = -boxHalfSize.x;
+	closestPt.x = dist;
+
+	dist = relCentre.y;
+	if (dist > boxHalfSize.y) dist = boxHalfSize.y;
+	if (dist < -boxHalfSize.y) dist = -boxHalfSize.y;
+	closestPt.y = dist;
+
+	dist = relCentre.z;
+	if (dist > boxHalfSize.z) dist = boxHalfSize.z;
+	if (dist < -boxHalfSize.z) dist = -boxHalfSize.z;
+	closestPt.z = dist;
+
+	// Check we're in contact
+	dist = (closestPt - relCentre).LengthSquared();
+	if (dist > radius * radius) return false;
+
+	return true;
+}

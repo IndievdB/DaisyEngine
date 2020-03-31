@@ -3,5 +3,6 @@ class SphereCollider
 {
 public:
 	float radius;
+	bool isTrigger;
 };
 

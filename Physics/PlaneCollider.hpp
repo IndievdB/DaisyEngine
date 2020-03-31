@@ -7,4 +7,5 @@ class PlaneCollider
 public:
 	Vector3 normal;
 	float offset;
+	bool isTrigger;
 };

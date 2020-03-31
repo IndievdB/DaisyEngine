@@ -15,4 +15,6 @@ public:
 	static bool BoxAndBox(const BoxCollider& one, const Transform& oneTransform, const BoxCollider& two, const Transform& twoTransform);
 
 	static bool BoxAndHalfSpace(const BoxCollider& box, const Transform& boxTransform, const PlaneCollider& plane);
+
+	static bool BoxAndSphere(const BoxCollider& box, const Transform& boxTransform, const SphereCollider& sphere, const Transform& sphereTransform);
 };

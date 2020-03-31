@@ -13,7 +13,6 @@ void PhysicsSystem::RunPhysics(std::shared_ptr<entt::registry> registry)
 	UpdateRigidBodies(registry);
 	GenerateContacts(registry);
 	resolver.resolveContacts(cData.contactArray, cData.contactCount, 0.01f);
-
 }
 
 void PhysicsSystem::UpdateRigidBodies(std::shared_ptr<entt::registry> registry)

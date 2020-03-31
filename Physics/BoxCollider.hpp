@@ -6,5 +6,6 @@ class BoxCollider
 {
 public:
 	Vector3 halfSize;
+	bool isTrigger;
 };
 

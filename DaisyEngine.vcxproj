@@ -147,7 +147,6 @@
     <ClCompile Include="Physics\IntersectionTests.cpp" />
     <ClCompile Include="Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
-    <ClCompile Include="Physics\PlaneCollider.cpp" />
     <ClCompile Include="Vendor\glad\glad.c" />
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -156,7 +155,6 @@
     <ClCompile Include="Core\ResourceManager.cpp" />
     <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Physics\RigidBody.cpp" />
-    <ClCompile Include="Physics\SphereCollider.cpp" />
     <ClCompile Include="Vendor\stb\stb_image.cpp" />
     <ClCompile Include="Renderer\Texture.cpp" />
     <ClCompile Include="Renderer\Window.cpp" />
