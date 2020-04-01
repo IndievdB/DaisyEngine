@@ -28,8 +28,8 @@ function Update(entity)
 		t.position = t.position - t:GetForward() * 0.2
 	end
 
-	pitch = pitch + Input.GetMouseDelta().y * 0.1
-	yaw = yaw - Input.GetMouseDelta().x * 0.1
+	pitch = pitch + Input.GetMouseDelta().y * 0.002
+	yaw = yaw - Input.GetMouseDelta().x * 0.002
 
-	t:SetRotation(pitch, yaw, 0)
+	t.rotation:SetEuler(pitch,yaw,0)
 end

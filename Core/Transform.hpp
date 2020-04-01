@@ -30,15 +30,4 @@ struct Transform
 	{
 		return Matrix3x3(rotation) * Vector3::right;
 	}
-
-	void SetRotation(float pitch, float yaw, float roll)
-	{
-		pitch = pitch * kDegToRad;
-		yaw = yaw * kDegToRad;
-		roll = roll * kDegToRad;
-		rotation.x = sin(pitch / 2.0f) * cos(yaw / 2.0f) * cos(roll / 2.0f) - cos(pitch / 2.0f) * sin(yaw / 2.0f) * sin(roll / 2.0f);
-		rotation.y = cos(pitch / 2.0f) * sin(yaw / 2.0f) * cos(roll / 2.0f) + sin(pitch / 2.0f) * cos(yaw / 2.0f) * sin(roll / 2.0f);
-		rotation.z = cos(pitch / 2.0f) * cos(yaw / 2.0f) * sin(roll / 2.0f) - sin(pitch / 2.0f) * sin(yaw / 2.0f) * cos(roll / 2.0f);
-		rotation.w = cos(pitch / 2.0f) * cos(yaw / 2.0f) * cos(roll / 2.0f) + sin(pitch / 2.0f) * sin(yaw / 2.0f) * sin(roll / 2.0f);
-	}
 };

@@ -156,25 +156,25 @@ Quaternion Quaternion::Normalized() const
     }
 }
 
-void Quaternion::Set( float zRot, float yRot, float xRot )
+void Quaternion::Set( float pitch, float yaw, float roll )
 {    
-    zRot *= 0.5f;
-    yRot *= 0.5f;
-    xRot *= 0.5f;
+	pitch *= 0.5f;
+	yaw *= 0.5f;
+	roll *= 0.5f;
     
-    float Cx = cosf(xRot);
-    float Sx = sinf(xRot);
+    float Cx = cosf(pitch);
+    float Sx = sinf(pitch);
     
-    float Cy = cosf(yRot);
-    float Sy = sinf(yRot);
+    float Cy = cosf(yaw);
+    float Sy = sinf(yaw);
     
-    float Cz = cosf(zRot);
-    float Sz = sinf(zRot);
+    float Cz = cosf(roll);
+    float Sz = sinf(roll);
 
-    w = Cx*Cy*Cz - Sx*Sy*Sz;
-    x = Sx*Cy*Cz + Cx*Sy*Sz;
-    y = Cx*Sy*Cz - Sx*Cy*Sz;
-    z = Cx*Cy*Sz + Sx*Sy*Cx;
+	x = Sx * Cy * Cz - Cx * Sy * Sz;
+	y = Cx * Sy * Cz + Sx * Cy * Sz;
+	z = Cx * Cy * Sz - Sx * Sy * Cx;
+	w = Cx * Cy * Cz + Sx * Sy * Sz;
 }
 
 void Quaternion::Set( const Vector3& axis, float angle )

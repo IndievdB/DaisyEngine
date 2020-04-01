@@ -50,7 +50,7 @@ public:
     void Normalize();
     Quaternion Normalized() const;
     inline void Set( float _w, float _x, float _y, float _z );
-    void Set( float zRot, float yRot, float xRot );
+    void Set( float pitch, float yaw, float roll );
     void Set( const Vector3& axis, float angle );
     void Set( const Vector3& from, const Vector3& to );
     void Set( const Matrix3x3& matrix );
