@@ -34,6 +34,7 @@ public:
     bool IsZero() const;
     float Length() const;
     float LengthSquared() const;
+	float MaxComponent() const;
     void Normalize();
     Vector2 Normalized() const;
     Vector2 Perpendicular() const { return Vector2(-y, x); }

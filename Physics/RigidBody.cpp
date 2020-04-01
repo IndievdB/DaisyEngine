@@ -2,11 +2,6 @@
 
 static float sleepEpsilon = 0.3f;
 
-static inline void _checkInverseInertiaTensor(const Matrix3x3& iitWorld)
-{
-	// TODO: Perform a validity check in an assert.
-}
-
 static inline void _transformInertiaTensor(Matrix3x3& iitWorld, const Quaternion& q, const Matrix3x3& iitBody, const Matrix4x4& rotmat)
 {
 	float t4 = rotmat[0] * iitBody[0] + rotmat[4] * iitBody[1] + rotmat[8] * iitBody[2];
@@ -152,7 +147,6 @@ bool RigidBody::hasFiniteMass() const
 void RigidBody::setInertiaTensor(const Matrix3x3& inertiaTensor)
 {
 	inverseInertiaTensor = Matrix3x3::Inverse(inertiaTensor);
-	_checkInverseInertiaTensor(inverseInertiaTensor);
 }
 
 void RigidBody::getInertiaTensor(Matrix3x3& inertiaTensor) const
@@ -181,7 +175,6 @@ Matrix3x3 RigidBody::getInertiaTensorWorld() const
 
 void RigidBody::setInverseInertiaTensor(const Matrix3x3& inverseInertiaTensor)
 {
-	_checkInverseInertiaTensor(inverseInertiaTensor);
 	RigidBody::inverseInertiaTensor = inverseInertiaTensor;
 }
 
@@ -230,107 +223,6 @@ void RigidBody::setAngularDamping(const float angularDamping)
 float RigidBody::getAngularDamping() const
 {
 	return angularDamping;
-}
-
-/*void RigidBody::setPosition(const Vector3& position)
-{
-	RigidBody::position = position;
-}
-
-void RigidBody::getPosition(Vector3& position) const
-{
-	position = RigidBody::position;
-}
-
-Vector3 RigidBody::getPosition() const
-{
-	return position;
-}
-
-void RigidBody::setOrientation(const Quaternion& orientation)
-{
-	RigidBody::orientation = orientation.Normalized();
-}
-
-void RigidBody::setOrientation(const float r, const float i,
-	const float j, const float k)
-{
-	orientation.w = r;
-	orientation.x = i;
-	orientation.y = j;
-	orientation.z = k;
-	orientation.Normalize();
-}
-
-void RigidBody::getOrientation(Quaternion& orientation) const
-{
-	orientation = RigidBody::orientation;
-}
-
-Quaternion RigidBody::getOrientation() const
-{
-	return orientation;
-}*/
-
-
-void RigidBody::getTransform(Matrix4x4& transform) const
-{
-	memcpy(transform.mV, transformcyMatrix.mV, sizeof(Matrix4x4));
-}
-
-void RigidBody::getTransform(float matrixValues[16]) const
-{
-	memcpy(matrixValues, transformcyMatrix.mV, sizeof(float) * 12);
-	matrixValues[3] = matrixValues[7] = matrixValues[11] = 0;
-	matrixValues[15] = 1;
-}
-
-void RigidBody::getGLTransform(float matrixValues[16]) const
-{
-	matrixValues[0] = (float)transformcyMatrix[0];
-	matrixValues[4] = (float)transformcyMatrix[1];
-	matrixValues[8] = (float)transformcyMatrix[2];
-	matrixValues[12] = 0;
-
-	matrixValues[1] = (float)transformcyMatrix[4];
-	matrixValues[5] = (float)transformcyMatrix[5];
-	matrixValues[9] = (float)transformcyMatrix[6];
-	matrixValues[13] = 0;
-
-	matrixValues[2] = (float)transformcyMatrix[8];
-	matrixValues[6] = (float)transformcyMatrix[9];
-	matrixValues[10] = (float)transformcyMatrix[10];
-	matrixValues[14] = 0;
-
-	matrixValues[3] = (float)transformcyMatrix[12];
-	matrixValues[7] = (float)transformcyMatrix[13];
-	matrixValues[11] = (float)transformcyMatrix[14];
-	matrixValues[15] = 1;
-}
-
-Matrix4x4 RigidBody::getTransform() const
-{
-	return transformcyMatrix;
-}
-
-Vector3 RigidBody::getPointInLocalSpace(const Vector3& point) const
-{
-	return Matrix4x4::AffineInverse(transformcyMatrix).TransformPoint(point);
-}
-
-Vector3 RigidBody::getPointInWorldSpace(const Vector3& point) const
-{
-	return transformcyMatrix.TransformPoint(point);
-}
-
-Vector3 RigidBody::getDirectionInLocalSpace(const Vector3& direction) const
-{
-	return Matrix4x4::AffineInverse(transformcyMatrix).TransformVector(direction);
-}
-
-Vector3 RigidBody::getDirectionInWorldSpace(const Vector3& direction) const
-{
-	return transformcyMatrix.TransformVector(direction);
 }
 
 void RigidBody::setVelocity(const Vector3& velocity)
@@ -409,7 +301,6 @@ void RigidBody::setCanSleep(const bool canSleep)
 	if (!canSleep && !isAwake) setAwake();
 }
 
-
 void RigidBody::getLastFrameAcceleration(Vector3& acceleration) const
 {
 	acceleration = lastFrameAcceleration;
@@ -435,9 +326,8 @@ void RigidBody::addForce(const Vector3& force)
 void RigidBody::addForceAtBodyPoint(const Transform& transform, const Vector3& force, const Vector3& point)
 {
 	// Convert to coordinates relative to center of mass.
-	Vector3 pt = getPointInWorldSpace(point);
+	Vector3 pt = Matrix4x4::Transformation(transform).TransformPoint(point);
 	addForceAtPoint(transform, force, pt);
-
 }
 
 void RigidBody::addForceAtPoint(const Transform& transform, const Vector3& force, const Vector3& point)

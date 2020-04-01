@@ -34,6 +34,7 @@ public:
     bool IsZero() const;
     float Length() const;
     float LengthSquared() const;
+	float MaxComponent() const;
     void Normalize();
     Vector4 Normalized() const;
     inline void Set( float _x, float _y, float _z, float _w );

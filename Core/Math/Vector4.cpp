@@ -52,6 +52,11 @@ float Vector4::LengthSquared() const
     return ( x*x + y*y + z*z + w*w );
 }
 
+float Vector4::MaxComponent() const
+{
+	return fmaxf(fmaxf(fmaxf(x, y), z),w);
+}
+
 void Vector4::Normalize()
 {
     float lengthsq = x*x + y*y + z*z + w*w;

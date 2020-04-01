@@ -36,10 +36,10 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	srand(time(NULL));
 	
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		auto entity = registry->create();
-		Vector3 position = Vector3(0, rand() % 5 + 10, 0);
+		Vector3 position = Vector3(rand() % 8 - 4, rand() % 5 + 5, rand() % 8 - 4);
 		float diameter = rand() % 2 + 1.0f;
 		Vector3 scale (diameter, diameter, diameter);
 		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
@@ -62,17 +62,17 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		collider.radius = 0.5f;
 	}
 	
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		auto entity = registry->create();
-		Vector3 position = Vector3(0, rand() % 5 + 2, 0);
+		Vector3 position = Vector3(rand() % 8 - 4, rand() % 5 + 5, rand() % 8 - 4);
 		Vector3 scale = Vector3(rand() % 4 + 1.0f, rand() % 2 + 1.0f, rand() % 2 + 1.0f);
 		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
 		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
 		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/cube.obj");
-		registry->assign<LuaBehaviour>(entity, "Resources/CollisionTest.lua");
+		//registry->assign<LuaBehaviour>(entity, "Resources/CollisionTest.lua");
 
-		/*RigidBody& rb = registry->assign<RigidBody>(entity);
+		RigidBody& rb = registry->assign<RigidBody>(entity);
 		Vector3 halfSize = Vector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f);
 		float mass = halfSize.x * halfSize.y * halfSize.z * 8.0f; rb.setMass(mass);
 
@@ -86,10 +86,10 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		rb.clearAccumulators();
 		rb.setAcceleration(0, -10.0f, 0);
 		rb.setAwake();
-		rb.calculateDerivedData(transform);*/
+		rb.calculateDerivedData(transform);
 
 		BoxCollider& collider = registry->assign<BoxCollider>(entity);
 		collider.halfSize = Vector3(0.5f, 0.5f, 0.5f);
-		collider.isTrigger = true;
+		//collider.isTrigger = true;
 	}
 }

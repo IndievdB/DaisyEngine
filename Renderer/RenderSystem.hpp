@@ -11,16 +11,16 @@
 
 void RenderAll(std::shared_ptr<entt::registry> registry)
 {
-	Matrix4x4 projection = Matrix4x4::Perspective(45.0f*kDegToRad, 800.0f / 600.0f, 0.1f, 1000.0f);
+	Matrix4x4 projection;
 	Matrix4x4 view;
 
-	registry->view<Transform, Camera>().each([&view](auto& transform, auto& camera)
+	registry->view<Transform, Camera>().each([&projection, &view](auto& transform, auto& camera)
 	{
-		Matrix3x3 rotationMatrix(transform.rotation);
+		projection = Matrix4x4::Perspective(camera.fov * kDegToRad, 800.0f / 600.0f, camera.nearPlane, camera.farPlane);
 
+		Matrix3x3 rotationMatrix(transform.rotation);
 		Vector3 forward = rotationMatrix * Vector3::forward;
 		Vector3 up = rotationMatrix * Vector3::up;
-
 		view = Matrix4x4::LookAt(transform.position, transform.position + forward, up);
 	});
 

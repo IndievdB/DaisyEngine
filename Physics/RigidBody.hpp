@@ -50,14 +50,6 @@ public:
 	float getLinearDamping() const;
 	void setAngularDamping(const float angularDamping);
 	float getAngularDamping() const;
-	void getTransform(Matrix4x4& transform) const;
-	void getTransform(float cyMatrix[16]) const;
-	void getGLTransform(float cyMatrix[16]) const;
-	Matrix4x4 getTransform() const;
-	Vector3 getPointInLocalSpace(const Vector3& point) const;
-	Vector3 getPointInWorldSpace(const Vector3& point) const;
-	Vector3 getDirectionInLocalSpace(const Vector3& direction) const;
-	Vector3 getDirectionInWorldSpace(const Vector3& direction) const;
 	void setVelocity(const Vector3& velocity);
 	void setVelocity(const float x, const float y, const float z);
 	void getVelocity(Vector3& velocity) const;

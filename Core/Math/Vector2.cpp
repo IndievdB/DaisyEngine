@@ -46,6 +46,11 @@ float Vector2::LengthSquared() const
     return (x*x + y*y);
 }
 
+float Vector2::MaxComponent() const
+{
+	return fmaxf(x, y);
+}
+
 void Vector2::Normalize()
 {
     // Get the length squared of vector first for speed.
