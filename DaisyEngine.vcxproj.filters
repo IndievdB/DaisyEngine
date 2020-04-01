@@ -63,9 +63,6 @@
     <ClCompile Include="Vendor\glad\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Behaviour\LuaBehaviour.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Behaviour\LuaSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -377,5 +374,11 @@
     <ClInclude Include="Core\Math\Matrix4x4.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Physics\TriggerData.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CollisionTest.lua" />
   </ItemGroup>
 </Project>

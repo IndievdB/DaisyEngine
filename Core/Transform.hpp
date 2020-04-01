@@ -5,6 +5,7 @@
 #include "../Core/Math/Matrix3x3.hpp"
 #include "../Core/Math/Matrix4x4.hpp"
 #include "../Core/Math/Mathf.hpp"
+#include <iostream>
 
 struct Transform
 {

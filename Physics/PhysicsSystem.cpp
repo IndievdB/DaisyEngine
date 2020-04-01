@@ -7,12 +7,21 @@
 #include <iostream>
 #include "../Vendor/entt/entt.hpp"
 #include "CollisionDetector.hpp"
+//#include "../Behaviour/LuaBehaviour.hpp"
 
 void PhysicsSystem::RunPhysics(std::shared_ptr<entt::registry> registry)
 {
+	UpdateTriggers(registry);
 	UpdateRigidBodies(registry);
 	GenerateContacts(registry);
 	resolver.resolveContacts(cData.contactArray, cData.contactCount, 0.01f);
+}
+
+void PhysicsSystem::UpdateTriggers(std::shared_ptr<entt::registry> registry)
+{
+	registry->view<PlaneCollider>().each([](auto& collider) { collider.triggerData.NextFrame(); });
+	registry->view<BoxCollider>().each([](auto& collider) { collider.triggerData.NextFrame(); });
+	registry->view<SphereCollider>().each([](auto& collider) { collider.triggerData.NextFrame(); });
 }
 
 void PhysicsSystem::UpdateRigidBodies(std::shared_ptr<entt::registry> registry)
@@ -42,74 +51,43 @@ void PhysicsSystem::GenerateContacts(std::shared_ptr<entt::registry> registry)
 	// Check all boxes against...
 	for (auto box = boxes.begin(); box != boxes.end(); ++box)
 	{
-		Transform& transform = registry->get<Transform>(*box);
-		BoxCollider& collider = registry->get<BoxCollider>(*box);
-		RigidBody* rigidBody = registry->try_get<RigidBody>(*box);
-
 		// all planes
 		for (auto plane = planes.begin(); plane != planes.end(); ++plane)
 		{
 			if (!cData.hasMoreContacts()) return;
-
-			CollisionDetector::BoxAndHalfSpace(collider, transform, rigidBody, registry->get<PlaneCollider>(*plane), cData);
-			// CollisionDetector.boxAndHalfSpace(box, plane, ref cData);
+			CollisionDetector::BoxAndPlane(registry, *box, *plane, cData);
 		}
 
 		// all other boxes
 		for (auto otherBox = std::next(box); otherBox != boxes.end(); ++otherBox)
 		{
 			if (!cData.hasMoreContacts()) return;
-
-			Transform& otherTransform = registry->get<Transform>(*otherBox);
-			BoxCollider& otherCollider = registry->get<BoxCollider>(*otherBox);
-			RigidBody* otherRigidBody = registry->try_get<RigidBody>(*otherBox);
-
-			CollisionDetector::BoxAndBox(collider, transform, rigidBody, otherCollider, otherTransform, otherRigidBody, cData);
-
-			// CollisionDetector.boxAndBox(box, other, ref cData);
+			CollisionDetector::BoxAndBox(registry, *box, *otherBox, cData);
 		}
 
 		// all spheres
 		for (auto sphere = spheres.begin(); sphere != spheres.end(); ++sphere)
 		{
 			if (!cData.hasMoreContacts()) return;
-
-			Transform& sphereTransform = registry->get<Transform>(*sphere);
-			SphereCollider& sphereCollider = registry->get<SphereCollider>(*sphere);
-			RigidBody* sphereRigidBody = registry->try_get<RigidBody>(*sphere);
-
-			CollisionDetector::BoxAndSphere(collider, transform, rigidBody, sphereCollider, sphereTransform, sphereRigidBody, cData);
-			//CollisionDetector.boxAndSphere(box, other, ref cData);
+			CollisionDetector::BoxAndSphere(registry, *box, *sphere, cData);
 		}
 	}
 
 	// Check all spheres against...
 	for (auto sphere = spheres.begin(); sphere != spheres.end(); ++sphere)
 	{
-		Transform& transform = registry->get<Transform>(*sphere);
-		SphereCollider& collider = registry->get<SphereCollider>(*sphere);
-		RigidBody* rigidBody = registry->try_get<RigidBody>(*sphere);
-
 		// all planes
 		for (auto plane = planes.begin(); plane != planes.end(); ++plane)
 		{
 			if (!cData.hasMoreContacts()) return;
-
-			CollisionDetector::SphereAndHalfSpace(collider, transform, rigidBody, registry->get<PlaneCollider>(*plane), cData);
-			//CollisionDetector.sphereAndHalfSpace(ball, plane, ref cData);
+			CollisionDetector::SphereAndPlane(registry, *sphere, *plane, cData);
 		}
 
 		// all other spheres
 		for (auto otherSphere = std::next(sphere); otherSphere != spheres.end(); ++otherSphere)
 		{
 			if (!cData.hasMoreContacts()) return;
-
-			Transform& otherTransform = registry->get<Transform>(*otherSphere);
-			SphereCollider& otherCollider = registry->get<SphereCollider>(*otherSphere);
-			RigidBody* otherRigidBody = registry->try_get<RigidBody>(*otherSphere);
-
-			CollisionDetector::SphereAndSphere(collider, transform, rigidBody, otherCollider, otherTransform, otherRigidBody, cData);
-			//CollisionDetector.sphereAndSphere(ball, other, ref cData);
+			CollisionDetector::SphereAndSphere(registry, *sphere, *otherSphere, cData);
 		}
 	}
 }

@@ -1,17 +1,14 @@
 #pragma once
 
 #include "../Vendor/entt/entt.hpp"
+#include "../Physics/TriggerData.hpp"
 #include <string>
 
 class lua_State;
 
-class LuaBehaviour
+struct LuaBehaviour
 {
-public:
-	LuaBehaviour(std::string scriptPath);
-	~LuaBehaviour();
-	void Update(entt::entity& entity);
-private:
+	LuaBehaviour(std::string scriptPath) : scriptPath(scriptPath) {};
 	std::string scriptPath;
-	lua_State* L;
+	std::shared_ptr<lua_State*> L;
 };

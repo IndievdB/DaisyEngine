@@ -22,13 +22,15 @@ int main()
 
 	LoadScene(registry);
 
+	luaSystem.Intialize();
+
 	while (window.isOpen)
 	{
 		inputSystem.Update();
 		window.ProcessInput();
 		window.Clear();
 
-		luaSystem.UpdateAllLuaScripts();
+		luaSystem.Update();
 
 		RenderAll(registry);
 

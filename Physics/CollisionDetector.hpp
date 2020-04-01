@@ -7,16 +7,15 @@
 #include "RigidBody.hpp"
 #include "CollisionData.hpp"
 
+#include "../Vendor/entt/entt.hpp"
+
 class CollisionDetector
 {
 public:
-	static unsigned SphereAndHalfSpace(const SphereCollider& sphere, Transform& sphereTransform, RigidBody* sphereRigidBody, const PlaneCollider& plane, CollisionData& data);
 
-	static unsigned SphereAndSphere(const SphereCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const SphereCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data);
-
-	static unsigned BoxAndHalfSpace(const BoxCollider& box, Transform& boxTransform, RigidBody* boxRigidBody, const PlaneCollider& plane, CollisionData& data);
-
-	static unsigned BoxAndBox(const BoxCollider& one, Transform& oneTransform, RigidBody* oneRigidBody, const BoxCollider& two, Transform& twoTransform, RigidBody* twoRigidBody, CollisionData& data);
-
-	static unsigned BoxAndSphere(const BoxCollider& box, Transform& boxTransform, RigidBody* boxRigidBody, const SphereCollider& sphere, Transform& sphereTransform, RigidBody* sphereRigidBody, CollisionData& data);
+	static unsigned SphereAndPlane(const std::shared_ptr<entt::registry> registry, const entt::entity& sphere, const entt::entity& plane, CollisionData& data);
+	static unsigned SphereAndSphere(const std::shared_ptr<entt::registry> registry, const entt::entity& one, const entt::entity& two, CollisionData& data);
+	static unsigned BoxAndPlane(const std::shared_ptr<entt::registry> registry, const entt::entity& box, const entt::entity& plane, CollisionData& data);
+	static unsigned BoxAndBox(const std::shared_ptr<entt::registry> registry, const entt::entity& one, const entt::entity& two, CollisionData& data);
+	static unsigned BoxAndSphere(const std::shared_ptr<entt::registry> registry, const entt::entity& box, const entt::entity& sphere, CollisionData& data);
 };
