@@ -13,11 +13,11 @@
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
 	auto arialFont = ResourceManager::GetInstance()->GetFont("Resources/fonts/arial.ttf");
-	auto material = ResourceManager::GetInstance()->GetMaterial("WhiteMat", "Resources/transform.shader");
+	auto material = ResourceManager::GetInstance()->GetMaterial("WhiteMat", "Resources/lambert.shader");
 	material->SetTexture("mainTex", "Resources/Prototype White.png");
-	material = ResourceManager::GetInstance()->GetMaterial("BlueMat", "Resources/transform.shader");
+	material = ResourceManager::GetInstance()->GetMaterial("BlueMat", "Resources/lambert.shader");
 	material->SetTexture("mainTex", "Resources/Prototype Blue.png");
-	material = ResourceManager::GetInstance()->GetMaterial("GrayMat", "Resources/transform.shader");
+	material = ResourceManager::GetInstance()->GetMaterial("GrayMat", "Resources/lambert.shader");
 	material->SetTexture("mainTex", "Resources/Prototype Gray.png");
 
 	{

@@ -264,6 +264,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\CollisionTest.lua" />
+    <None Include="Resources\lambert.shader" />
     <None Include="Resources\text.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

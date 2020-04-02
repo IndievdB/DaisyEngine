@@ -396,5 +396,6 @@
   <ItemGroup>
     <None Include="Resources\CollisionTest.lua" />
     <None Include="Resources\text.shader" />
+    <None Include="Resources\lambert.shader" />
   </ItemGroup>
 </Project>

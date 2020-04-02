@@ -31,6 +31,14 @@ Shader::Shader(const std::string& shaderPath)
 		vertexSource.insert(index, "layout(location = 0) ");
 	}
 
+	index = vertexSource.find(" : NORMAL");
+	if (index != std::string::npos)
+	{
+		vertexSource.replace(index, 9, "");
+		while (index != 0 && vertexSource[index - 1] != '\n') index--;
+		vertexSource.insert(index, "layout(location = 1) ");
+	}
+
 	index = vertexSource.find(" : TEXCOORD");
 	if (index != std::string::npos)
 	{
