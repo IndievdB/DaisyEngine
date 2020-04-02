@@ -5,11 +5,14 @@
 #include "Physics/BoxCollider.hpp"
 #include "Physics/SphereCollider.hpp"
 #include "Physics/PlaneCollider.hpp"
+#include "Renderer/MeshRenderer.hpp"
 #include "Renderer/Camera.hpp"
+#include "Renderer/TextMesh.hpp"
 #include "Behaviour/LuaBehaviour.hpp"
 
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
+	auto arialFont = ResourceManager::GetInstance()->GetFont("Resources/fonts/arial.ttf");
 	auto material = ResourceManager::GetInstance()->GetMaterial("WhiteMat", "Resources/transform.shader");
 	material->SetTexture("mainTex", "Resources/Prototype White.png");
 	material = ResourceManager::GetInstance()->GetMaterial("BlueMat", "Resources/transform.shader");
@@ -32,6 +35,18 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		PlaneCollider& collider = registry->assign<PlaneCollider>(entity);
 		collider.normal = Vector3::up;
 		collider.offset = 0;
+	}
+
+	{
+		auto entity = registry->create();
+		registry->assign<Transform>(entity, Vector3(1.0f, 25.0f, 0.0f), Vector3::one, Quaternion::identity);
+		registry->assign<TextMesh>(entity, "This is sample text", 1.0f, Vector3(0.5f, 0.8f, 0.2f), arialFont);
+	}
+
+	{
+		auto entity = registry->create();
+		registry->assign<Transform>(entity, Vector3(54.0f, 550.0f, 0.0f), Vector3::one, Quaternion::identity);
+		registry->assign<TextMesh>(entity, "(C) LearnOpenGL.com", 0.6f, Vector3(0.3f, 0.7f, 0.9f), arialFont);
 	}
 
 	srand(time(NULL));

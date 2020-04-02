@@ -4,6 +4,7 @@
 #include "../Renderer/Texture.hpp"
 #include "../Renderer/Shader.hpp"
 #include "../Renderer/Mesh.hpp"
+#include "../Renderer/Font.hpp"
 
 #include <iostream>
 #include <vector>
@@ -20,12 +21,14 @@ public:
 	void LoadShader(std::string path);
 	void LoadMaterial(std::string name, std::string shaderPath);
 	void LoadMesh(std::string path);
+	void LoadFont(std::string path);
 
 	std::shared_ptr<Texture> GetTexture(std::string path);
 	std::shared_ptr<Shader> GetShader(std::string path);
 	std::shared_ptr<Material> GetMaterial(std::string name, std::string shaderPath);
 	std::shared_ptr<Material> GetMaterial(std::string name);
 	std::shared_ptr<Mesh> GetMesh(std::string path);
+	std::shared_ptr<Font> GetFont(std::string path);
 
 private:
 	static ResourceManager* s_Instance;
@@ -33,5 +36,6 @@ private:
 	std::map<std::string, std::shared_ptr<Shader>> shaders;
 	std::map<std::string, std::shared_ptr<Material>> materials;
 	std::map<std::string, std::shared_ptr<Mesh>> meshes;
+	std::map<std::string, std::shared_ptr<Font>> fonts;
 };
 

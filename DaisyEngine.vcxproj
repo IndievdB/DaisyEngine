@@ -100,7 +100,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>lua53.lib;assimp-vc142-mtd.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>freetype.lib;lua53.lib;assimp-vc142-mtd.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -146,6 +146,9 @@
     <ClCompile Include="Physics\IntersectionTests.cpp" />
     <ClCompile Include="Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
+    <ClCompile Include="Renderer\Font.cpp" />
+    <ClCompile Include="Renderer\RenderSystem.cpp" />
+    <ClCompile Include="Renderer\TextMesh.cpp" />
     <ClCompile Include="Vendor\glad\glad.c" />
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -169,6 +172,8 @@
     <ClInclude Include="Core\Math\Vector3.hpp" />
     <ClInclude Include="Core\Math\Vector4.hpp" />
     <ClInclude Include="Physics\TriggerData.hpp" />
+    <ClInclude Include="Renderer\Font.hpp" />
+    <ClInclude Include="Renderer\TextMesh.hpp" />
     <ClInclude Include="Vendor\LuaBridge\detail\CFunctions.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\ClassInfo.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\Config.h" />
@@ -259,6 +264,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\CollisionTest.lua" />
+    <None Include="Resources\text.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

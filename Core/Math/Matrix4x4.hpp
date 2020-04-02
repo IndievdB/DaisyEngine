@@ -53,6 +53,7 @@ public:
     
     static Matrix4x4 AffineInverse( const Matrix4x4& mat );
 	static Matrix4x4 LookAt( const Vector3& eye, const Vector3& center, const Vector3& up);
+	static Matrix4x4 Orthographic(float left, float right, float bottom, float top, float near, float far);
 	static Matrix4x4 Perspective( float fov, float aspect, float near, float far);
     static Matrix4x4 Rotation( const Matrix3x3& matrix );
     static Matrix4x4 Rotation( const Quaternion& quat );

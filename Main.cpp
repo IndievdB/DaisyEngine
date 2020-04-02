@@ -19,6 +19,7 @@ int main()
 	auto registry = std::make_shared<entt::registry>();
 	PhysicsSystem physicsSystem;
 	LuaSystem luaSystem(registry);
+	RenderSystem renderSystem;
 
 	LoadScene(registry);
 
@@ -32,7 +33,7 @@ int main()
 
 		luaSystem.Update();
 
-		RenderAll(registry);
+		renderSystem.RenderAll(registry);
 
 		physicsSystem.RunPhysics(registry);
 

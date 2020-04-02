@@ -377,6 +377,33 @@ Matrix4x4 Matrix4x4::LookAt(const Vector3& eye, const Vector3& center, const Vec
 	return result;
 }
 
+Matrix4x4 Matrix4x4::Orthographic(float left, float right, float bottom, float top, float near, float far)
+{
+	Matrix4x4 result;
+
+	result[0] = 2 / (right - left);
+	result[1] = 0;
+	result[2] = 0;
+	result[3] = 0;
+
+	result[4] = 0;
+	result[5] = 2 / (top - bottom);
+	result[6] = 0;
+	result[7] = 0;
+
+	result[8] = 0;
+	result[9] = 0;
+	result[10] = -2 / (far - near);
+	result[11] = 0;
+
+	result[12] = -(right + left) / (right - left);
+	result[13] = -(top + bottom) / (top - bottom);
+	result[14] = -(far + near) / (far - near);
+	result[15] = 1;
+
+	return result;
+}
+
 Matrix4x4 Matrix4x4::Perspective(float fov, float aspect, float near, float far)
 {
 	float yScale = 1.0 / tan(fov / 2);

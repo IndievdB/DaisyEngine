@@ -113,3 +113,22 @@ std::shared_ptr<Mesh> ResourceManager::GetMesh(std::string path)
 
 	return std::shared_ptr<Mesh>(meshes.find(path)->second);
 }
+
+// Fonts
+
+void ResourceManager::LoadFont(std::string path)
+{
+	if (fonts.find(path) != fonts.end())
+		return;
+
+	std::shared_ptr<Font> resourcePointer = std::make_shared<Font>(path);
+	fonts.emplace(path, resourcePointer);
+}
+
+std::shared_ptr<Font> ResourceManager::GetFont(std::string path)
+{
+	if (fonts.find(path) == fonts.end())
+		LoadFont(path);
+
+	return std::shared_ptr<Font>(fonts.find(path)->second);
+}
