@@ -9,7 +9,8 @@
 #include "Vendor/entt/entt.hpp"
 #include "Behaviour/LuaSystem.hpp"
 
-#include "Demo.hpp"
+//#include "Explosion.hpp"
+#include "PBRDemo.hpp"
 
 int main()
 {

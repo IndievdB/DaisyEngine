@@ -93,6 +93,15 @@
     <ClCompile Include="Renderer\Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Cubemap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Framebuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Renderbuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer\Shader.hpp">
@@ -159,9 +168,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Physics\ContactResolver.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Demo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vendor\LuaBridge\detail\CFunctions.h">
@@ -392,10 +398,26 @@
     <ClInclude Include="Renderer\Font.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Explosion.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PBRDemo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Cubemap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Framebuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Renderbuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\CollisionTest.lua" />
     <None Include="Resources\text.shader" />
     <None Include="Resources\lambert.shader" />
+    <None Include="Resources\PBR\pbr.shader" />
   </ItemGroup>
 </Project>

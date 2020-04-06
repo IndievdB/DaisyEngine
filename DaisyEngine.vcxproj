@@ -146,7 +146,10 @@
     <ClCompile Include="Physics\IntersectionTests.cpp" />
     <ClCompile Include="Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
+    <ClCompile Include="Renderer\Cubemap.cpp" />
     <ClCompile Include="Renderer\Font.cpp" />
+    <ClCompile Include="Renderer\Framebuffer.cpp" />
+    <ClCompile Include="Renderer\Renderbuffer.cpp" />
     <ClCompile Include="Renderer\RenderSystem.cpp" />
     <ClCompile Include="Renderer\TextMesh.cpp" />
     <ClCompile Include="Vendor\glad\glad.c" />
@@ -171,8 +174,12 @@
     <ClInclude Include="Core\Math\Vector2.hpp" />
     <ClInclude Include="Core\Math\Vector3.hpp" />
     <ClInclude Include="Core\Math\Vector4.hpp" />
+    <ClInclude Include="PBRDemo.hpp" />
     <ClInclude Include="Physics\TriggerData.hpp" />
+    <ClInclude Include="Renderer\Cubemap.hpp" />
     <ClInclude Include="Renderer\Font.hpp" />
+    <ClInclude Include="Renderer\Framebuffer.hpp" />
+    <ClInclude Include="Renderer\Renderbuffer.hpp" />
     <ClInclude Include="Renderer\TextMesh.hpp" />
     <ClInclude Include="Vendor\LuaBridge\detail\CFunctions.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\ClassInfo.h" />
@@ -253,7 +260,7 @@
     <ClInclude Include="Renderer\Mesh.hpp" />
     <ClInclude Include="Core\ResourceManager.hpp" />
     <ClInclude Include="Renderer\MeshRenderer.hpp" />
-    <ClInclude Include="Demo.hpp" />
+    <ClInclude Include="Explosion.hpp" />
     <ClInclude Include="Renderer\RenderSystem.hpp" />
     <ClInclude Include="Renderer\Shader.hpp" />
     <ClInclude Include="Physics\RigidBody.hpp" />
@@ -265,6 +272,7 @@
   <ItemGroup>
     <None Include="Resources\CollisionTest.lua" />
     <None Include="Resources\lambert.shader" />
+    <None Include="Resources\PBR\pbr.shader" />
     <None Include="Resources\text.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

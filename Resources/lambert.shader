@@ -130,6 +130,6 @@ vec3 AddPointLight(PointLight light, vec3 normal, vec3 fragPos)
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 	// combine results
 	vec3 diffuse = light.color * diff * vec3(texture(mainTex, TexCoord));
-	diffuse *= attenuation;
+	//diffuse *= attenuation;
 	return diffuse;
 }
