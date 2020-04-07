@@ -21,7 +21,7 @@ RenderSystem::RenderSystem()
 	Shader brdfShader("Resources/PBR/BRDF.shader");
 	Shader skyboxShader("Resources/PBR/Skybox.shader");
 
-	Mesh fullscreenQuad("Resources/PBR/FullscreenQuad.obj");
+	Mesh fullscreenQuad("Resources/PBR/upsideDownQuad.obj");
 
 	Framebuffer offscreenFramebuffer;
 	Renderbuffer offscreenDepthRenderbuffer(GL_DEPTH_COMPONENT24, 512, 512);
@@ -149,10 +149,13 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 {
 	Matrix4x4 projection;
 	Matrix4x4 view;
+	Vector3 cameraPosition;
 
-	registry->view<Transform, Camera>().each([&projection, &view](auto& transform, auto& camera)
+	registry->view<Transform, Camera>().each([&projection, &view, &cameraPosition](auto& transform, auto& camera)
 	{
 		projection = Matrix4x4::Perspective(camera.fov * kDegToRad, 800.0f / 600.0f, camera.nearPlane, camera.farPlane);
+
+		cameraPosition = transform.position;
 
 		Matrix3x3 rotationMatrix(transform.rotation);
 		Vector3 forward = rotationMatrix * Vector3::forward;
@@ -160,7 +163,7 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		view = Matrix4x4::LookAt(transform.position, transform.position + forward, up);
 	});
 
-	registry->view<Transform, MeshRenderer>().each([projection, view, this](auto& transform, auto& meshRenderer)
+	registry->view<Transform, MeshRenderer>().each([projection, view, cameraPosition, this](auto& transform, auto& meshRenderer)
 	{
 		Matrix4x4 model = Matrix4x4::Transformation(transform);
 
@@ -168,16 +171,11 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		meshRenderer.material->GetShader()->SetMatrix4x4("projection", projection);
 		meshRenderer.material->GetShader()->SetMatrix4x4("view", view);
 		meshRenderer.material->GetShader()->SetMatrix4x4("model", model);
+		meshRenderer.material->GetShader()->SetVector3("camPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
 		irradianceCubemap->Bind(meshRenderer.material->GetShader()->GetTextureUnit("irradianceMap"));
 		prefilterCubemap->Bind(meshRenderer.material->GetShader()->GetTextureUnit("prefilterMap"));
 		brdfLUTTexture->Bind(meshRenderer.material->GetShader()->GetTextureUnit("brdfLUT"));
-
-		for (unsigned int i = 0; i < 4; i++)
-			meshRenderer.material->GetShader()->SetVector3("lightPositions[" + std::to_string(i) + "]", 0,0,0);
-		
-		for (unsigned int i = 0; i < 4; i++)
-			meshRenderer.material->GetShader()->SetVector3("lightColors[" + std::to_string(i) + "]", 0,0,0);
 
 		meshRenderer.material->Bind();
 		meshRenderer.mesh->Render();

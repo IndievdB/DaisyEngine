@@ -25,7 +25,7 @@ int main()
 	LoadScene(registry);
 
 	luaSystem.Intialize();
-
+	
 	while (window.isOpen)
 	{
 		inputSystem.Update();

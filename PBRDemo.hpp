@@ -48,7 +48,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		wallMat->SetTexture("roughnessMap", "Resources/PBR/wall/roughness.png");
 		wallMat->SetTexture("aoMap", "Resources/PBR/wall/ao.png");
 	}
-
+	
 	{
 		auto entity = registry->create();
 		Quaternion rotation = Quaternion(1, 0, 0, 0);
@@ -66,7 +66,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
 		registry->assign<MeshRenderer>(entity, "IronMat", "Resources/sphere.obj");
 	}
-
+	
 	{
 		auto entity = registry->create();
 		Vector3 position = Vector3(-2.0f, 0, 0);
