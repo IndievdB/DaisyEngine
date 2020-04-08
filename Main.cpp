@@ -10,7 +10,8 @@
 #include "Behaviour/LuaSystem.hpp"
 
 //#include "Explosion.hpp"
-#include "PBRDemo.hpp"
+//#include "PBRDemo.hpp"
+#include "Clustered.hpp"
 
 int main()
 {

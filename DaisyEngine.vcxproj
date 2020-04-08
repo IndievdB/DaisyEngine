@@ -149,8 +149,10 @@
     <ClCompile Include="Renderer\Cubemap.cpp" />
     <ClCompile Include="Renderer\Font.cpp" />
     <ClCompile Include="Renderer\Framebuffer.cpp" />
+    <ClCompile Include="Renderer\PBRSettings.cpp" />
     <ClCompile Include="Renderer\Renderbuffer.cpp" />
     <ClCompile Include="Renderer\RenderSystem.cpp" />
+    <ClCompile Include="Renderer\Skybox.cpp" />
     <ClCompile Include="Renderer\TextMesh.cpp" />
     <ClCompile Include="Vendor\glad\glad.c" />
     <ClCompile Include="Core\Input.cpp" />
@@ -167,6 +169,7 @@
   <ItemGroup>
     <ClInclude Include="Behaviour\LuaBehaviour.hpp" />
     <ClInclude Include="Behaviour\LuaSystem.hpp" />
+    <ClInclude Include="Clustered.hpp" />
     <ClInclude Include="Core\Math\Mathf.hpp" />
     <ClInclude Include="Core\Math\Matrix3x3.hpp" />
     <ClInclude Include="Core\Math\Matrix4x4.hpp" />
@@ -179,7 +182,10 @@
     <ClInclude Include="Renderer\Cubemap.hpp" />
     <ClInclude Include="Renderer\Font.hpp" />
     <ClInclude Include="Renderer\Framebuffer.hpp" />
+    <ClInclude Include="Renderer\PBRSettings.hpp" />
+    <ClInclude Include="Renderer\PointLight.hpp" />
     <ClInclude Include="Renderer\Renderbuffer.hpp" />
+    <ClInclude Include="Renderer\Skybox.hpp" />
     <ClInclude Include="Renderer\TextMesh.hpp" />
     <ClInclude Include="Vendor\LuaBridge\detail\CFunctions.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\ClassInfo.h" />
