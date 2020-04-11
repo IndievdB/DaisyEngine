@@ -9,8 +9,6 @@
 #include "Vendor/entt/entt.hpp"
 #include "Behaviour/LuaSystem.hpp"
 
-//#include "Explosion.hpp"
-//#include "PBRDemo.hpp"
 #include "Clustered.hpp"
 
 int main()
@@ -22,11 +20,9 @@ int main()
 	PhysicsSystem physicsSystem;
 	LuaSystem luaSystem(registry);
 	RenderSystem renderSystem;
-
 	LoadScene(registry);
-
 	luaSystem.Intialize();
-	
+
 	while (window.isOpen)
 	{
 		inputSystem.Update();
@@ -34,11 +30,11 @@ int main()
 		window.Clear();
 
 		luaSystem.Update();
-
 		renderSystem.RenderAll(registry);
-
 		physicsSystem.RunPhysics(registry);
 
 		window.SwapBuffers();
 	}
+
+
 }

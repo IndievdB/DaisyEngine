@@ -2,7 +2,7 @@
 // Begin Vertex Shader
 // ============================================
 
-#version 330 core
+#version 430 core
 
 in vec3 aPos : POSITION;
 in vec2 aTexCoords : TEXCOORD;
@@ -19,7 +19,7 @@ void main()
 // Begin Fragment Shader
 // ============================================
 
-#version 330 core
+#version 430 core
 out vec4 FragColor;
 in vec2 TexCoords;
 uniform sampler2D mainTex;

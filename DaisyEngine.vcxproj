@@ -146,6 +146,7 @@
     <ClCompile Include="Physics\IntersectionTests.cpp" />
     <ClCompile Include="Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
+    <ClCompile Include="Renderer\ComputeShader.cpp" />
     <ClCompile Include="Renderer\Cubemap.cpp" />
     <ClCompile Include="Renderer\Font.cpp" />
     <ClCompile Include="Renderer\Framebuffer.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="Core\Math\Vector4.hpp" />
     <ClInclude Include="PBRDemo.hpp" />
     <ClInclude Include="Physics\TriggerData.hpp" />
+    <ClInclude Include="Renderer\ComputeShader.hpp" />
     <ClInclude Include="Renderer\Cubemap.hpp" />
     <ClInclude Include="Renderer\Font.hpp" />
     <ClInclude Include="Renderer\Framebuffer.hpp" />
