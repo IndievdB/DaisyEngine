@@ -146,6 +146,7 @@
     <ClCompile Include="Physics\IntersectionTests.cpp" />
     <ClCompile Include="Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
+    <ClCompile Include="Renderer\ClusteredSettings.cpp" />
     <ClCompile Include="Renderer\ComputeShader.cpp" />
     <ClCompile Include="Renderer\Cubemap.cpp" />
     <ClCompile Include="Renderer\Font.cpp" />
@@ -155,6 +156,10 @@
     <ClCompile Include="Renderer\RenderSystem.cpp" />
     <ClCompile Include="Renderer\Skybox.cpp" />
     <ClCompile Include="Renderer\TextMesh.cpp" />
+    <ClCompile Include="Temp\BoxCollision.cpp" />
+    <ClCompile Include="Temp\Cube.cpp" />
+    <ClCompile Include="Temp\GridUtility.cpp" />
+    <ClCompile Include="Temp\Plane.cpp" />
     <ClCompile Include="Vendor\glad\glad.c" />
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -180,6 +185,7 @@
     <ClInclude Include="Core\Math\Vector4.hpp" />
     <ClInclude Include="PBRDemo.hpp" />
     <ClInclude Include="Physics\TriggerData.hpp" />
+    <ClInclude Include="Renderer\ClusteredSettings.hpp" />
     <ClInclude Include="Renderer\ComputeShader.hpp" />
     <ClInclude Include="Renderer\Cubemap.hpp" />
     <ClInclude Include="Renderer\Font.hpp" />
@@ -189,6 +195,11 @@
     <ClInclude Include="Renderer\Renderbuffer.hpp" />
     <ClInclude Include="Renderer\Skybox.hpp" />
     <ClInclude Include="Renderer\TextMesh.hpp" />
+    <ClInclude Include="Temp\BoxCollision.h" />
+    <ClInclude Include="Temp\Cube.h" />
+    <ClInclude Include="Temp\GLUtil.h" />
+    <ClInclude Include="Temp\GridUtility.h" />
+    <ClInclude Include="Temp\Plane.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\CFunctions.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\ClassInfo.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\Config.h" />

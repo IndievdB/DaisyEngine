@@ -24,7 +24,7 @@ float GetRandomFloat(const float min, const float max)
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
 	{
-		auto material = ResourceManager::GetInstance()->GetMaterial("BrickMat", "Resources/transform.shader");
+		auto material = ResourceManager::GetInstance()->GetMaterial("BrickMat", "Resources/Clustered/debug.shader");
 		material->SetTexture("mainTex", "Resources/spnza_bricks_a_diff.tga");
 	}
 
@@ -78,7 +78,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 					Vector3 pos(xCoord, yCoord, zCoord);
 					auto entity = registry->create();
 					registry->assign<Transform>(entity, Vector3 (xCoord, yCoord, zCoord), Vector3::one, Quaternion::identity);
-					registry->assign<PointLight>(entity, Vector3(r, g, b), radius, intensity);
+					registry->assign<PointLight>(entity, Vector4(r, g, b, 1), radius, intensity);
 					++lightCount;
 				}
 			}

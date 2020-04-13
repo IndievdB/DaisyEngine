@@ -13,9 +13,11 @@
 #include "Framebuffer.hpp"
 #include "Window.hpp"
 
-RenderSystem::RenderSystem() : skybox ("Resources/PBR/Malibu_Overlook_3k.hdr")
+RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("Resources/PBR/Malibu_Overlook_3k.hdr")
 {
 	pbrSettings.Setup(skybox.environmentCubemap);
+
+	clusteredSettings = new ClusteredSettings(registry, NUM_LIGHTS, 8, 8, 8, Vector2(-1, -1), Vector2(1, 1));
 }
 
 void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
@@ -36,17 +38,26 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		view = Matrix4x4::LookAt(transform.position, transform.position + forward, up);
 	});
 
+	clusteredSettings->Update(projection, view, cameraPosition);
+
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
 	registry->view<Transform, MeshRenderer>().each([projection, view, cameraPosition, this](auto& transform, auto& meshRenderer)
 	{
 		Matrix4x4 model = Matrix4x4::Transformation(transform);
+		std::shared_ptr<Shader> shader = meshRenderer.material->GetShader();
 
-		meshRenderer.material->GetShader()->Use();
-		meshRenderer.material->GetShader()->SetMatrix4x4("projection", projection);
-		meshRenderer.material->GetShader()->SetMatrix4x4("view", view);
-		meshRenderer.material->GetShader()->SetMatrix4x4("model", model);
-		meshRenderer.material->GetShader()->SetVector3("camPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+		shader->Use();
+		shader->SetMatrix4x4("projection", projection);
+		shader->SetMatrix4x4("view", view);
+		shader->SetMatrix4x4("model", model);
+		shader->SetVector3("camPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
-		pbrSettings.Bind(meshRenderer.material->GetShader());
+		pbrSettings.Bind(shader);
+
+		shader->SetFloat("nearPlane", 1.0f);
+		shader->SetFloat("farPlane", 4000.0f);
+		shader->SetFloat("ambientLighting", 0.05f);
 
 		meshRenderer.material->Bind();
 		meshRenderer.mesh->Render();

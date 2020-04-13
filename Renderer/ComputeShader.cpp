@@ -1,8 +1,10 @@
 #include "ComputeShader.hpp"
 #include <glad/glad.h>
 #include <iostream>
-#include <fstream>
 #include <sstream>
+#include <fstream>
+#include <vector>
+#include <iterator>
 
 ComputeShader::ComputeShader(std::string filePath)
 {
@@ -43,16 +45,8 @@ void ComputeShader::Dispatch(int x, int y, int z)
 
 int ComputeShader::GenerateShader(std::string filePath)
 {
-	std::ifstream file(filePath, std::ios::in | std::ios::binary);
-
-	if (!file)
-	{
-		std::cout << "failed to load shader" << std::endl;
-		return -1;
-	}
-
-	std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
-	file.close();
+	std::string content;
+	LoadShaderFile(filePath, content);
 
 	shader = glCreateShader(GL_COMPUTE_SHADER);
 	const char* chars = content.c_str();
@@ -61,6 +55,52 @@ int ComputeShader::GenerateShader(std::string filePath)
 	CheckCompileErrors(shader);
 
 	return shader;
+}
+
+bool ComputeShader::LoadShaderFile(std::string from, std::string& into)
+{
+	std::ifstream file;
+	std::string temp;
+
+	file.open(from.c_str());
+
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	while (!file.eof())
+	{
+		getline(file, temp);
+
+		if (temp.find("#include") != std::string::npos)
+		{
+			into += IncludeShader(temp) + "\n";
+		}
+		else
+		{
+			into += temp + "\n";
+		}
+	}
+
+	file.close();
+	return true;
+}
+
+std::string ComputeShader::IncludeShader(std::string includeLine)
+{
+	std::istringstream iss(includeLine);
+
+	std::vector<std::string> tokens
+	{
+		std::istream_iterator<std::string>{iss},
+		std::istream_iterator<std::string>{}
+	};
+
+	std::string glslToAppend;
+	LoadShaderFile(tokens.at(1), glslToAppend);
+
+	return glslToAppend;
 }
 
 void ComputeShader::CheckCompileErrors(unsigned int inputShader)

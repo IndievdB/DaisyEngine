@@ -17,8 +17,11 @@ public:
 	void SetVector3(std::string name, float x, float y, float z) const;
 	void SetVector4(std::string name, float x, float y, float z, float w) const;
 	void SetMatrix4x4(std::string name, Matrix4x4 matrix) const;
-private:
+	uint32_t GetProgramID() { return program; };
+ private:
 	int GenerateShader(std::string filePath);
+	bool LoadShaderFile(std::string from, std::string& into);
+	std::string IncludeShader(std::string includeLine);
 	void CheckCompileErrors(unsigned int shader);
 	uint32_t program;
 	uint32_t shader;

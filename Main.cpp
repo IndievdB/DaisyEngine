@@ -17,10 +17,12 @@ int main()
 	Input inputSystem;
 	Window window("Daisy", 800, 600);
 	auto registry = std::make_shared<entt::registry>();
+	
+	LoadScene(registry);
+
 	PhysicsSystem physicsSystem;
 	LuaSystem luaSystem(registry);
-	RenderSystem renderSystem;
-	LoadScene(registry);
+	RenderSystem renderSystem(registry);
 	luaSystem.Intialize();
 
 	while (window.isOpen)

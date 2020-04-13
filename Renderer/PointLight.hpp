@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../Core/Math/Vector3.hpp"
+#include "../Core/Math/Vector4.hpp"
 
 struct PointLight
 {
-	Vector3 color;
+	Vector4 color;
 	float radius;
 	float intensity;
 
-	PointLight(Vector3 color, float radius, float intensity) : color(color), radius(radius), intensity(intensity) {};
+	PointLight(Vector4 color, float radius, float intensity) : color(color), radius(radius), intensity(intensity) {};
 };
