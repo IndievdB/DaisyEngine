@@ -2,21 +2,33 @@
 // Begin Vertex Shader
 // ============================================
 
-#version 330 core
+#version 430
 in vec3 aPos : POSITION;
 in vec2 aTexCoords : TEXCOORD;
 in vec3 aNormal : NORMAL;
 
-out vec2 TexCoords;
-out vec3 WorldPos;
-out vec3 Normal;
-
-uniform mat4 projection;
-uniform mat4 view;
 uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+out vec3 FragPos;
+out vec2 TexCoords;
+out vec3 Normal;
+out vec3 WorldPos;
 
 void main()
 {
+	/*vec4 viewPos = view * model * vec4(aPos, 1.0);
+	FragPos = viewPos.xyz;
+	TexCoords = aTexCoords;
+
+	WorldPos = vec3(model * vec4(aPos, 1.0));
+	
+	mat3 normalMatrix = transpose(inverse(mat3(view * model)));
+	Normal = normalMatrix * (vec4(aNormal, 1.0)).xyz;
+	
+	gl_Position = projection * viewPos;*/
+
 	TexCoords = aTexCoords;
 	WorldPos = vec3(model * vec4(aPos, 1.0));
 	Normal = mat3(model) * aNormal;
@@ -28,36 +40,79 @@ void main()
 // Begin Fragment Shader
 // ============================================
 
-#version 330 core
-out vec4 FragColor;
-in vec2 TexCoords;
-in vec3 WorldPos;
-in vec3 Normal;
+#version 430
 
-// material parameters
+const int numLights = 512;
+const vec3 tilesOnAxes = vec3(8, 8, 8);
+const int numTiles = int(tilesOnAxes.x * tilesOnAxes.y * tilesOnAxes.z);
+
+int GetTileIndex(const int xIndex, const int yIndex, const int zIndex)
+{
+	return xIndex + int(tilesOnAxes.x) * (yIndex + int(tilesOnAxes.y) * zIndex);
+}
+
+struct LightData
+{
+	vec4 pos4;
+	vec4 lightColour;
+	float lightRadius;
+	float intensity;
+
+	float fpadding[2];
+};
+
+struct Tile
+{
+	float x;
+	float y;
+	float z;
+	float width;
+	float height;
+	float length;
+
+	float _padding[6];
+};
+
+layout (std430, binding = 1) buffer LightDataBuffer
+{
+	LightData lightData[];
+};
+
+layout (std430, binding = 3) buffer TileLightsBuffer
+{
+	int lightIndexes[numTiles];
+	int tileLights[][numLights];
+};
+
+layout(binding = 0) uniform atomic_uint count;
+
+uniform float nearPlane;
+uniform float farPlane;
+uniform float ambientLighting;
+uniform mat4 view;
+uniform sampler2D mainTex;
+
+//PBR
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D metallicMap;
 uniform sampler2D roughnessMap;
 uniform sampler2D aoMap;
-
-// IBL
 uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
-
-// lights
-uniform vec3 lightPositions[4];
-uniform vec3 lightColors[4];
-
 uniform vec3 camPos;
-
 const float PI = 3.14159265359;
+//
+
+in vec3 FragPos;
+in vec2 TexCoords;
+in vec3 Normal;
+in vec3 WorldPos;
+
+out vec4 FragColor;
+
 // ----------------------------------------------------------------------------
-// Easy trick to get tangent-normals to world-space to keep PBR code simplified.
-// Don't worry if you don't get what's going on; you generally want to do normal
-// mapping the usual way for performance anways; I do plan make a note of this 
-// technique somewhere later in the normal mapping tutorial.
 vec3 getNormalFromMap()
 {
 	vec3 tangentNormal = texture(normalMap, TexCoords).xyz * 2.0 - 1.0;
@@ -120,7 +175,8 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 // ----------------------------------------------------------------------------
-void main()
+
+vec4 AddPBRLighting(int tileIndex)
 {
 	// material properties
 	vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2));
@@ -140,14 +196,17 @@ void main()
 
 	// reflectance equation
 	vec3 Lo = vec3(0.0);
-	for (int i = 0; i < 4; ++i)
+
+	for (int i = 0; i < lightIndexes[tileIndex]; i++)
 	{
+		int lightIndex = tileLights[tileIndex][i];
+
 		// calculate per-light radiance
-		vec3 L = normalize(lightPositions[i] - WorldPos);
+		vec3 L = normalize(lightData[lightIndex].pos4.xyz - WorldPos);
 		vec3 H = normalize(V + L);
-		float distance = length(lightPositions[i] - WorldPos);
+		float distance = length(lightData[lightIndex].pos4.xyz - WorldPos);
 		float attenuation = 1.0 / (distance * distance);
-		vec3 radiance = lightColors[i] * attenuation;
+		vec3 radiance = lightData[lightIndex].lightColour.rgb * attenuation * pow(lightData[lightIndex].intensity, 2.2f);
 
 		// Cook-Torrance BRDF
 		float NDF = DistributionGGX(N, H, roughness);
@@ -202,5 +261,17 @@ void main()
 	// gamma correct
 	color = pow(color, vec3(1.0 / 2.2));
 
-	FragColor = vec4(color, 1.0);
+	return vec4(color, 1.0);
+}
+
+
+void main(void)
+{
+	float zCoord = abs(FragPos.z - nearPlane) / (farPlane - nearPlane);
+	int xIndex = int(TexCoords.x * (tilesOnAxes.x - 1));
+	int yIndex = int(TexCoords.y * (tilesOnAxes.y - 1));
+	int zIndex = int(zCoord * (tilesOnAxes.z - 1));
+	int tile = GetTileIndex(xIndex, yIndex, zIndex);
+
+	FragColor = AddPBRLighting(tile);
 }

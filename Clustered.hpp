@@ -26,6 +26,13 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	{
 		auto material = ResourceManager::GetInstance()->GetMaterial("BrickMat", "Resources/Clustered/debug.shader");
 		material->SetTexture("mainTex", "Resources/spnza_bricks_a_diff.tga");
+
+		/*auto ironMat = ResourceManager::GetInstance()->GetMaterial("IronMat", "Resources/Clustered/debug.shader");
+		ironMat->SetTexture("albedoMap", "Resources/PBR/iron/albedo.png");
+		ironMat->SetTexture("normalMap", "Resources/PBR/iron/normal.png");
+		ironMat->SetTexture("metallicMap", "Resources/PBR/iron/metallic.png");
+		ironMat->SetTexture("roughnessMap", "Resources/PBR/iron/roughness.png");
+		ironMat->SetTexture("aoMap", "Resources/PBR/iron/ao.png");*/
 	}
 
 	{

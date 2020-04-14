@@ -16,7 +16,6 @@
 RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("Resources/PBR/Malibu_Overlook_3k.hdr")
 {
 	pbrSettings.Setup(skybox.environmentCubemap);
-
 	clusteredSettings = new ClusteredSettings(registry, NUM_LIGHTS, 8, 8, 8, Vector2(-1, -1), Vector2(1, 1));
 }
 
@@ -40,8 +39,6 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 
 	clusteredSettings->Update(projection, view, cameraPosition);
 
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
 	registry->view<Transform, MeshRenderer>().each([projection, view, cameraPosition, this](auto& transform, auto& meshRenderer)
 	{
 		Matrix4x4 model = Matrix4x4::Transformation(transform);
@@ -52,12 +49,14 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		shader->SetMatrix4x4("view", view);
 		shader->SetMatrix4x4("model", model);
 		shader->SetVector3("camPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
-
-		pbrSettings.Bind(shader);
-
 		shader->SetFloat("nearPlane", 1.0f);
 		shader->SetFloat("farPlane", 4000.0f);
 		shader->SetFloat("ambientLighting", 0.05f);
+
+		//shader->SetVector3("lightPositions[0]", 0, 3, 0);
+		//shader->SetVector3("lightColors[0]", 100, 0, 0);
+
+		pbrSettings.Bind(shader);
 
 		meshRenderer.material->Bind();
 		meshRenderer.mesh->Render();

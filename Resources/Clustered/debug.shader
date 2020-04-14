@@ -123,7 +123,6 @@ void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, i
 
 void main(void)
 {
-	vec3 position = FragPos;
 	vec3 normal = normalize(Normal);
 
 	vec4 col = texture2D(mainTex, TexCoords);

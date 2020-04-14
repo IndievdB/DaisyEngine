@@ -13,35 +13,38 @@
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
 	{
-		auto ironMat = ResourceManager::GetInstance()->GetMaterial("IronMat", "Resources/PBR/pbr.shader");
+		auto material = ResourceManager::GetInstance()->GetMaterial("BrickMat", "Resources/Clustered/debug.shader");
+		material->SetTexture("mainTex", "Resources/spnza_bricks_a_diff.tga");
+
+		auto ironMat = ResourceManager::GetInstance()->GetMaterial("IronMat", "Resources/Clustered/pbr.shader");
 		ironMat->SetTexture("albedoMap", "Resources/PBR/iron/albedo.png");
 		ironMat->SetTexture("normalMap", "Resources/PBR/iron/normal.png");
 		ironMat->SetTexture("metallicMap", "Resources/PBR/iron/metallic.png");
 		ironMat->SetTexture("roughnessMap", "Resources/PBR/iron/roughness.png");
 		ironMat->SetTexture("aoMap", "Resources/PBR/iron/ao.png");
 
-		auto goldMat = ResourceManager::GetInstance()->GetMaterial("GoldMat", "Resources/PBR/pbr.shader");
+		auto goldMat = ResourceManager::GetInstance()->GetMaterial("GoldMat", "Resources/Clustered/pbr.shader");
 		goldMat->SetTexture("albedoMap", "Resources/PBR/gold/albedo.png");
 		goldMat->SetTexture("normalMap", "Resources/PBR/gold/normal.png");
 		goldMat->SetTexture("metallicMap", "Resources/PBR/gold/metallic.png");
 		goldMat->SetTexture("roughnessMap", "Resources/PBR/gold/roughness.png");
 		goldMat->SetTexture("aoMap", "Resources/PBR/gold/ao.png");
 
-		auto grassMat = ResourceManager::GetInstance()->GetMaterial("GrassMat", "Resources/PBR/pbr.shader");
+		auto grassMat = ResourceManager::GetInstance()->GetMaterial("GrassMat", "Resources/Clustered/pbr.shader");
 		grassMat->SetTexture("albedoMap", "Resources/PBR/grass/albedo.png");
 		grassMat->SetTexture("normalMap", "Resources/PBR/grass/normal.png");
 		grassMat->SetTexture("metallicMap", "Resources/PBR/grass/metallic.png");
 		grassMat->SetTexture("roughnessMap", "Resources/PBR/grass/roughness.png");
 		grassMat->SetTexture("aoMap", "Resources/PBR/grass/ao.png");
 
-		auto plasticMat = ResourceManager::GetInstance()->GetMaterial("PlasticMat", "Resources/PBR/pbr.shader");
+		auto plasticMat = ResourceManager::GetInstance()->GetMaterial("PlasticMat", "Resources/Clustered/pbr.shader");
 		plasticMat->SetTexture("albedoMap", "Resources/PBR/plastic/albedo.png");
 		plasticMat->SetTexture("normalMap", "Resources/PBR/plastic/normal.png");
 		plasticMat->SetTexture("metallicMap", "Resources/PBR/plastic/metallic.png");
 		plasticMat->SetTexture("roughnessMap", "Resources/PBR/plastic/roughness.png");
 		plasticMat->SetTexture("aoMap", "Resources/PBR/plastic/ao.png");
 
-		auto wallMat = ResourceManager::GetInstance()->GetMaterial("WallMat", "Resources/PBR/pbr.shader");
+		auto wallMat = ResourceManager::GetInstance()->GetMaterial("WallMat", "Resources/Clustered/pbr.shader");
 		wallMat->SetTexture("albedoMap", "Resources/PBR/wall/albedo.png");
 		wallMat->SetTexture("normalMap", "Resources/PBR/wall/normal.png");
 		wallMat->SetTexture("metallicMap", "Resources/PBR/wall/metallic.png");
@@ -105,5 +108,11 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Quaternion rotation = Quaternion::identity;
 		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
 		registry->assign<MeshRenderer>(entity, "WallMat", "Resources/sphere.obj");
+	}
+
+	{
+		auto entity = registry->create();
+		registry->assign<Transform>(entity, Vector3(0, 3, 0), Vector3::one, Quaternion::identity);
+		registry->assign<PointLight>(entity, Vector4(1, 0, 0, 1), 100, 15);
 	}
 }
