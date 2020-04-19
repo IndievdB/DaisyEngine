@@ -53,9 +53,6 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		shader->SetFloat("farPlane", 4000.0f);
 		shader->SetFloat("ambientLighting", 0.05f);
 
-		//shader->SetVector3("lightPositions[0]", 0, 3, 0);
-		//shader->SetVector3("lightColors[0]", 100, 0, 0);
-
 		pbrSettings.Bind(shader);
 
 		meshRenderer.material->Bind();
