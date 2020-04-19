@@ -56,7 +56,8 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		pbrSettings.Bind(shader);
 
 		meshRenderer.material->Bind();
-		meshRenderer.mesh->Render();
+		//meshRenderer.mesh->Render();
+		meshRenderer.mesh->Render(shader, 0.01f);
 	});
 
 	skybox.Render(projection, view);

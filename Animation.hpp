@@ -12,7 +12,7 @@
 
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
-	auto material = ResourceManager::GetInstance()->GetMaterial("BlueMat", "Resources/transform.shader");
+	auto material = ResourceManager::GetInstance()->GetMaterial("BlueMat", "Resources/animation.shader");
 	material->SetTexture("mainTex", "Resources/Prototype Blue.png");
 	material = ResourceManager::GetInstance()->GetMaterial("GrayMat", "Resources/transform.shader");
 	material->SetTexture("mainTex", "Resources/Prototype Gray.png");
@@ -36,7 +36,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	{
 		auto entity = registry->create();
-		registry->assign<Transform>(entity, Vector3::up * 5.0f, Vector3::one * 0.1f, Quaternion::identity);
+		registry->assign<Transform>(entity, Vector3::zero, Vector3::one * 0.01f, Quaternion::identity);
 		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/walking.fbx");
 	}
 

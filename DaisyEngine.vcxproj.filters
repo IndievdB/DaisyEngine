@@ -470,6 +470,9 @@
     <ClInclude Include="Temp\GLUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Animation.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\CollisionTest.lua" />

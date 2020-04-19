@@ -173,6 +173,7 @@
     <ClCompile Include="Renderer\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.hpp" />
     <ClInclude Include="Behaviour\LuaBehaviour.hpp" />
     <ClInclude Include="Behaviour\LuaSystem.hpp" />
     <ClInclude Include="Clustered.hpp" />
