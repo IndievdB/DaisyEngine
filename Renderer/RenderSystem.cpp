@@ -12,6 +12,7 @@
 #include "Material.hpp"
 #include "Framebuffer.hpp"
 #include "Window.hpp"
+#include "DirectionalLight.hpp"
 
 RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("Resources/PBR/Malibu_Overlook_3k.hdr")
 {
@@ -39,7 +40,13 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 
 	clusteredSettings->Update(projection, view, cameraPosition);
 
-	registry->view<Transform, MeshRenderer>().each([projection, view, cameraPosition, this](auto& transform, auto& meshRenderer)
+	std::shared_ptr<DirectionalLight> directionalLight;
+	registry->view<Transform, DirectionalLight>().each([&directionalLight](auto& transform, auto& light)
+	{
+		directionalLight = std::make_shared<DirectionalLight>(light);
+	});
+
+	registry->view<Transform, MeshRenderer>().each([projection, view, cameraPosition, directionalLight, this](auto& transform, auto& meshRenderer)
 	{
 		Matrix4x4 model = Matrix4x4::Transformation(transform);
 		std::shared_ptr<Shader> shader = meshRenderer.material->GetShader();
@@ -55,8 +62,13 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 
 		pbrSettings.Bind(shader);
 
+		if (directionalLight != nullptr)
+		{
+			shader->SetVector3("directionalLight.direction", directionalLight->direction.x, directionalLight->direction.y, directionalLight->direction.z);
+			shader->SetVector3("directionalLight.color", directionalLight->color.x, directionalLight->color.y, directionalLight->color.z);
+		}
+
 		meshRenderer.material->Bind();
-		//meshRenderer.mesh->Render();
 		meshRenderer.mesh->Render(shader, 0.01f);
 	});
 

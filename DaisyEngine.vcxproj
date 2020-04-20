@@ -189,11 +189,13 @@
     <ClInclude Include="Renderer\ClusteredSettings.hpp" />
     <ClInclude Include="Renderer\ComputeShader.hpp" />
     <ClInclude Include="Renderer\Cubemap.hpp" />
+    <ClInclude Include="Renderer\DirectionalLight.hpp" />
     <ClInclude Include="Renderer\Font.hpp" />
     <ClInclude Include="Renderer\Framebuffer.hpp" />
     <ClInclude Include="Renderer\PBRSettings.hpp" />
     <ClInclude Include="Renderer\PointLight.hpp" />
     <ClInclude Include="Renderer\Renderbuffer.hpp" />
+    <ClInclude Include="Shadows.hpp" />
     <ClInclude Include="Renderer\Skybox.hpp" />
     <ClInclude Include="Renderer\TextMesh.hpp" />
     <ClInclude Include="Temp\BoxCollision.h" />

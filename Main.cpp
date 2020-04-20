@@ -12,7 +12,8 @@
 //#include "PBRDemo.hpp"
 //#include "Clustered.hpp"
 //#include "Explosion.hpp"
-#include "Animation.hpp"
+//#include "Animation.hpp"
+#include "Shadows.hpp"
 
 int main()
 {
