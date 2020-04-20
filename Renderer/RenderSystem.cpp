@@ -46,7 +46,106 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		directionalLight = std::make_shared<DirectionalLight>(light);
 	});
 
-	registry->view<Transform, MeshRenderer>().each([projection, view, cameraPosition, directionalLight, this](auto& transform, auto& meshRenderer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// configure depth map FBO
+	// -----------------------
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth texture
+	unsigned int depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// -----------------------
+
+	 // 1. render depth of scene to texture (from light's perspective)
+	// --------------------------------------------------------------
+	Matrix4x4 lightProjection, lightView;
+	Matrix4x4 lightSpaceMatrix;
+	float near_plane = 1.0f, far_plane = 50.0f;
+	//lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
+	lightProjection = Matrix4x4::Orthographic(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	Vector3 lightPos(-directionalLight->direction.x * 10.0f, -directionalLight->direction.y * 10.0f, -directionalLight->direction.z * 10.0f);
+	lightView = Matrix4x4::LookAt(lightPos, Vector3::zero, Vector3::one);
+	lightSpaceMatrix = lightProjection * lightView;
+	// render scene from light's point of view
+	std::shared_ptr<Shader> depthShader = ResourceManager::GetInstance()->GetShader("Resources/Clustered/shadowMappingDepth.shader");
+	depthShader->Use();
+	depthShader->SetMatrix4x4("lightSpaceMatrix", lightSpaceMatrix);
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	registry->view<Transform, MeshRenderer>().each([&depthShader](auto& transform, auto& meshRenderer)
+	{
+		Matrix4x4 model = Matrix4x4::Transformation(transform);
+		depthShader->SetMatrix4x4("model", model);
+		meshRenderer.mesh->Render(depthShader, 0.01f);
+	});
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, 800, 600);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+	
+	/*Mesh fullscreenQuad("Resources/PBR/upsideDownQuad.obj");
+	Shader fullscreenShader("Resources/debugDepth.shader");
+	fullscreenShader.Use();
+	fullscreenShader.SetFloat("near_plane", near_plane);
+	fullscreenShader.SetFloat("far_plane", far_plane);
+
+	glActiveTexture(GL_TEXTURE0 + fullscreenShader.GetTextureUnit("depthMap"));
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+
+	fullscreenQuad.Render();
+	return;*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	registry->view<Transform, MeshRenderer>().each([projection, view, cameraPosition, directionalLight, lightSpaceMatrix, depthMap, this](auto& transform, auto& meshRenderer)
 	{
 		Matrix4x4 model = Matrix4x4::Transformation(transform);
 		std::shared_ptr<Shader> shader = meshRenderer.material->GetShader();
@@ -64,8 +163,13 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 
 		if (directionalLight != nullptr)
 		{
+			shader->SetMatrix4x4("lightSpaceMatrix", lightSpaceMatrix);
+			shader->SetVector3("lightPos", -directionalLight->direction.x, -directionalLight->direction.y, -directionalLight->direction.z);
 			shader->SetVector3("directionalLight.direction", directionalLight->direction.x, directionalLight->direction.y, directionalLight->direction.z);
 			shader->SetVector3("directionalLight.color", directionalLight->color.x, directionalLight->color.y, directionalLight->color.z);
+
+			glActiveTexture(GL_TEXTURE0 + shader->GetTextureUnit("shadowMap"));
+			glBindTexture(GL_TEXTURE_2D, depthMap);
 		}
 
 		meshRenderer.material->Bind();

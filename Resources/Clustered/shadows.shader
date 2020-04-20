@@ -10,15 +10,21 @@ in vec3 aNormal : NORMAL;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 lightSpaceMatrix;
 
-out vec3 FragPos;
+out vec3 ViewPos;
+out vec3 WorldPos;
+out vec4 WorldPosLightSpace;
 out vec2 TexCoords;
 out vec3 Normal;
 
 void main()
 {
+	WorldPos = vec3(model * vec4(aPos, 1.0));
+	WorldPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0);
+
 	vec4 viewPos = view * model * vec4(aPos, 1.0);
-	FragPos = viewPos.xyz;
+	ViewPos = viewPos.xyz;
 	TexCoords = aTexCoords;
 	
 	Normal = mat3(transpose(inverse(model))) * aNormal;
@@ -81,13 +87,18 @@ uniform float farPlane;
 uniform float ambientLighting;
 uniform mat4 view;
 uniform sampler2D mainTex;
+uniform sampler2D shadowMap;
+uniform vec3 lightPos;
+uniform vec3 camPos;
 
-in vec3 FragPos;
+
+in vec3 ViewPos;
+in vec3 WorldPos;
+in vec4 WorldPosLightSpace;
 in vec2 TexCoords;
 in vec3 Normal;
 
 out vec4 FragColor;
-
 
 void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, inout vec4 lightResult)
 {
@@ -128,6 +139,59 @@ void AddDirectionalLight(DirectionalLight light, vec4 albedoCol, vec3 normal, in
 	lightResult.rgb += diffuse;
 }
 
+/*float ShadowCalculation(vec4 fragPosLightSpace)
+{
+	// perform perspective divide
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	// transform to [0,1] range
+	projCoords = projCoords * 0.5 + 0.5;
+	// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+	float closestDepth = texture(shadowMap, projCoords.xy).r;
+	// get depth of current fragment from light's perspective
+	float currentDepth = projCoords.z;
+	// check whether current frag pos is in shadow
+	float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+
+	return shadow;
+}*/
+
+
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+	// perform perspective divide
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	// transform to [0,1] range
+	projCoords = projCoords * 0.5 + 0.5;
+	// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+	float closestDepth = texture(shadowMap, projCoords.xy).r;
+	// get depth of current fragment from light's perspective
+	float currentDepth = projCoords.z;
+	// calculate bias (based on depth map resolution and slope)
+	vec3 normal = normalize(Normal);
+	vec3 lightDir = normalize(lightPos - WorldPos);
+	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+	// check whether current frag pos is in shadow
+	// float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+	// PCF
+	float shadow = 0.0;
+	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+	for (int x = -1; x <= 1; ++x)
+	{
+		for (int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+		}
+	}
+	shadow /= 9.0;
+
+	// keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+	if (projCoords.z > 1.0)
+		shadow = 0.0;
+
+	return shadow;
+}
+
 void main(void)
 {
 	vec3 normal = normalize(Normal);
@@ -140,7 +204,7 @@ void main(void)
 
 	vec4 albedoCol = vec4(col.rgb, 1);
 
-	float zCoord = abs(FragPos.z - nearPlane) / (farPlane - nearPlane);
+	float zCoord = abs(ViewPos.z - nearPlane) / (farPlane - nearPlane);
 
 	int xIndex = int(TexCoords.x * (tilesOnAxes.x - 1));
 	int yIndex = int(TexCoords.y * (tilesOnAxes.y - 1));
@@ -152,12 +216,15 @@ void main(void)
 	for (int j = 0; j < lightIndexes[tile]; j++)
 	{
 		int lightIndex = tileLights[tile][j];
-		AddBPLighting(FragPos, normal, albedoCol, lightIndex, lightResult);
+		AddBPLighting(ViewPos, normal, albedoCol, lightIndex, lightResult);
 	}
 
 	AddDirectionalLight(directionalLight, albedoCol, normal, lightResult);
 
+	float shadow = ShadowCalculation(WorldPosLightSpace);
+	lightResult.rgb *= (1.0 - shadow);
 	lightResult.rgb += albedoCol.rgb * ambientLighting;
 	lightResult.a = albedoCol.a;
+
 	FragColor = lightResult;
 }
