@@ -19,6 +19,9 @@ Window::Window(const char* title, float width, float height)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	//glfwWindowHint(GLFW_SAMPLES, 4);
 
+	this->width = width;
+	this->height = height;
+
 	window = glfwCreateWindow(width, height, title, NULL, NULL);
 	if (window == NULL)
 	{
@@ -51,6 +54,16 @@ Window::Window(const char* title, float width, float height)
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	Window::s_Instance = this;
+}
+
+float Window::GetWidth()
+{
+	return this->width;
+}
+
+float Window::GetHeight()
+{
+	return this->height;
 }
 
 void Window::ResetDimensions()

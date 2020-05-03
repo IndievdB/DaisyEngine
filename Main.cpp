@@ -15,6 +15,7 @@
 //#include "Animation.hpp"
 #include "Shadows.hpp"
 
+
 int main()
 {
 	ResourceManager resourceManager;
@@ -41,6 +42,4 @@ int main()
 
 		window.SwapBuffers();
 	}
-
-
 }

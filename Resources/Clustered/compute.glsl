@@ -9,9 +9,6 @@ uniform int numLightsInFrustum;
 uniform mat4 projMatrix;
 uniform mat4 viewMatrix;
 uniform vec4 cameraPosition;
-uniform int forceGlobalLight;
-
-const int GLOBAL_LIGHT = 0;
 
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
@@ -64,6 +61,7 @@ layout(std430, binding = 4) buffer CubePlanesBuffer
 layout(std430, binding = 5) buffer ScreenSpaceDataBuffer
 {
 	float indexes[numLights];
+	float zRadius[numLights];
 	vec4 numLightsIn;
 	vec4 NDCCoords[];
 };
@@ -83,18 +81,16 @@ void main()
 	int intersections = 0;
 
 	uint lightsOnScreen = atomicCounter(count);
-	for (int i = 0; i < lightsOnScreen; ++i)
+	for (int i = 0; i < lightsOnScreen; i++)
 	{
 		int lightIndex = int(indexes[i]);
-
-		bool force = forceGlobalLight == 1 && lightIndex == GLOBAL_LIGHT;
-
-		if (force || SphereCubeColliding(cubePlanes[index].faces, NDCCoords[i]))
+		
+		if (CollideTest(cubePlanes[index].faces, NDCCoords[i], zRadius[i]))
 		{
 			tileLights[index][intersections] = lightIndex;
 			++intersections;
 		}
-		else if (zIndex == 0)
+		/*else if (zIndex == 0)
 		{
 			vec4 light4 = vec4(lightData[lightIndex].pos4.xyz, lightData[lightIndex].lightRadius);
 			if (PointInSphere(cameraPosition.xyz, light4, nearPlane, farPlane))
@@ -102,9 +98,17 @@ void main()
 				tileLights[index][intersections] = lightIndex;
 				++intersections;
 			}
-		}
+		}*/
 	}
 
-	lightIndexes[index] = intersections;
-}
+	//lightIndexes[index] = int(NDCCoords[0].x * 255);
 
+	//lightIndexes[index] = int(cubePlanes[index].faces[2].w * 255);
+	//lightIndexes[index] = int(cubePlanes[index].faces[2].w * 255);
+	lightIndexes[index] = intersections;
+	//lightIndexes[index] = zIndex;
+
+	//lightIndexes[index] = int(NDCCoords[0].z * 255);
+	//lightIndexes[index] = int(index);
+	//lightIndexes[index] = int(lightsOnScreen);
+}

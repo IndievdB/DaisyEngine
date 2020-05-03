@@ -24,6 +24,7 @@ struct TileData
 struct ScreenSpaceData
 {
 	float indexes[NUM_LIGHTS];
+	float zRadius[NUM_LIGHTS];
 	Vector4 numLightsIn;
 	Vector4 NDCCoords[NUM_LIGHTS];
 };
@@ -66,14 +67,14 @@ public:
 	void GenerateGrid();
 	void InitGridSSBO();
 
-	void Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos) const;
+	void Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far) const;
 
 	ComputeShader* dataPrep;
 	ComputeShader* compute;
 	Vector3** dataPrepWorkGroups;
 private:
-	void PrepareDataGPU(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos) const;
-	void FillTilesGPU(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos) const;
+	void PrepareDataGPU(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far) const;
+	void FillTilesGPU(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far) const;
 	void InitLightSSBO();
 
 	std::shared_ptr<entt::registry> registry;
@@ -85,6 +86,7 @@ private:
 	int numLights;
 	int numTiles;
 	int numLightsInFrustum = 0;
+	int numLightsInScene;
 
 	Vector3 gridSize;
 	Vector3 gridDimensions;

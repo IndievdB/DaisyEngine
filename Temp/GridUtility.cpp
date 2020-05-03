@@ -88,12 +88,21 @@ Tile GridUtility::GenerateTile(const Vector3 position, const Vector3 dimensions)
 
 void GridUtility::AddFaces(CubePlanes& cube, const Vector3 position, const Vector3 dimensions)
 {
-	cube.faces[LEFT] = Vector4(LEFT_NORMAL.x, LEFT_NORMAL.y, LEFT_NORMAL.z, position.Length());
-	cube.faces[RIGHT] = Vector4(RIGHT_NORMAL.x, RIGHT_NORMAL.y, RIGHT_NORMAL.z, (position + Vector3(dimensions.x, 0, 0)).Length());
-	cube.faces[FRONT] = Vector4(FRONT_NORMAL.x, FRONT_NORMAL.y, FRONT_NORMAL.z, (position + Vector3(0, 0, dimensions.z)).Length());
-	cube.faces[BACK] = Vector4(BACK_NORMAL.x, BACK_NORMAL.y, BACK_NORMAL.z, position.Length());
-	cube.faces[TOP] = Vector4(TOP_NORMAL.x, TOP_NORMAL.y, TOP_NORMAL.z, (position + Vector3(0, dimensions.y, 0)).Length());
-	cube.faces[BOTTOM] = Vector4(BOTTOM_NORMAL.x, BOTTOM_NORMAL.y, BOTTOM_NORMAL.z, position.Length());
+	cube.faces[LEFT] = Vector4(0, 0, 0, position.x);
+	cube.faces[RIGHT] = Vector4(0, 0, 0, position.x + dimensions.x);
+
+	cube.faces[TOP] = Vector4(0,0,0, position.y);
+	cube.faces[BOTTOM] = Vector4(0,0,0, position.y + dimensions.y);
+
+	cube.faces[FRONT] = Vector4(0, 0, 0, position.z);
+	cube.faces[BACK] = Vector4(0, 0, 0, position.z + dimensions.z);
+
+	//cube.faces[LEFT] = Vector4(LEFT_NORMAL.x, LEFT_NORMAL.y, LEFT_NORMAL.z, position.Length());
+	//cube.faces[RIGHT] = Vector4(RIGHT_NORMAL.x, RIGHT_NORMAL.y, RIGHT_NORMAL.z, (position + Vector3(dimensions.x, 0, 0)).Length());
+	//cube.faces[FRONT] = Vector4(FRONT_NORMAL.x, FRONT_NORMAL.y, FRONT_NORMAL.z, (position + Vector3(0, 0, dimensions.z)).Length());
+	//cube.faces[BACK] = Vector4(BACK_NORMAL.x, BACK_NORMAL.y, BACK_NORMAL.z, position.Length());
+	//cube.faces[TOP] = Vector4(TOP_NORMAL.x, TOP_NORMAL.y, TOP_NORMAL.z, (position + Vector3(0, dimensions.y, 0)).Length());
+	//cube.faces[BOTTOM] = Vector4(BOTTOM_NORMAL.x, BOTTOM_NORMAL.y, BOTTOM_NORMAL.z, position.Length());
 }
 
 void GridUtility::AddPositions(CubePlanes& cube, const Vector3 position, const Vector3 dimensions)

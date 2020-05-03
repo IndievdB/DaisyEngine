@@ -32,21 +32,20 @@ ClusteredSettings::ClusteredSettings(std::shared_ptr<entt::registry> registry, i
 	tileData = new TileData();
 	GenerateGrid();
 	InitGridSSBO();
-
 	InitLightSSBO();
 }
 
 void ClusteredSettings::InitLightSSBO()
 {
-	int lightIndex = 0;
+	numLightsInScene = 0;
 
-	registry->view<Transform, PointLight>().each([this, &lightIndex](auto& transform, auto& pointLight)
+	registry->view<Transform, PointLight>().each([this](auto& transform, auto& pointLight)
 	{
-		lightData[lightIndex].lightPosition = Vector4 (transform.position.x, transform.position.y, transform.position.z, 1);
-		lightData[lightIndex].lightColour = pointLight.color;
-		lightData[lightIndex].lightRadius = pointLight.radius;
-		lightData[lightIndex].intensity = pointLight.intensity;
-		lightIndex++;
+		lightData[numLightsInScene].lightPosition = Vector4 (transform.position.x, transform.position.y, transform.position.z, 1);
+		lightData[numLightsInScene].lightColour = pointLight.color;
+		lightData[numLightsInScene].lightRadius = pointLight.radius;
+		lightData[numLightsInScene].intensity = pointLight.intensity;
+		numLightsInScene++;
 	});
 
 	ssbo = GLUtil::InitSSBO(1, 1, ssbo, sizeof(LightData) * NUM_LIGHTS, &lightData, GL_STATIC_COPY);
@@ -70,6 +69,16 @@ void ClusteredSettings::InitGridSSBO()
 	gridPlanesSSBO = GLUtil::InitSSBO(1, 4, gridPlanesSSBO,
 		sizeof(CubePlanes) * numTiles, gridPlanes, GL_STATIC_COPY);
 
+	/*for (int i = 0; i < numTiles; i++)
+	{
+		std::cout << gridPlanes[i].positions[0] << " , ";
+		std::cout << gridPlanes[i].positions[1] << " , ";
+		std::cout << gridPlanes[i].positions[2] << " , ";
+		std::cout << gridPlanes[i].positions[3] << " , ";
+		std::cout << gridPlanes[i].positions[4] << " , ";
+		std::cout << gridPlanes[i].positions[5] << std::endl;
+	}*/
+
 	screenSpaceDataSSBO = GLUtil::InitSSBO(1, 5, screenSpaceDataSSBO,
 		sizeof(ScreenSpaceData), &ssdata, GL_STATIC_COPY);
 
@@ -80,7 +89,7 @@ void ClusteredSettings::InitGridSSBO()
 	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, countBuffer);
 }
 
-void ClusteredSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos) const
+void ClusteredSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far) const
 {
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, countBuffer);
 	glInvalidateBufferData(countBuffer);
@@ -88,19 +97,19 @@ void ClusteredSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x
 	glClearBufferData(GL_ATOMIC_COUNTER_BUFFER, GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, &zero);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 
-	PrepareDataGPU(projectionMatrix, viewMatrix, cameraPos);
-	FillTilesGPU(projectionMatrix, viewMatrix, cameraPos);
+	PrepareDataGPU(projectionMatrix, viewMatrix, cameraPos, near, far);
+	FillTilesGPU(projectionMatrix, viewMatrix, cameraPos, near, far);
 }
 
-void ClusteredSettings::FillTilesGPU(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos) const
+void ClusteredSettings::FillTilesGPU(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far) const
 {
 	//Writes to the shared buffer used in lighting pass
 	compute->Use();
 
 	glUniform1i(loc_numZTiles, gridSize.z);
 	glUniform1i(glGetUniformLocation(compute->GetProgramID(), "forceGlobalLight"), 0);
-	glUniform1f(glGetUniformLocation(compute->GetProgramID(), "nearPlane"), 1.0f);
-	glUniform1f(glGetUniformLocation(compute->GetProgramID(), "farPlane"), 4000.0f);
+	glUniform1f(glGetUniformLocation(compute->GetProgramID(), "nearPlane"), near);
+	glUniform1f(glGetUniformLocation(compute->GetProgramID(), "farPlane"), far);
 	glUniformMatrix4fv(glGetUniformLocation(compute->GetProgramID(), "projMatrix"), 1, false, (float*)& projectionMatrix);
 	glUniformMatrix4fv(glGetUniformLocation(compute->GetProgramID(), "viewMatrix"), 1, false, (float*)& viewMatrix);
 
@@ -112,13 +121,15 @@ void ClusteredSettings::FillTilesGPU(const Matrix4x4& projectionMatrix, const Ma
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_ATOMIC_COUNTER_BARRIER_BIT);
 }
 
-void ClusteredSettings::PrepareDataGPU(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos) const
+void ClusteredSettings::PrepareDataGPU(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far) const
 {
 	Matrix4x4 projView = projectionMatrix * viewMatrix;
 	dataPrep->Use();
 
-	glUniform1f(glGetUniformLocation(dataPrep->GetProgramID(), "nearPlane"), 1.0f);
-	glUniform1f(glGetUniformLocation(dataPrep->GetProgramID(), "farPlane"), 4000.0f);
+	glUniform1i(glGetUniformLocation(dataPrep->GetProgramID(), "lightsInScene"), numLightsInScene);
+
+	glUniform1f(glGetUniformLocation(dataPrep->GetProgramID(), "nearPlane"), near);
+	glUniform1f(glGetUniformLocation(dataPrep->GetProgramID(), "farPlane"), far);
 	glUniformMatrix4fv(loc_projMatrix, 1, false, (float*)& projectionMatrix);
 	glUniformMatrix4fv(glGetUniformLocation(dataPrep->GetProgramID(), "viewMatrix"), 1, false, (float*)& viewMatrix);
 	glUniformMatrix4fv(loc_projView, 1, false, (float*)& projView);

@@ -154,6 +154,7 @@
     <ClCompile Include="Renderer\PBRSettings.cpp" />
     <ClCompile Include="Renderer\Renderbuffer.cpp" />
     <ClCompile Include="Renderer\RenderSystem.cpp" />
+    <ClCompile Include="Renderer\ShadowSettings.cpp" />
     <ClCompile Include="Renderer\Skybox.cpp" />
     <ClCompile Include="Renderer\TextMesh.cpp" />
     <ClCompile Include="Temp\BoxCollision.cpp" />
@@ -168,6 +169,12 @@
     <ClCompile Include="Core\ResourceManager.cpp" />
     <ClCompile Include="Renderer\Shader.cpp" />
     <ClCompile Include="Physics\RigidBody.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_demo.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Vendor\stb\stb_image.cpp" />
     <ClCompile Include="Renderer\Texture.cpp" />
     <ClCompile Include="Renderer\Window.cpp" />
@@ -195,6 +202,7 @@
     <ClInclude Include="Renderer\PBRSettings.hpp" />
     <ClInclude Include="Renderer\PointLight.hpp" />
     <ClInclude Include="Renderer\Renderbuffer.hpp" />
+    <ClInclude Include="Renderer\ShadowSettings.hpp" />
     <ClInclude Include="Shadows.hpp" />
     <ClInclude Include="Renderer\Skybox.hpp" />
     <ClInclude Include="Renderer\TextMesh.hpp" />
@@ -203,6 +211,14 @@
     <ClInclude Include="Temp\GLUtil.h" />
     <ClInclude Include="Temp\GridUtility.h" />
     <ClInclude Include="Temp\Plane.h" />
+    <ClInclude Include="Vendor\imgui\imconfig.h" />
+    <ClInclude Include="Vendor\imgui\imgui.h" />
+    <ClInclude Include="Vendor\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="Vendor\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="Vendor\imgui\imgui_internal.h" />
+    <ClInclude Include="Vendor\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Vendor\imgui\imstb_textedit.h" />
+    <ClInclude Include="Vendor\imgui\imstb_truetype.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\CFunctions.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\ClassInfo.h" />
     <ClInclude Include="Vendor\LuaBridge\detail\Config.h" />

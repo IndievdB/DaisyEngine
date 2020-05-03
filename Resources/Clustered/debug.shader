@@ -98,7 +98,6 @@ void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, i
 	
 	if (dist <= lightData[lightIndex].lightRadius)
 	{
-		
 		//Diffuse
 		vec3 viewDir = normalize(-position);
 		vec3 lightDir = normalize(lightPosView - position);
@@ -114,18 +113,14 @@ void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, i
 	}
 }
 
-
-
-/*void main()
-{
-	FragColor = texture(mainTex, TexCoords);
-}*/
-
 void main(void)
 {
+	vec2 screenSpacePosition = vec2(gl_FragCoord.x / 800.0f, gl_FragCoord.y / 600.0f);
+
 	vec3 normal = normalize(Normal);
 
 	vec4 col = texture2D(mainTex, TexCoords);
+
 	if (col.a < 0.1f)
 	{
 		discard;
@@ -135,9 +130,9 @@ void main(void)
 
 	float zCoord = abs(FragPos.z - nearPlane) / (farPlane - nearPlane);
 
-	int xIndex = int(TexCoords.x * (tilesOnAxes.x - 1));
-	int yIndex = int(TexCoords.y * (tilesOnAxes.y - 1));
-	int zIndex = int(zCoord * (tilesOnAxes.z - 1));
+	int xIndex = int(screenSpacePosition.x * (tilesOnAxes.x));
+	int yIndex = int(screenSpacePosition.y * (tilesOnAxes.y));
+	int zIndex = int(zCoord * (tilesOnAxes.z));
 
 	int tile = GetTileIndex(xIndex, yIndex, zIndex);
 

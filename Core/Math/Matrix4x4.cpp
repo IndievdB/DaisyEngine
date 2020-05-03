@@ -911,10 +911,10 @@ Vector4 operator * (const Matrix4x4& matrix, const Vector4& vector)
 {
     Vector4 result;
     
-    result.x = matrix.mV[0]*vector.x + matrix.mV[1]*vector.y + matrix.mV[2]*vector.z + matrix.mV[3]*vector.w;
-    result.y = matrix.mV[4]*vector.x + matrix.mV[5]*vector.y + matrix.mV[6]*vector.z + matrix.mV[7]*vector.w;
-    result.z = matrix.mV[8]*vector.x + matrix.mV[9]*vector.y + matrix.mV[10]*vector.z + matrix.mV[11]*vector.w;
-    result.w = matrix.mV[12]*vector.x + matrix.mV[13]*vector.y + matrix.mV[14]*vector.z + matrix.mV[15]*vector.w;
+    result.x = matrix.mV[0]*vector.x + matrix.mV[4]*vector.y + matrix.mV[8]*vector.z + matrix.mV[12]*vector.w;
+    result.y = matrix.mV[1]*vector.x + matrix.mV[5]*vector.y + matrix.mV[9]*vector.z + matrix.mV[13]*vector.w;
+    result.z = matrix.mV[2]*vector.x + matrix.mV[6]*vector.y + matrix.mV[10]*vector.z + matrix.mV[14]*vector.w;
+    result.w = matrix.mV[3]*vector.x + matrix.mV[7]*vector.y + matrix.mV[11]*vector.z + matrix.mV[15]*vector.w;
     
     return result;
 }

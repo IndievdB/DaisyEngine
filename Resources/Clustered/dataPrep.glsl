@@ -7,27 +7,9 @@ uniform float farPlane;
 uniform mat4 projectionMatrix;
 uniform mat4 projView;
 uniform mat4 viewMatrix;
+uniform int lightsInScene;
 
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
-
-struct Tile
-{
-	float x;
-	float y;
-	float z;
-	float width;
-	float height;
-	float length;
-
-	float _padding[6];
-};
-
-//faces - xyz is normal, w is distance from origin
-struct CubePlanes
-{
-	vec4 faces[6];
-	vec4 positions[6];
-};
 
 struct LightData
 {
@@ -45,21 +27,10 @@ layout(std430, binding = 1) buffer LightDataBuffer
 	LightData lightData[];
 };
 
-//Shared with compute shader
-layout (std430, binding = 3) buffer TileLightsBuffer
-{
-	int lightIndexes[numTiles];
-	int tileLights[numTiles][numLights];
-};
-
-layout(std430, binding = 4) buffer CubePlanesBuffer
-{
-	CubePlanes cubePlanes[];
-};
-
 layout(std430, binding = 5) buffer ScreenSpaceDataBuffer
 {
 	float indexes[numLights];
+	float zRadius[numLights];
 	vec4 numLightsIn;
 	vec4 NDCCoords[];
 };
@@ -76,6 +47,9 @@ void main()
 
 	int id = xIndex + int(gl_NumWorkGroups.x) * (yIndex + int(gl_NumWorkGroups.y) * zIndex);
 
+	if (id >= lightsInScene)
+		return;
+
 	vec4 worldLight = vec4(lightData[id].pos4.xyz, 1.0f);
 
 	vec4 frustum[6];
@@ -88,18 +62,30 @@ void main()
 	{
 		vec4 projViewPos = projView * worldLight;
 		vec4 viewPos = viewMatrix * worldLight;
-		float zCoord = abs(viewPos.z - nearPlane) / farPlane + nearPlane;
+		float zCoord = -(viewPos.z - nearPlane) / farPlane + nearPlane;
 
 		//Store reciprocal to avoid use of division below.
 		float w = 1.0f / projViewPos.w;
 
 		//Final screenspace data.
-		float radius = lightData[id].lightRadius * w;
+		//float radius = lightData[id].lightRadius * w * 2.0f;
+		float fovy = 2 * atan(1/projectionMatrix[1].y);
+		float radius = (lightData[id].lightRadius / (tan((fovy/2.0f)) * abs(viewPos.z)));
+
+		vec4 S = viewMatrix * (worldLight + vec4(lightData[id].lightRadius,0,0,0));
+		float viewRadius = distance (viewPos.xyz, S.xyz);
+		vec4 S1 = projectionMatrix * (viewPos + vec4(viewRadius,0,0,0));
+
+		//vec4 projViewPosPlusRadius = projectionMatrix * viewPos;
+		//float radius = distance(projViewPos, S1);
+
+
 		vec4 clipPos = vec4(projViewPos.x * w, projViewPos.y * w, zCoord, radius);
 
 		uint currentLightCount = atomicCounterIncrement(count);
 
 		NDCCoords[currentLightCount] = clipPos;
+		zRadius[currentLightCount] = lightData[id].lightRadius / (farPlane - nearPlane);
 		indexes[currentLightCount] = id;
 	}
 }

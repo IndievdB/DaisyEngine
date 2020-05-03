@@ -15,9 +15,12 @@ public:
 	void ResetDimensions();
 	GLFWwindow* GetGLFWWindow();
 	static Window* GetInstance();
+	float GetWidth();
+	float GetHeight();
 private:
 	static Window* s_Instance;
 	GLFWwindow* window;
+	float width, height;
 };
 
 #endif

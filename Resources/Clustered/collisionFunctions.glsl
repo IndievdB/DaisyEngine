@@ -12,9 +12,39 @@ bool SphereCubeColliding(vec4 frustum[6], vec4 sphere)
 	c += min(dot(sphere.xyz, frustum[2].xyz) + frustum[2].w + sphere.w, 0.0);
 	c += min(dot(sphere.xyz, frustum[3].xyz) + frustum[3].w + sphere.w, 0.0);
 	c += min(dot(sphere.xyz, frustum[4].xyz) + frustum[4].w + sphere.w, 0.0);
-	c += min(dot(sphere.xyz, frustum[5].xyz) + frustum[5].w + sphere.w, 0.0);
+	c += min(dot(sphere.xyz, frustum[5].xyz) + frustum[5].w + sphere.w,	 0.0);
 
 	return c == 0.0;
+}
+
+bool CollideTest(vec4 frustum[6], vec4 sphere, float zRadius)
+{
+	bool withinLeftBounds = (sphere.x + sphere.w >= frustum[0].w);
+	bool withinRightBounds = (sphere.x - sphere.w <= frustum[1].w);
+
+	bool withinTopBounds = (sphere.y + sphere.w >= frustum[4].w);
+	bool withinBottomBounds = (sphere.y - sphere.w <= frustum[5].w);
+
+	bool withinFrontBounds = (sphere.z + zRadius >= frustum[2].w);
+	bool withinBackBounds = (sphere.z - zRadius <= frustum[3].w);
+
+	//
+
+	bool withinLeftBoundsINV = (-(sphere.x + sphere.w) >= frustum[0].w);
+	bool withinRightBoundsINV = (-(sphere.x - sphere.w) <= frustum[1].w);
+
+	bool withinTopBoundsINV = (-(sphere.y + sphere.w) >= frustum[4].w);
+	bool withinBottomBoundsINV = (-(sphere.y - sphere.w) <= frustum[5].w);
+	
+	//
+
+	//return withinFrontBounds && withinBackBounds;
+	//return withinTopBounds && withinBottomBounds;
+	//return withinLeftBounds && withinRightBounds;
+
+	return (withinLeftBounds || withinLeftBoundsINV) && (withinRightBounds || withinRightBoundsINV) &&
+	(withinTopBounds || withinTopBoundsINV) && (withinBottomBounds || withinBottomBoundsINV) &&
+	withinFrontBounds && withinBackBounds;
 }
 
 //Builds a normalized plane from view projection matrix
