@@ -79,6 +79,8 @@ layout(binding = 0) uniform atomic_uint count;
 
 uniform float nearPlane;
 uniform float farPlane;
+uniform float screenWidth;
+uniform float screenHeight;
 uniform float ambientLighting;
 uniform mat4 view;
 uniform sampler2D mainTex;
@@ -115,7 +117,7 @@ void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, i
 
 void main(void)
 {
-	vec2 screenSpacePosition = vec2(gl_FragCoord.x / 800.0f, gl_FragCoord.y / 600.0f);
+	vec2 screenSpacePosition = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 
 	vec3 normal = normalize(Normal);
 

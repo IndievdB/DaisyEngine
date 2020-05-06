@@ -2,16 +2,20 @@
 #include <glad/glad.h>
 
 #include "../Core/Transform.hpp"
-#include "../Temp/GLUtil.h"
 
-ClusteredSettings::ClusteredSettings(std::shared_ptr<entt::registry> registry, int numLights, int numXTiles, int numYTiles, int numZTiles, Vector2 minScreenCoord, Vector2 maxScreenCoord)
+ClusteredSettings::ClusteredSettings(std::shared_ptr<entt::registry> registry, int numLights)
 {
+	Vector2 minScreenCoord(-1, -1);
+	Vector2 maxScreenCoord(1, 1);
+
+	this->gridSize = Vector3(8, 8, 8);
 	this->camera = camera;
 	this->numLights = numLights;
 	this->minCoord = minScreenCoord;
 	this->registry = registry;
 
-	gridSize = Vector3(numXTiles, numYTiles, numZTiles);
+	//lightData = new LightData[NUM_LIGHTS];
+
 	gridDimensions = Vector3(
 		std::abs(minScreenCoord.x - maxScreenCoord.x) / static_cast<float>(gridSize.x),
 		std::abs(minScreenCoord.y - maxScreenCoord.y) / static_cast<float>(gridSize.y),
@@ -19,7 +23,8 @@ ClusteredSettings::ClusteredSettings(std::shared_ptr<entt::registry> registry, i
 
 	numTiles = gridSize.x * gridSize.y * gridSize.z;
 
-	gridPlanes = new CubePlanes[numTiles];
+	//gridPlanes = new CubePlanes[numTiles];
+	tileBounds = new TileBounds[numTiles];
 
 	compute = new ComputeShader("Resources/Clustered/compute.glsl");
 	loc_numZTiles = glGetUniformLocation(compute->GetProgramID(), "numZTiles");
@@ -48,39 +53,68 @@ void ClusteredSettings::InitLightSSBO()
 		numLightsInScene++;
 	});
 
-	ssbo = GLUtil::InitSSBO(1, 1, ssbo, sizeof(LightData) * NUM_LIGHTS, &lightData, GL_STATIC_COPY);
-	tilelightssssbo = GLUtil::InitSSBO(1, 3, tilelightssssbo, sizeof(TileData), tileData, GL_STATIC_COPY);
-
-	//TEMP?
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightData) * NUM_LIGHTS, &lightData, GL_STATIC_COPY);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, ssbo);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	tilelightsSSBO.Initialize(3, sizeof(TileData), tileData);
+	lightDataSSBO.Initialize(1, sizeof(LightData) * NUM_LIGHTS, &lightData);
 }
 
 void ClusteredSettings::GenerateGrid()
 {
-	const GridData gridData(grid, gridPlanes, screenTiles, minCoord);
-	GridUtility::Generate3DGrid(gridData, gridDimensions, gridSize);
+	float xOffset = 0;
+	float yOffset = 0;
+	numTiles = gridSize.x * gridSize.y * gridSize.z;
+
+	int xIndex = 0;
+	int yIndex = 0;
+	int zIndex = 0;
+
+	for (int i = 0; i < gridSize.x * gridSize.y; i++)
+	{
+		zIndex = 0;
+		xIndex = ceilf(xOffset);
+
+		//Once reached the end of x axis, reset x offset and move up y axis.
+		if (xIndex == gridSize.x)
+		{
+			yOffset += gridDimensions.y;
+			++yIndex;
+			xOffset = 0;
+			xIndex = 0;
+		}
+
+		//Create tile closest to screen.
+		const Vector3 startPosition((gridDimensions.x * xOffset) + minCoord.x, yOffset + minCoord.y, 1.0f);
+		int index = xIndex + int(gridSize.x) * (yIndex + int(gridSize.y) * zIndex);
+
+		tileBounds[index].left = startPosition.x;
+		tileBounds[index].right = startPosition.x + gridDimensions.x;
+		tileBounds[index].top = startPosition.y;
+		tileBounds[index].bottom = startPosition.y + gridDimensions.y;
+		tileBounds[index].front = startPosition.z;
+		tileBounds[index].back = startPosition.z + gridDimensions.z;
+
+		//Fill along the z axis from the tile above.
+		for (int k = 1; k <= gridSize.z - 1; ++k)
+		{
+			zIndex = k;
+			const float newZCoord = startPosition.z + (gridDimensions.z * k);
+			index = xIndex + int(gridSize.x) * (yIndex + int(gridSize.y) * zIndex);
+
+			tileBounds[index].left = startPosition.x;
+			tileBounds[index].right = startPosition.x + gridDimensions.x;
+			tileBounds[index].top = startPosition.y;
+			tileBounds[index].bottom = startPosition.y + gridDimensions.y;
+			tileBounds[index].front = newZCoord;
+			tileBounds[index].back = newZCoord + gridDimensions.z;
+		}
+
+		++xOffset;
+	}
 }
 
 void ClusteredSettings::InitGridSSBO()
 {
-	gridPlanesSSBO = GLUtil::InitSSBO(1, 4, gridPlanesSSBO,
-		sizeof(CubePlanes) * numTiles, gridPlanes, GL_STATIC_COPY);
-
-	/*for (int i = 0; i < numTiles; i++)
-	{
-		std::cout << gridPlanes[i].positions[0] << " , ";
-		std::cout << gridPlanes[i].positions[1] << " , ";
-		std::cout << gridPlanes[i].positions[2] << " , ";
-		std::cout << gridPlanes[i].positions[3] << " , ";
-		std::cout << gridPlanes[i].positions[4] << " , ";
-		std::cout << gridPlanes[i].positions[5] << std::endl;
-	}*/
-
-	screenSpaceDataSSBO = GLUtil::InitSSBO(1, 5, screenSpaceDataSSBO,
-		sizeof(ScreenSpaceData), &ssdata, GL_STATIC_COPY);
+	tileBoundsSSBO.Initialize(6, sizeof(TileBounds) * numTiles, tileBounds);
+	screenSpaceDataSSBO.Initialize(5, sizeof(ScreenSpaceData), &ssdata);
 
 	glGenBuffers(1, &countBuffer);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, countBuffer);

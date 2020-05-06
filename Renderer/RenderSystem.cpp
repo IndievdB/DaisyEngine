@@ -21,7 +21,7 @@
 RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("Resources/PBR/Malibu_Overlook_3k.hdr")
 {
 	pbrSettings.Setup(skybox.environmentCubemap);
-	clusteredSettings = new ClusteredSettings(registry, NUM_LIGHTS, 8, 8, 8, Vector2(-1, -1), Vector2(1, 1));
+	clusteredSettings = new ClusteredSettings(registry, NUM_LIGHTS);
 	shadowSettings = new ShadowSettings(registry);
 
 	IMGUI_CHECKVERSION();
@@ -87,6 +87,8 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		shader->SetVector3("camPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 		shader->SetFloat("nearPlane", camera->nearPlane);
 		shader->SetFloat("farPlane", camera->farPlane);
+		shader->SetFloat("screenWidth", Window::GetInstance()->GetWidth());
+		shader->SetFloat("screenHeight", Window::GetInstance()->GetHeight());
 		shader->SetFloat("ambientLighting", 0.05f);
 
 		pbrSettings.Bind(shader);
@@ -95,9 +97,10 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		{
 			shader->SetVector3("directionalLight.direction", directionalLight->direction.x, directionalLight->direction.y, directionalLight->direction.z);
 			shader->SetVector3("directionalLight.color", directionalLight->color.x, directionalLight->color.y, directionalLight->color.z);
-
 			shadowSettings->Bind(shader);
 		}
+
+		
 
 		meshRenderer.material->Bind();
 		meshRenderer.mesh->Render(shader, 0.01f);

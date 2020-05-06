@@ -13,7 +13,7 @@
 
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
-	auto material = ResourceManager::GetInstance()->GetMaterial("BrickMat", "Resources/Clustered/debug.shader");
+	auto material = ResourceManager::GetInstance()->GetMaterial("BrickMat", "Resources/Clustered/Shadows.shader");
 	material->SetTexture("mainTex", "Resources/spnza_bricks_a_diff.tga");
 
 	{

@@ -27,8 +27,6 @@ void main()
 	ViewPos = viewPos.xyz;
 	TexCoords = aTexCoords;
 	
-	//mat3 normalMatrix = transpose(inverse(mat3(view * model)));
-	//Normal = normalMatrix * (vec4(aNormal, 1.0)).xyz;
 	Normal = mat3(model) * aNormal;
 	
 	gl_Position = projection * viewPos;
@@ -86,6 +84,8 @@ layout(binding = 0) uniform atomic_uint count;
 
 uniform float nearPlane;
 uniform float farPlane;
+uniform float screenWidth;
+uniform float screenHeight;
 uniform float ambientLighting;
 uniform mat4 view;
 uniform sampler2D mainTex;
@@ -142,21 +142,13 @@ void AddDirectionalLight(DirectionalLight light, vec4 albedoCol, vec3 normal, in
 
 float ShadowCalculation(DirectionalLight light, vec4 fragPosLightSpace)
 {
-	// perform perspective divide
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-	// transform to [0,1] range
 	projCoords = projCoords * 0.5 + 0.5;
-	// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
 	float closestDepth = texture(shadowMap, projCoords.xy).r;
-	// get depth of current fragment from light's perspective
 	float currentDepth = projCoords.z;
-	// calculate bias (based on depth map resolution and slope)
 	vec3 normal = normalize(Normal);
 	vec3 lightDir = normalize(-light.direction);
 	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-	// check whether current frag pos is in shadow
-	// float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
-	// PCF
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
 	for (int x = -1; x <= 1; ++x)
@@ -169,18 +161,15 @@ float ShadowCalculation(DirectionalLight light, vec4 fragPosLightSpace)
 	}
 	shadow /= 9.0;
 
-	// keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
 	if (projCoords.z > 1.0)
 		shadow = 0.0;
-
-	//if (projCoords.x > 0 && projCoords.x < 1 && projCoords.y > 0 && projCoords.y < 1)
-	//	shadow += 0.5f;
 
 	return shadow;
 }
 
 void main(void)
 {
+	vec2 screenSpacePosition = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 	vec3 normal = normalize(Normal);
 
 	vec4 col = texture2D(mainTex, TexCoords);
@@ -193,9 +182,9 @@ void main(void)
 
 	float zCoord = abs(ViewPos.z - nearPlane) / (farPlane - nearPlane);
 
-	int xIndex = int(TexCoords.x * (tilesOnAxes.x - 1));
-	int yIndex = int(TexCoords.y * (tilesOnAxes.y - 1));
-	int zIndex = int(zCoord * (tilesOnAxes.z - 1));
+	int xIndex = int(screenSpacePosition.x * (tilesOnAxes.x));
+	int yIndex = int(screenSpacePosition.y * (tilesOnAxes.y));
+	int zIndex = int(zCoord * (tilesOnAxes.z));
 
 	int tile = GetTileIndex(xIndex, yIndex, zIndex);
 
@@ -214,4 +203,5 @@ void main(void)
 	lightResult.a = albedoCol.a;
 
 	FragColor = lightResult;
+	//FragColor = vec4(lightIndexes[tile], lightIndexes[tile], lightIndexes[tile],1);
 }

@@ -31,6 +31,13 @@ struct CubePlanes
 	vec4 positions[6];
 };
 
+struct TileBounds
+{
+	float left, right, top, bottom, front, back;
+
+	float padding[2];
+};
+
 struct LightData
 {
 	vec4 pos4;
@@ -53,17 +60,17 @@ layout (std430, binding = 3) buffer TileLightsBuffer
 	int tileLights[numTiles][numLights];
 };
 
-layout(std430, binding = 4) buffer CubePlanesBuffer
-{
-	CubePlanes cubePlanes[];
-};
-
 layout(std430, binding = 5) buffer ScreenSpaceDataBuffer
 {
 	float indexes[numLights];
 	float zRadius[numLights];
 	vec4 numLightsIn;
 	vec4 NDCCoords[];
+};
+
+layout(std430, binding = 6) buffer TileBoundsBuffer
+{
+	TileBounds tileBounds[];
 };
 
 layout(binding = 0) uniform atomic_uint count;
@@ -84,31 +91,15 @@ void main()
 	for (int i = 0; i < lightsOnScreen; i++)
 	{
 		int lightIndex = int(indexes[i]);
-		
-		if (CollideTest(cubePlanes[index].faces, NDCCoords[i], zRadius[i]))
+		TileBounds bounds = tileBounds[index];
+
+		//if (CollideTest(cubePlanes[index].faces, NDCCoords[i], zRadius[i]))
+		if (CollideTest2(bounds.left, bounds.right, bounds.bottom, bounds.top, bounds.front, bounds.back, NDCCoords[i], zRadius[i]))
 		{
 			tileLights[index][intersections] = lightIndex;
 			++intersections;
 		}
-		/*else if (zIndex == 0)
-		{
-			vec4 light4 = vec4(lightData[lightIndex].pos4.xyz, lightData[lightIndex].lightRadius);
-			if (PointInSphere(cameraPosition.xyz, light4, nearPlane, farPlane))
-			{
-				tileLights[index][intersections] = lightIndex;
-				++intersections;
-			}
-		}*/
 	}
 
-	//lightIndexes[index] = int(NDCCoords[0].x * 255);
-
-	//lightIndexes[index] = int(cubePlanes[index].faces[2].w * 255);
-	//lightIndexes[index] = int(cubePlanes[index].faces[2].w * 255);
 	lightIndexes[index] = intersections;
-	//lightIndexes[index] = zIndex;
-
-	//lightIndexes[index] = int(NDCCoords[0].z * 255);
-	//lightIndexes[index] = int(index);
-	//lightIndexes[index] = int(lightsOnScreen);
 }

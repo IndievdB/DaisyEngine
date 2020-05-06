@@ -1,14 +1,15 @@
 #pragma once
 
 #include "../Core/Math/Vector2.hpp"
+#include "../Core/Math/Vector3.hpp"
 #include "../Core/Math/Vector4.hpp"
 #include "../Core/Math/Matrix4x4.hpp"
-#include "../Temp/GridUtility.h"
 
 #include "PointLight.hpp"
 #include "ComputeShader.hpp"
 #include "Camera.hpp"
 #include "../Vendor/entt/entt.hpp"
+#include "SSBO.hpp"
 
 #include <glad/glad.h>
 
@@ -39,10 +40,17 @@ struct LightData
 	float padding[2];
 };
 
+struct TileBounds
+{
+	float left, right, top, bottom, front, back;
+
+	float padding[2];
+};
+
 class ClusteredSettings
 {
 public:
-	ClusteredSettings(std::shared_ptr<entt::registry> registry, int numLights, int numXTiles, int numYTiles, int numZTiles, Vector2 minScreenCoord, Vector2 maxScreenCoord);
+	ClusteredSettings(std::shared_ptr<entt::registry> registry, int numLights);
 	~ClusteredSettings()
 	{
 		delete compute;
@@ -52,11 +60,6 @@ public:
 	TileData* GetTileData() const
 	{
 		return tileData;
-	}
-
-	Tile* GetScreenTiles()
-	{
-		return screenTiles;
 	}
 
 	int GetNumTiles()  const
@@ -79,7 +82,7 @@ private:
 
 	std::shared_ptr<entt::registry> registry;
 	LightData lightData[NUM_LIGHTS];
-	//PointLight** lights;
+	//LightData* lightData;
 	Camera* camera;
 	Vector2 minCoord;
 
@@ -92,24 +95,23 @@ private:
 	Vector3 gridDimensions;
 
 	//Data
-	Tile screenTiles[NUM_TILES];
-	Cube grid[NUM_TILES];
-	CubePlanes* gridPlanes;
+	TileBounds* tileBounds;
 
-	Cube screenCube;
+	//Cube screenCube;
 	TileData* tileData;
 
 	Vector4 screenLightData[NUM_LIGHTS];
 	ScreenSpaceData ssdata;
 
 	//SSBO Stuff
-	GLuint tileDataSSBO;
-	GLuint gridPlanesSSBO;
-	GLuint screenSpaceDataSSBO;
-	GLuint modelMatricesSSBO;
-	
-	GLuint ssbo;
-	GLuint tilelightssssbo;
+	//GLuint tileBoundsSSBO;
+	//GLuint screenSpaceDataSSBO;
+	//GLuint tilelightssssbo;
+
+	SSBO screenSpaceDataSSBO;
+	SSBO tilelightsSSBO;
+	SSBO tileBoundsSSBO;
+	SSBO lightDataSSBO;
 
 	GLuint countBuffer;
 	GLuint count;

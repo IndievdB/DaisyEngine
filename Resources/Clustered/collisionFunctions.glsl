@@ -38,9 +38,31 @@ bool CollideTest(vec4 frustum[6], vec4 sphere, float zRadius)
 	
 	//
 
-	//return withinFrontBounds && withinBackBounds;
-	//return withinTopBounds && withinBottomBounds;
-	//return withinLeftBounds && withinRightBounds;
+	return (withinLeftBounds || withinLeftBoundsINV) && (withinRightBounds || withinRightBoundsINV) &&
+	(withinTopBounds || withinTopBoundsINV) && (withinBottomBounds || withinBottomBoundsINV) &&
+	withinFrontBounds && withinBackBounds;
+}
+
+bool CollideTest2(float left, float right, float bottom, float top, float front, float back, vec4 sphere, float zRadius)
+{
+	bool withinLeftBounds = (sphere.x + sphere.w >= left);
+	bool withinRightBounds = (sphere.x - sphere.w <= right);
+
+	bool withinTopBounds = (sphere.y + sphere.w >= top);
+	bool withinBottomBounds = (sphere.y - sphere.w <= bottom);
+
+	bool withinFrontBounds = (sphere.z + zRadius >= front);
+	bool withinBackBounds = (sphere.z - zRadius <= back);
+
+	//
+
+	bool withinLeftBoundsINV = (-(sphere.x + sphere.w) >= left);
+	bool withinRightBoundsINV = (-(sphere.x - sphere.w) <= right);
+
+	bool withinTopBoundsINV = (-(sphere.y + sphere.w) >= top);
+	bool withinBottomBoundsINV = (-(sphere.y - sphere.w) <= bottom);
+	
+	//
 
 	return (withinLeftBounds || withinLeftBoundsINV) && (withinRightBounds || withinRightBoundsINV) &&
 	(withinTopBounds || withinTopBoundsINV) && (withinBottomBounds || withinBottomBoundsINV) &&

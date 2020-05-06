@@ -157,10 +157,6 @@
     <ClCompile Include="Renderer\ShadowSettings.cpp" />
     <ClCompile Include="Renderer\Skybox.cpp" />
     <ClCompile Include="Renderer\TextMesh.cpp" />
-    <ClCompile Include="Temp\BoxCollision.cpp" />
-    <ClCompile Include="Temp\Cube.cpp" />
-    <ClCompile Include="Temp\GridUtility.cpp" />
-    <ClCompile Include="Temp\Plane.cpp" />
     <ClCompile Include="Vendor\glad\glad.c" />
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -203,14 +199,10 @@
     <ClInclude Include="Renderer\PointLight.hpp" />
     <ClInclude Include="Renderer\Renderbuffer.hpp" />
     <ClInclude Include="Renderer\ShadowSettings.hpp" />
+    <ClInclude Include="Renderer\SSBO.hpp" />
     <ClInclude Include="Shadows.hpp" />
     <ClInclude Include="Renderer\Skybox.hpp" />
     <ClInclude Include="Renderer\TextMesh.hpp" />
-    <ClInclude Include="Temp\BoxCollision.h" />
-    <ClInclude Include="Temp\Cube.h" />
-    <ClInclude Include="Temp\GLUtil.h" />
-    <ClInclude Include="Temp\GridUtility.h" />
-    <ClInclude Include="Temp\Plane.h" />
     <ClInclude Include="Vendor\imgui\imconfig.h" />
     <ClInclude Include="Vendor\imgui\imgui.h" />
     <ClInclude Include="Vendor\imgui\imgui_impl_glfw.h" />
