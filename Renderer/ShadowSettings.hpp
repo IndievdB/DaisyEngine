@@ -16,4 +16,5 @@ private:
 	std::shared_ptr<entt::registry> registry;
 	Matrix4x4 lightSpaceMatrix;
 	Texture* shadowMap;
+	void TempDirectionalLight(std::shared_ptr<Camera> camera, Matrix4x4& view);
 };

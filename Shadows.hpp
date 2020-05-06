@@ -111,9 +111,9 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 
 
-	/*{
+	{
 		auto entity = registry->create();
 		registry->assign<Transform>(entity, Vector3(-10.0f, 8.0f, -10.0f), Vector3::one, Quaternion::identity);
-		registry->assign<DirectionalLight>(entity, Vector3(0.7f,-0.8f,0.7f).Normalized(), Vector3(1.0f, 1.0f, 1.0f));
-	}*/
+		registry->assign<DirectionalLight>(entity, Vector3(0.7f,-0.8f,0.7f).Normalized(), Vector3(0.2f, 0.2f, 0.2f));
+	}
 }

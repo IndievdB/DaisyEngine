@@ -16,7 +16,7 @@ public:
 	void SetFloat(std::string name, float value) const;
 	void SetVector3(std::string name, float x, float y, float z) const;
 	void SetVector4(std::string name, float x, float y, float z, float w) const;
-	void SetMatrix4x4(std::string name, Matrix4x4 matrix) const;
+	void SetMatrix4x4(std::string name, const Matrix4x4& matrix) const;
 	uint32_t GetProgramID() { return program; };
  private:
 	int GenerateShader(std::string filePath);

@@ -146,7 +146,7 @@ void ComputeShader::SetVector4(std::string name, float x, float y, float z, floa
 	glUniform4f(glGetUniformLocation(program, name.c_str()), x, y, z, w);
 }
 
-void ComputeShader::SetMatrix4x4(std::string name, Matrix4x4 matrix) const
+void ComputeShader::SetMatrix4x4(std::string name, const Matrix4x4& matrix) const
 {
 	glUseProgram(program);
 	unsigned int transformLoc = glGetUniformLocation(program, name.c_str());

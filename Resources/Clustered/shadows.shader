@@ -27,7 +27,7 @@ void main()
 	ViewPos = viewPos.xyz;
 	TexCoords = aTexCoords;
 	
-	Normal = mat3(model) * aNormal;
+	Normal = mat3(transpose(inverse(model))) * aNormal;
 	
 	gl_Position = projection * viewPos;
 }
@@ -101,28 +101,7 @@ in vec3 Normal;
 
 out vec4 FragColor;
 
-void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, inout vec4 lightResult)
-{
-	vec3 lightPosition = lightData[lightIndex].pos4.xyz;
-	vec3 lightPosView = vec3(view * vec4(lightPosition, 1.0));
-	float dist = length(lightPosView - position);
-	
-	if (dist <= lightData[lightIndex].lightRadius)
-	{
-		//Diffuse
-		vec3 viewDir = normalize(-position);
-		vec3 lightDir = normalize(lightPosView - position);
-		vec3 diffuse = max(dot(normal, lightDir), 0.0) * albedoCol.rgb * lightData[lightIndex].lightColour.rgb;
-	
-		//Attenuation
-		float attenuation = 1.0 - clamp(dist / lightData[lightIndex].lightRadius, 0.0, 1.0);
-		attenuation *= lightData[lightIndex].intensity;
-		
-		diffuse *= attenuation;
-		
-		lightResult.rgb += diffuse;
-	}
-}
+
 
 struct DirectionalLight
 {
@@ -167,6 +146,24 @@ float ShadowCalculation(DirectionalLight light, vec4 fragPosLightSpace)
 	return shadow;
 }
 
+void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, inout vec4 lightResult)
+{
+	vec3 lightPosition = lightData[lightIndex].pos4.xyz;
+	float dist = length(lightPosition - position);
+
+	if (dist <= lightData[lightIndex].lightRadius)
+	{
+		vec3 lightDir = normalize(lightPosition - position);
+		vec3 diffuse = max(dot(normal, lightDir), 0.0) * albedoCol.rgb * lightData[lightIndex].lightColour.rgb;
+		float attenuation = 1.0 - clamp(dist / lightData[lightIndex].lightRadius, 0.0, 1.0);
+
+		attenuation *= lightData[lightIndex].intensity;
+		diffuse *= attenuation;
+
+		lightResult.rgb += diffuse;
+	}
+}
+
 void main(void)
 {
 	vec2 screenSpacePosition = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
@@ -192,7 +189,7 @@ void main(void)
 	for (int j = 0; j < lightIndexes[tile]; j++)
 	{
 		int lightIndex = tileLights[tile][j];
-		AddBPLighting(ViewPos, normal, albedoCol, lightIndex, lightResult);
+		AddBPLighting(WorldPos, normal, albedoCol, lightIndex, lightResult);
 	}
 
 	AddDirectionalLight(directionalLight, albedoCol, normal, lightResult);
@@ -203,5 +200,4 @@ void main(void)
 	lightResult.a = albedoCol.a;
 
 	FragColor = lightResult;
-	//FragColor = vec4(lightIndexes[tile], lightIndexes[tile], lightIndexes[tile],1);
 }

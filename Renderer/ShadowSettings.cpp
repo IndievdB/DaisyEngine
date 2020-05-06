@@ -20,8 +20,10 @@ ShadowSettings::ShadowSettings(std::shared_ptr<entt::registry> registry)
 	shadowMap->AddBorder(1, 1, 1, 1);
 }
 
-void ShadowSettings::Update(std::shared_ptr<Camera> camera, Matrix4x4& view)
+void ShadowSettings::TempDirectionalLight(std::shared_ptr<Camera> camera, Matrix4x4& view)
 {
+	// 1. GET DIRECTIONAL LIGHT
+
 	std::shared_ptr<DirectionalLight> directionalLight;
 	std::shared_ptr<Transform> transform;
 	registry->view<Transform, DirectionalLight>().each([&transform, &directionalLight](auto& trans, auto& light)
@@ -33,24 +35,17 @@ void ShadowSettings::Update(std::shared_ptr<Camera> camera, Matrix4x4& view)
 	if (directionalLight == nullptr)
 		return;
 
+	// 2. CREATE FRAMEBUFFER
+
 	Framebuffer offscreenFramebuffer;
 	offscreenFramebuffer.AttachTexture(*shadowMap, GL_DEPTH_ATTACHMENT);
-	
 
-
-
-
-
-
-
-
+	// 3. CALCULATE BOUNDS TO COVER FRUSTUM
 
 	float FOV = camera->fov + 2.0f;
 
 	Matrix4x4 viewInverse = Matrix4x4::AffineInverse(view);
 	Matrix4x4 lightView = Matrix4x4::LookAt(Vector3::zero, directionalLight->direction, Vector3::one);
-
-	//std::cout << LightM << std::endl;
 
 	float aspectRatio = (float)Window::GetInstance()->GetWidth() / (float)Window::GetInstance()->GetHeight();
 	float tanHalfHFOV = tanf(kDegToRad * (FOV / 2.0f));
@@ -64,19 +59,17 @@ void ShadowSettings::Update(std::shared_ptr<Camera> camera, Matrix4x4& view)
 	Vector4 frustumCornersL[8];
 	Vector4 frustumCorners[8] =
 	{
-		// near face
 		Vector4(xn, yn, -camera->nearPlane, 1.0f),
 		Vector4(-xn, yn, -camera->nearPlane, 1.0f),
 		Vector4(xn, -yn, -camera->nearPlane, 1.0f),
 		Vector4(-xn, -yn, -camera->nearPlane, 1.0f),
 
-		// far face
 		Vector4(xf, yf, -camera->farPlane, 1.0f),
 		Vector4(-xf, yf, -camera->farPlane, 1.0f),
 		Vector4(xf, -yf, -camera->farPlane, 1.0f),
 		Vector4(-xf, -yf, -camera->farPlane, 1.0f)
 	};
-	
+
 	float minX = INFINITY;
 	float maxX = -INFINITY;
 	float minY = INFINITY;
@@ -86,14 +79,9 @@ void ShadowSettings::Update(std::shared_ptr<Camera> camera, Matrix4x4& view)
 
 	for (int j = 0; j < 8; j++)
 	{
-		// Transform the frustum coordinate from view to world space
 		Vector4 vW = viewInverse * frustumCorners[j];
 
-
-		// Transform the frustum coordinate from world to light space
 		frustumCornersL[j] = lightView * vW;
-
-		//std::cout << frustumCornersL[j] << std::endl;
 
 		minX = std::min(minX, frustumCornersL[j].x);
 		maxX = std::max(maxX, frustumCornersL[j].x);
@@ -102,13 +90,11 @@ void ShadowSettings::Update(std::shared_ptr<Camera> camera, Matrix4x4& view)
 		minZ = std::min(minZ, -frustumCornersL[j].z);
 		maxZ = std::max(maxZ, -frustumCornersL[j].z);
 	}
-	
 
+	// 3. RENDER SCENE FROM LIGHTS PERSPECTIVE
 
-	//std::cout << minZ << "       " << maxZ << std::endl;
-	
 	Matrix4x4 lightProjection = Matrix4x4::Orthographic(minX, maxX, minY, maxY, minZ - 50.0f, maxZ);
-	
+
 	lightSpaceMatrix = lightProjection * lightView;
 	std::shared_ptr<Shader> depthShader = ResourceManager::GetInstance()->GetShader("Resources/Clustered/shadowMappingDepth.shader");
 	depthShader->Use();
@@ -129,12 +115,19 @@ void ShadowSettings::Update(std::shared_ptr<Camera> camera, Matrix4x4& view)
 	Window::GetInstance()->ResetDimensions();
 	Window::GetInstance()->Clear();
 
+	// 4. OPTIONALLY RENDER SHADOW TEXTURE TO SCREEN
+
 	return;
-	Mesh quad ("Resources/PBR/FullscreenQuad.obj");
+	Mesh quad("Resources/PBR/FullscreenQuad.obj");
 	Shader quadShader("Resources/texture.shader");
 	quadShader.Use();
 	shadowMap->Bind(quadShader.GetTextureUnit("mainTex"));
 	quad.Render();
+}
+
+void ShadowSettings::Update(std::shared_ptr<Camera> camera, Matrix4x4& view)
+{
+	TempDirectionalLight(camera, view);
 }
 
 void ShadowSettings::Bind(std::shared_ptr<Shader> shader)

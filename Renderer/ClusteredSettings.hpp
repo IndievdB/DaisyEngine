@@ -117,7 +117,7 @@ private:
 	GLuint count;
 
 	//Uniform location
-	GLuint loc_numZTiles;
+	//GLuint loc_numZTiles;
 	GLuint loc_projMatrix;
 	GLuint loc_projView;
 	GLuint loc_cameraPos;
