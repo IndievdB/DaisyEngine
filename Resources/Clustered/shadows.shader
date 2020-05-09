@@ -112,14 +112,6 @@ struct DirectionalLight
 
 uniform DirectionalLight directionalLight;
 
-void AddDirectionalLight(DirectionalLight light, vec4 albedoCol, vec3 normal, inout vec4 lightResult)
-{
-	vec3 lightDir = normalize(-light.direction);
-	float diff = max(dot(normal, lightDir), 0.0);
-	vec3 diffuse = light.color * diff * albedoCol.rgb;
-	lightResult.rgb += diffuse;
-}
-
 float ShadowCalculation(DirectionalLight light, vec4 fragPosLightSpace)
 {
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -147,6 +139,54 @@ float ShadowCalculation(DirectionalLight light, vec4 fragPosLightSpace)
 	return shadow;
 }
 
+void AddDirectionalLight(DirectionalLight light, vec4 albedoCol, vec3 normal, inout vec4 lightResult)
+{
+	vec3 lightDir = normalize(-light.direction);
+	float diff = max(dot(normal, lightDir), 0.0);
+	vec3 diffuse = light.color * diff * albedoCol.rgb;
+
+	float shadow = ShadowCalculation(light, WorldPosLightSpace);
+	diffuse *= (1.0 - shadow);
+
+	lightResult.rgb += diffuse;
+}
+
+
+vec3 gridSamplingDisk[20] = vec3[]
+(
+	vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+	vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+	vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+	vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+	vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
+	);
+
+float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos, float lightRadius)
+{
+	vec3 fragToLight = fragPos - lightPos;
+	float currentDepth = length(fragToLight);
+
+	float shadow = 0.0;
+	float bias = 0.15;
+	int samples = 20;
+	float viewDistance = length(ViewPos - fragPos);
+	float diskRadius = (1.0 + (viewDistance / farPlane)) / 25.0;
+
+	for (int i = 0; i < samples; ++i)
+	{
+		float closestDepth = texture(pointShadowMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
+		closestDepth *= lightRadius;   // undo mapping [0;1]
+		if (currentDepth - bias > closestDepth)
+			shadow += 1.0;
+	}
+	shadow /= float(samples);
+
+	//shadow = currentDepth - bias > texture(pointShadowMap, fragToLight).r * farPlane ? 1.0 : 0.0;
+
+	return shadow;
+}
+
+
 void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, inout vec4 lightResult)
 {
 	vec3 lightPosition = lightData[lightIndex].pos4.xyz;
@@ -161,42 +201,13 @@ void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, i
 		attenuation *= lightData[lightIndex].intensity;
 		diffuse *= attenuation;
 
+		float shadow = ShadowCalculationPoint(WorldPos, lightPosition, lightData[lightIndex].lightRadius);
+		diffuse *= (1.0 - shadow);
+
 		lightResult.rgb += diffuse;
 	}
 }
 
-
-vec3 gridSamplingDisk[20] = vec3[]
-(
-	vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
-	vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
-	vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
-	vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
-	vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
-);
-
-float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos)
-{
-	vec3 fragToLight = fragPos - lightPos;
-	float currentDepth = length(fragToLight);
-
-	float shadow = 0.0;
-	float bias = 0.15;
-	int samples = 20;
-	float viewDistance = length(ViewPos - fragPos);
-	float diskRadius = (1.0 + (viewDistance / farPlane)) / 25.0;
-
-	for (int i = 0; i < samples; ++i)
-	{
-		float closestDepth = texture(pointShadowMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
-		closestDepth *= farPlane;   // undo mapping [0;1]
-		if (currentDepth - bias > closestDepth)
-			shadow += 1.0;
-	}
-	shadow /= float(samples);
-
-	return shadow;
-}
 
 
 
@@ -226,18 +237,23 @@ void main(void)
 	int tile = GetTileIndex(xIndex, yIndex, zIndex);
 
 	vec4 lightResult = vec4(0.0, 0.0, 0.0, 1.0);
+	
+	lightResult.rgb += albedoCol.rgb * ambientLighting;
+	AddDirectionalLight(directionalLight, albedoCol, normal, lightResult);
+
 	for (int j = 0; j < lightIndexes[tile]; j++)
 	{
 		int lightIndex = tileLights[tile][j];
 		AddBPLighting(WorldPos, normal, albedoCol, lightIndex, lightResult);
 	}
 
-	AddDirectionalLight(directionalLight, albedoCol, normal, lightResult);
+	//AddDirectionalLight(directionalLight, albedoCol, normal, lightResult);
 
-	float shadow = ShadowCalculation(directionalLight, WorldPosLightSpace);
+	/*float shadow = ShadowCalculation(directionalLight, WorldPosLightSpace);
+	
 	lightResult.rgb *= (1.0 - shadow);
 	lightResult.rgb += albedoCol.rgb * ambientLighting;
-	lightResult.a = albedoCol.a;
+	lightResult.a = albedoCol.a;*/
 
 	FragColor = lightResult;
 

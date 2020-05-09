@@ -24,14 +24,14 @@ void main()
 in vec4 FragPos;
 
 uniform vec3 lightPos;
-uniform float far_plane;
+uniform float lightRadius;
 
 out vec4 FragColor;
 
 void main()
 {             
     float lightDistance = length(FragPos.xyz - lightPos);
-    lightDistance = lightDistance / far_plane;
+    lightDistance = lightDistance / lightRadius;
     //gl_FragDepth = lightDistance;
 	FragColor = vec4(vec3(lightDistance),1);
 }

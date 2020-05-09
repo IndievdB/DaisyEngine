@@ -93,18 +93,8 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	{
 		auto entity = registry->create();
 		registry->assign<Transform>(entity, Vector3(0, 8.0f, 0), Vector3::one, Quaternion::identity);
-		registry->assign<PointLight>(entity, Vector4(1, 0, 0, 1), 10.0f, 2.0f);
+		registry->assign<PointLight>(entity, Vector4(1, 0, 0, 1), 20.0f, 3.0f);
 	}
-
-	{
-		auto entity = registry->create();
-		Vector3 position = Vector3(0, 8.0f, 0);
-		Vector3 scale(0.2f, 0.2f, 0.2f);
-		Quaternion rotation = Quaternion::identity;
-		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
-		registry->assign<MeshRenderer>(entity, "BrickMat", "Resources/sphere.obj");
-	}
-
 
 
 
@@ -114,6 +104,6 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	{
 		auto entity = registry->create();
 		registry->assign<Transform>(entity, Vector3(-10.0f, 8.0f, -10.0f), Vector3::one, Quaternion::identity);
-		registry->assign<DirectionalLight>(entity, Vector3(0.7f,-0.8f,0.7f).Normalized(), Vector3(0.2f, 0.2f, 0.2f));
+		registry->assign<DirectionalLight>(entity, Vector3(0.7f,-0.8f,0.7f).Normalized(), Vector3(0.5f, 0.5f, 0.5f));
 	}
 }
