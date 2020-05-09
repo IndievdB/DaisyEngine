@@ -75,6 +75,8 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 
 	shadowSettings->Update(camera, view);
 
+
+	
 	registry->view<Transform, MeshRenderer>().each([&projection, &view, &cameraPosition, &directionalLight, &camera, this](auto& transform, auto& meshRenderer)
 	{
 		Matrix4x4 model = Matrix4x4::Transformation(transform);
@@ -100,11 +102,13 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 			shadowSettings->Bind(shader);
 		}
 
-		
+		//shadowSettings->shadowCubeMap->Bind(shader->GetTextureUnit("pointShadowMap"));
 
 		meshRenderer.material->Bind();
 		meshRenderer.mesh->Render(shader, 0.01f);
 	});
+	
+
 
 	skybox.Render(projection, view);
 

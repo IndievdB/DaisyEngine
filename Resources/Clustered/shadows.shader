@@ -90,6 +90,7 @@ uniform float ambientLighting;
 uniform mat4 view;
 uniform sampler2D mainTex;
 uniform sampler2D shadowMap;
+uniform samplerCube pointShadowMap;
 uniform vec3 camPos;
 
 
@@ -164,6 +165,45 @@ void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, i
 	}
 }
 
+
+vec3 gridSamplingDisk[20] = vec3[]
+(
+	vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+	vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+	vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+	vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+	vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
+);
+
+float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos)
+{
+	vec3 fragToLight = fragPos - lightPos;
+	float currentDepth = length(fragToLight);
+
+	float shadow = 0.0;
+	float bias = 0.15;
+	int samples = 20;
+	float viewDistance = length(ViewPos - fragPos);
+	float diskRadius = (1.0 + (viewDistance / farPlane)) / 25.0;
+
+	for (int i = 0; i < samples; ++i)
+	{
+		float closestDepth = texture(pointShadowMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
+		closestDepth *= farPlane;   // undo mapping [0;1]
+		if (currentDepth - bias > closestDepth)
+			shadow += 1.0;
+	}
+	shadow /= float(samples);
+
+	return shadow;
+}
+
+
+
+
+
+
+
 void main(void)
 {
 	vec2 screenSpacePosition = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
@@ -200,4 +240,6 @@ void main(void)
 	lightResult.a = albedoCol.a;
 
 	FragColor = lightResult;
+
+	//FragColor = vec4(vec3(ShadowCalculationPoint(WorldPos, vec3(0,8,0))), 1);
 }

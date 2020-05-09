@@ -2,6 +2,7 @@
 
 Renderbuffer::Renderbuffer(GLenum format, int width, int height)
 {
+	glGenRenderbuffers(1, &renderBufferObjectID);
 	glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObjectID);
 	glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
 }

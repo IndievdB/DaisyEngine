@@ -17,32 +17,6 @@ bool SphereCubeColliding(vec4 frustum[6], vec4 sphere)
 	return c == 0.0;
 }
 
-bool CollideTest(vec4 frustum[6], vec4 sphere, float zRadius)
-{
-	bool withinLeftBounds = (sphere.x + sphere.w >= frustum[0].w);
-	bool withinRightBounds = (sphere.x - sphere.w <= frustum[1].w);
-
-	bool withinTopBounds = (sphere.y + sphere.w >= frustum[4].w);
-	bool withinBottomBounds = (sphere.y - sphere.w <= frustum[5].w);
-
-	bool withinFrontBounds = (sphere.z + zRadius >= frustum[2].w);
-	bool withinBackBounds = (sphere.z - zRadius <= frustum[3].w);
-
-	//
-
-	bool withinLeftBoundsINV = (-(sphere.x + sphere.w) >= frustum[0].w);
-	bool withinRightBoundsINV = (-(sphere.x - sphere.w) <= frustum[1].w);
-
-	bool withinTopBoundsINV = (-(sphere.y + sphere.w) >= frustum[4].w);
-	bool withinBottomBoundsINV = (-(sphere.y - sphere.w) <= frustum[5].w);
-	
-	//
-
-	return (withinLeftBounds || withinLeftBoundsINV) && (withinRightBounds || withinRightBoundsINV) &&
-	(withinTopBounds || withinTopBoundsINV) && (withinBottomBounds || withinBottomBoundsINV) &&
-	withinFrontBounds && withinBackBounds;
-}
-
 bool CollideTest2(float left, float right, float bottom, float top, float front, float back, vec4 sphere, float zRadius)
 {
 	bool withinLeftBounds = (sphere.x + sphere.w >= left);
@@ -63,7 +37,7 @@ bool CollideTest2(float left, float right, float bottom, float top, float front,
 	bool withinBottomBoundsINV = (-(sphere.y - sphere.w) <= bottom);
 	
 	//
-
+	
 	return (withinLeftBounds || withinLeftBoundsINV) && (withinRightBounds || withinRightBoundsINV) &&
 	(withinTopBounds || withinTopBoundsINV) && (withinBottomBounds || withinBottomBoundsINV) &&
 	withinFrontBounds && withinBackBounds;

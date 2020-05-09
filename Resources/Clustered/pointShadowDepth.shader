@@ -8,8 +8,11 @@ in vec3 aPos : POSITION;
 uniform mat4 lightSpaceMatrix;
 uniform mat4 model;
 
+out vec4 FragPos;
+
 void main()
 {
+	FragPos = model * vec4(aPos, 1.0);
 	gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
 }
 
@@ -18,12 +21,17 @@ void main()
 // ============================================
 
 #version 330 core
+in vec4 FragPos;
 
-//out vec4 FragColor;
+uniform vec3 lightPos;
+uniform float far_plane;
+
+out vec4 FragColor;
 
 void main()
 {             
-	//FragColor = vec4(1,1,1,1);
-    // gl_FragDepth = gl_FragCoord.z;
-	
+    float lightDistance = length(FragPos.xyz - lightPos);
+    lightDistance = lightDistance / far_plane;
+    //gl_FragDepth = lightDistance;
+	FragColor = vec4(vec3(lightDistance),1);
 }

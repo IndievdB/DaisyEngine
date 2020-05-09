@@ -8,6 +8,7 @@ class Cubemap
 {
 public:
 	Cubemap(GLenum minificationFilter, int width, int height);
+	Cubemap(int width, int height);
 	unsigned int GetCubemapID();
 	void GenerateMipMaps();
 	void Bind(int textureUnit);
