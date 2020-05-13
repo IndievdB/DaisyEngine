@@ -32,6 +32,5 @@ void main()
 {             
     float lightDistance = length(FragPos.xyz - lightPos);
     lightDistance = lightDistance / lightRadius;
-    //gl_FragDepth = lightDistance;
 	FragColor = vec4(vec3(lightDistance),1);
 }

@@ -24,7 +24,7 @@ ShadowSettings::ShadowSettings(std::shared_ptr<entt::registry> registry)
 	cube = new Mesh("Resources/sphere.obj");
 	cubeShader = new Shader("Resources/cubecube.shader");
 	skybox = new Skybox("Resources/PBR/Malibu_Overlook_3k.hdr");
-	shadowCubeMap = std::make_unique<Cubemap>(GL_LINEAR, 1024, 1024);
+	shadowCubeMap = std::make_unique<Cubemap>(GL_LINEAR, 256, 256);
 }
 
 void ShadowSettings::TempDirectionalLight(std::shared_ptr<Camera> camera, Matrix4x4& view)
@@ -152,7 +152,7 @@ void ShadowSettings::TempPointLight(std::shared_ptr<Camera> camera, Matrix4x4& v
 	Framebuffer offscreenFramebuffer;
 	offscreenFramebuffer.Bind();
 	
-	Renderbuffer offscreenDepthRenderbuffer(GL_DEPTH_COMPONENT24, 1024, 1024);
+	Renderbuffer offscreenDepthRenderbuffer(GL_DEPTH_COMPONENT24, 256, 256);
 	offscreenFramebuffer.AttachRenderbuffer(offscreenDepthRenderbuffer, GL_DEPTH_ATTACHMENT);
 	
 	// 3. RENDER SCENE FROM LIGHTS PERSPECTIVE
@@ -168,7 +168,7 @@ void ShadowSettings::TempPointLight(std::shared_ptr<Camera> camera, Matrix4x4& v
 		Matrix4x4::LookAt(transform->position, transform->position + Vector3(0.0f,  0.0f, -1.0f), Vector3(0.0f, -1.0f,  0.0f))
 	};
 	
-	glViewport(0, 0, 1024, 1024);
+	glViewport(0, 0, 256, 256);
 	Window::GetInstance()->Clear();
 	
 	for (unsigned int i = 0; i < 6; i++)
@@ -200,8 +200,8 @@ void ShadowSettings::TempPointLight(std::shared_ptr<Camera> camera, Matrix4x4& v
 	// 4. OPTIONALLY RENDER SHADOW TEXTURE TO SCREEN
 
 	//return;
-	Matrix4x4 model = Matrix4x4::Transformation(Vector3(0, 8, 0), Quaternion::identity);
-	Matrix4x4 projection = Matrix4x4::Perspective(camera->fov * kDegToRad, 800.0f / 600.0f, camera->nearPlane, camera->farPlane);
+	Matrix4x4 model = Matrix4x4::Transformation(*transform);
+	Matrix4x4 projection = Matrix4x4::Perspective(camera->fov * kDegToRad, Window::GetInstance()->GetWidth()/ Window::GetInstance()->GetHeight(), camera->nearPlane, camera->farPlane);
 	
 	cubeShader->Use();
 	cubeShader->SetMatrix4x4("model", model);

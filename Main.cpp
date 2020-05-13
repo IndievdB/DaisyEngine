@@ -8,12 +8,13 @@
 #include "Core/Input.hpp"
 #include "Vendor/entt/entt.hpp"
 #include "Behaviour/LuaSystem.hpp"
+#include "Editor/Editor.hpp"
 
 //#include "PBRDemo.hpp"
 //#include "Clustered.hpp"
-//#include "Explosion.hpp"
+#include "Explosion.hpp"
 //#include "Animation.hpp"
-#include "Shadows.hpp"
+//#include "Shadows.hpp"
 
 
 int main()
@@ -27,8 +28,9 @@ int main()
 
 	PhysicsSystem physicsSystem;
 	LuaSystem luaSystem(registry);
-	RenderSystem renderSystem(registry);
+	std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(registry);
 	luaSystem.Intialize();
+	Editor editor(registry, renderSystem);
 
 	while (window.isOpen)
 	{
@@ -37,8 +39,9 @@ int main()
 		window.Clear();
 
 		luaSystem.Update();
-		renderSystem.RenderAll(registry);
+		renderSystem->RenderAll(registry);
 		physicsSystem.RunPhysics(registry);
+		editor.Update();
 
 		window.SwapBuffers();
 	}

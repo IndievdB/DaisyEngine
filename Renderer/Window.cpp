@@ -51,7 +51,7 @@ Window::Window(const char* title, float width, float height)
 	isOpen = true;
 
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	Window::s_Instance = this;
 }

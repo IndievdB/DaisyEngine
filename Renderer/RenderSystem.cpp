@@ -10,13 +10,9 @@
 #include "TextMesh.hpp"
 #include "MeshRenderer.hpp"
 #include "Material.hpp"
-#include "Framebuffer.hpp"
 #include "Window.hpp"
 #include "DirectionalLight.hpp"
 
-#include "../Vendor/imgui/imgui.h"
-#include "../Vendor/imgui/imgui_impl_glfw.h"
-#include "../Vendor/imgui/imgui_impl_opengl3.h"
 
 RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("Resources/PBR/Malibu_Overlook_3k.hdr")
 {
@@ -24,24 +20,16 @@ RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("
 	clusteredSettings = new ClusteredSettings(registry, NUM_LIGHTS);
 	shadowSettings = new ShadowSettings(registry);
 
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-
-	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(Window::GetInstance()->GetGLFWWindow(), true);
-	ImGui_ImplOpenGL3_Init("#version 150");
+	offscreenTexture = std::make_shared<Texture>(Window::GetInstance()->GetWidth(), Window::GetInstance()->GetHeight(), GL_RGB32F, GL_RGB);
+	offscreenFramebuffer.AttachTexture(*offscreenTexture, GL_COLOR_ATTACHMENT0);
+	offscreenDepthRenderbuffer = std::make_unique<Renderbuffer>(GL_DEPTH_COMPONENT24, Window::GetInstance()->GetWidth(), Window::GetInstance()->GetHeight());
+	offscreenFramebuffer.AttachRenderbuffer(*offscreenDepthRenderbuffer, GL_DEPTH_ATTACHMENT);
+	Framebuffer::Unbind();
 }
 
-RenderSystem::~RenderSystem()
+std::shared_ptr<Texture> RenderSystem::GetOffscreenTexture()
 {
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
+	return offscreenTexture;
 }
 
 void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
@@ -77,6 +65,10 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 
 
 	
+	
+	offscreenFramebuffer.Bind();
+	Window::GetInstance()->Clear();
+
 	registry->view<Transform, MeshRenderer>().each([&projection, &view, &cameraPosition, &directionalLight, &camera, this](auto& transform, auto& meshRenderer)
 	{
 		Matrix4x4 model = Matrix4x4::Transformation(transform);
@@ -108,8 +100,6 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		meshRenderer.mesh->Render(shader, 0.01f);
 	});
 	
-
-
 	skybox.Render(projection, view);
 
 	registry->view<Transform, TextMesh>().each([](auto& transform, auto& textMesh)
@@ -117,18 +107,11 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		TextMesh::Render(textMesh, transform.position.x, transform.position.y);
 	});
 
+	Framebuffer::Unbind();
 
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-
-	ImGuiIO io = ImGui::GetIO();
-
-	ImGui::Begin("Profiling");
-	ImGui::Text("%f ms\n", io.DeltaTime * 1000.0f);
-	ImGui::Text("%f fps\n", io.Framerate);
-	ImGui::End();
-
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	/*Mesh quad("Resources/PBR/FullscreenQuad.obj");
+	Shader quadShader("Resources/texture.shader");
+	quadShader.Use();
+	offscreenTexture->Bind(quadShader.GetTextureUnit("mainTex"));
+	quad.Render();*/
 }

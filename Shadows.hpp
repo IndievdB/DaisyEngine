@@ -92,7 +92,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	//for (int i = 0; i < 512; i++)
 	{
 		auto entity = registry->create();
-		registry->assign<Transform>(entity, Vector3(0, 8.0f, 0), Vector3::one, Quaternion::identity);
+		registry->assign<Transform>(entity, Vector3(5, 10, 5), Vector3::one, Quaternion::identity);
 		registry->assign<PointLight>(entity, Vector4(1, 0, 0, 1), 20.0f, 3.0f);
 	}
 
