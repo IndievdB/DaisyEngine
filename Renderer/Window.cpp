@@ -19,8 +19,8 @@ Window::Window(const char* title, float width, float height)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	//glfwWindowHint(GLFW_SAMPLES, 4);
 
-	this->width = width;
-	this->height = height;
+	this->viewportWidth = this->windowWidth = width;
+	this->viewportHeight = this->windowHeight = height;
 
 	window = glfwCreateWindow(width, height, title, NULL, NULL);
 	if (window == NULL)
@@ -56,21 +56,26 @@ Window::Window(const char* title, float width, float height)
 	Window::s_Instance = this;
 }
 
-float Window::GetWidth()
+float Window::GetViewportWidth()
 {
-	return this->width;
+	return this->viewportWidth;
 }
 
-float Window::GetHeight()
+float Window::GetViewportHeight()
 {
-	return this->height;
+	return this->viewportHeight;
+}
+
+void Window::SetViewportDimensions(float x, float y)
+{
+	viewportWidth = x;
+	viewportHeight = y;
+	ResetDimensions();
 }
 
 void Window::ResetDimensions()
 {
-	int frameBufferWidth, frameBufferHeight;
-	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
-	glViewport(0, 0, frameBufferWidth, frameBufferHeight);
+	glViewport(0, 0, viewportWidth, viewportHeight);
 }
 
 Window* Window::GetInstance()

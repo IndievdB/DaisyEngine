@@ -2,6 +2,9 @@
 #include "../Renderer/Window.hpp"
 #include <GLFW\glfw3.h>
 
+#include "SceneWindow.hpp"
+#include "ProfilerWindow.hpp"
+
 #include "../Vendor/imgui/imgui.h"
 #include "../Vendor/imgui/imgui_impl_glfw.h"
 #include "../Vendor/imgui/imgui_impl_opengl3.h"
@@ -9,7 +12,9 @@
 Editor::Editor(std::shared_ptr<entt::registry> registry, std::shared_ptr<RenderSystem> renderer)
 {
 	this->registry = registry;
-	this->renderer = renderer;
+
+	windows.emplace_back(new ProfilerWindow);
+	windows.emplace_back(new SceneWindow(renderer));
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -17,7 +22,6 @@ Editor::Editor(std::shared_ptr<entt::registry> registry, std::shared_ptr<RenderS
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(Window::GetInstance()->GetGLFWWindow(), true);
@@ -30,9 +34,6 @@ Editor::~Editor()
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
-
-bool showProfiler = true;
-static bool show_app_dockspace = true;
 
 static void HelpMarker(const char* desc)
 {
@@ -66,6 +67,7 @@ void Editor::Update()
 	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	static bool show_app_dockspace = true;
 	ImGui::Begin("DockSpace Demo", &show_app_dockspace, window_flags);
 	ImGui::PopStyleVar(3);
 
@@ -78,15 +80,11 @@ void Editor::Update()
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("Docking"))
+		if (ImGui::BeginMenu("Windows"))
 		{
-			// Disabling fullscreen would allow the window to be moved to the front of other windows,
-			// which we can't undo at the moment without finer window depth/z control.
-			//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
+			for (int i = 0; i < windows.size(); i++)
+				ImGui::MenuItem(windows[i]->GetName(), "", &windows[i]->isOpen);
 
-			ImGui::MenuItem("test 1", "", &showProfiler);
-			ImGui::MenuItem("test 2");
-			ImGui::MenuItem("test 3");
 			ImGui::EndMenu();
 		}
 		HelpMarker("help!");
@@ -97,49 +95,12 @@ void Editor::Update()
 	ImGui::End();
 
 
-	//
+
+	for (int i = 0; i < windows.size(); i++)
+		windows[i]->Update();
 
 
-	ImGui::Begin("Scene");
-	ImGui::Image((void*) renderer->GetOffscreenTexture()->GetTextureID(), ImVec2(512,512), ImVec2(0,1), ImVec2(1,0));
-	ImGui::End();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-	//ImGuiIO io = ImGui::GetIO();
-
-	if (showProfiler)
-	{
-		ImGui::Begin("Profiling", &showProfiler);
-		ImGui::Text("%f ms\n", io.DeltaTime * 1000.0f);
-		ImGui::Text("%f fps\n", io.Framerate);
-		ImGui::End();
-	}
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		GLFWwindow* backup_current_context = glfwGetCurrentContext();
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-		glfwMakeContextCurrent(backup_current_context);
-	}
 }

@@ -20,9 +20,9 @@ RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("
 	clusteredSettings = new ClusteredSettings(registry, NUM_LIGHTS);
 	shadowSettings = new ShadowSettings(registry);
 
-	offscreenTexture = std::make_shared<Texture>(Window::GetInstance()->GetWidth(), Window::GetInstance()->GetHeight(), GL_RGB32F, GL_RGB);
+	offscreenTexture = std::make_shared<Texture>(Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight(), GL_RGB32F, GL_RGB);
 	offscreenFramebuffer.AttachTexture(*offscreenTexture, GL_COLOR_ATTACHMENT0);
-	offscreenDepthRenderbuffer = std::make_unique<Renderbuffer>(GL_DEPTH_COMPONENT24, Window::GetInstance()->GetWidth(), Window::GetInstance()->GetHeight());
+	offscreenDepthRenderbuffer = std::make_unique<Renderbuffer>(GL_DEPTH_COMPONENT24, Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight());
 	offscreenFramebuffer.AttachRenderbuffer(*offscreenDepthRenderbuffer, GL_DEPTH_ATTACHMENT);
 	Framebuffer::Unbind();
 }
@@ -43,7 +43,7 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 	{
 		camera = std::make_shared<Camera>(cam);
 
-		projection = Matrix4x4::Perspective(cam.fov * kDegToRad, 800.0f / 600.0f, cam.nearPlane, cam.farPlane);
+		projection = Matrix4x4::Perspective(cam.fov * kDegToRad, Window::GetInstance()->GetViewportWidth() / Window::GetInstance()->GetViewportHeight(), cam.nearPlane, cam.farPlane);
 
 		cameraPosition = transform.position;
 
@@ -67,6 +67,9 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 	
 	
 	offscreenFramebuffer.Bind();
+	offscreenDepthRenderbuffer->Reformat(GL_DEPTH_COMPONENT24, Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight());
+	offscreenTexture->Reformat(Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight(), GL_RGB32F, GL_RGB);
+	
 	Window::GetInstance()->Clear();
 
 	registry->view<Transform, MeshRenderer>().each([&projection, &view, &cameraPosition, &directionalLight, &camera, this](auto& transform, auto& meshRenderer)
@@ -81,8 +84,8 @@ void RenderSystem::RenderAll(std::shared_ptr<entt::registry> registry)
 		shader->SetVector3("camPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 		shader->SetFloat("nearPlane", camera->nearPlane);
 		shader->SetFloat("farPlane", camera->farPlane);
-		shader->SetFloat("screenWidth", Window::GetInstance()->GetWidth());
-		shader->SetFloat("screenHeight", Window::GetInstance()->GetHeight());
+		shader->SetFloat("screenWidth", Window::GetInstance()->GetViewportWidth());
+		shader->SetFloat("screenHeight", Window::GetInstance()->GetViewportHeight());
 		shader->SetFloat("ambientLighting", 0.05f);
 
 		pbrSettings.Bind(shader);

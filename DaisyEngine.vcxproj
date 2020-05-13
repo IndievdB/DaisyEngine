@@ -189,6 +189,9 @@
     <ClInclude Include="Core\Math\Vector3.hpp" />
     <ClInclude Include="Core\Math\Vector4.hpp" />
     <ClInclude Include="Editor\Editor.hpp" />
+    <ClInclude Include="Editor\EditorWindow.hpp" />
+    <ClInclude Include="Editor\ProfilerWindow.hpp" />
+    <ClInclude Include="Editor\SceneWindow.hpp" />
     <ClInclude Include="PBRDemo.hpp" />
     <ClInclude Include="Physics\TriggerData.hpp" />
     <ClInclude Include="Renderer\ClusteredSettings.hpp" />

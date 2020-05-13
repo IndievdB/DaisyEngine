@@ -1,6 +1,8 @@
 #ifndef Window_hpp
 #define Window_hpp
 
+#include <functional>
+
 struct GLFWwindow;
 
 class Window
@@ -15,12 +17,14 @@ public:
 	void ResetDimensions();
 	GLFWwindow* GetGLFWWindow();
 	static Window* GetInstance();
-	float GetWidth();
-	float GetHeight();
+	float GetViewportWidth();
+	float GetViewportHeight();
+	void SetViewportDimensions(float x, float y);
 private:
 	static Window* s_Instance;
 	GLFWwindow* window;
-	float width, height;
+	float windowWidth, windowHeight;
+	float viewportWidth, viewportHeight;
 };
 
 #endif

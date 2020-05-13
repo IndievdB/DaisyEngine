@@ -25,7 +25,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Quaternion rotation = Quaternion(1, 0, 0, 0);
 		registry->assign<Transform>(entity, Vector3(0.0f, 5.0f, -25.0f), Vector3::one, rotation);
 		registry->assign<Camera>(entity);
-		registry->assign<LuaBehaviour>(entity, "Resources/FreeCam.lua");
+		//registry->assign<LuaBehaviour>(entity, "Resources/FreeCam.lua");
 	}
 
 	{

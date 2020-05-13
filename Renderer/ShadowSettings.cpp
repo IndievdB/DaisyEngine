@@ -54,7 +54,7 @@ void ShadowSettings::TempDirectionalLight(std::shared_ptr<Camera> camera, Matrix
 	Matrix4x4 viewInverse = Matrix4x4::AffineInverse(view);
 	Matrix4x4 lightView = Matrix4x4::LookAt(Vector3::zero, directionalLight->direction, Vector3::one);
 
-	float aspectRatio = (float)Window::GetInstance()->GetWidth() / (float)Window::GetInstance()->GetHeight();
+	float aspectRatio = (float)Window::GetInstance()->GetViewportWidth() / (float)Window::GetInstance()->GetViewportHeight();
 	float tanHalfHFOV = tanf(kDegToRad * (FOV / 2.0f));
 	float tanHalfVFOV = tanf(kDegToRad * ((FOV * aspectRatio) / 2.0f));
 
@@ -201,7 +201,7 @@ void ShadowSettings::TempPointLight(std::shared_ptr<Camera> camera, Matrix4x4& v
 
 	//return;
 	Matrix4x4 model = Matrix4x4::Transformation(*transform);
-	Matrix4x4 projection = Matrix4x4::Perspective(camera->fov * kDegToRad, Window::GetInstance()->GetWidth()/ Window::GetInstance()->GetHeight(), camera->nearPlane, camera->farPlane);
+	Matrix4x4 projection = Matrix4x4::Perspective(camera->fov * kDegToRad, Window::GetInstance()->GetViewportWidth()/ Window::GetInstance()->GetViewportHeight(), camera->nearPlane, camera->farPlane);
 	
 	cubeShader->Use();
 	cubeShader->SetMatrix4x4("model", model);
