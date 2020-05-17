@@ -20,6 +20,7 @@ public:
 	float GetViewportWidth();
 	float GetViewportHeight();
 	void SetViewportDimensions(float x, float y);
+	void SetCursorVisible(bool isVisible);
 private:
 	static Window* s_Instance;
 	GLFWwindow* window;

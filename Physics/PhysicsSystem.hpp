@@ -9,7 +9,6 @@ class PhysicsSystem
 private:
 	void UpdateRigidBodies(std::shared_ptr<entt::registry> registry);
 	void GenerateContacts(std::shared_ptr<entt::registry> registry);
-	//void CallTriggers(std::shared_ptr<entt::registry> registry);
 	void UpdateTriggers(std::shared_ptr<entt::registry> registry);
 	CollisionData cData;
 	ContactResolver resolver;

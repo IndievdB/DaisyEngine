@@ -56,6 +56,18 @@ Window::Window(const char* title, float width, float height)
 	Window::s_Instance = this;
 }
 
+void Window::SetCursorVisible(bool isVisible)
+{
+	if (isVisible)
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+	else
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+}
+
 float Window::GetViewportWidth()
 {
 	return this->viewportWidth;

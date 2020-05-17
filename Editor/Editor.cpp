@@ -3,25 +3,27 @@
 #include <GLFW\glfw3.h>
 
 #include "SceneWindow.hpp"
+#include "GameWindow.hpp"
 #include "ProfilerWindow.hpp"
+#include "ResourcesWindow.hpp"
 
 #include "../Vendor/imgui/imgui.h"
 #include "../Vendor/imgui/imgui_impl_glfw.h"
 #include "../Vendor/imgui/imgui_impl_opengl3.h"
 
-Editor::Editor(std::shared_ptr<entt::registry> registry, std::shared_ptr<RenderSystem> renderer)
+Editor::Editor(std::shared_ptr<entt::registry> registry, std::shared_ptr<RenderSystem> renderer, std::shared_ptr<PhysicsSystem> physicsSystem, std::shared_ptr<LuaSystem> luaSystem)
 {
-	this->registry = registry;
-
 	windows.emplace_back(new ProfilerWindow);
+	windows.emplace_back(new ResourcesWindow);
 	windows.emplace_back(new SceneWindow(renderer));
+	windows.emplace_back(new GameWindow(renderer, registry, physicsSystem, luaSystem));
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(Window::GetInstance()->GetGLFWWindow(), true);
@@ -70,7 +72,7 @@ void Editor::Update()
 	static bool show_app_dockspace = true;
 	ImGui::Begin("DockSpace Demo", &show_app_dockspace, window_flags);
 	ImGui::PopStyleVar(3);
-
+	
 	ImGuiIO& io = ImGui::GetIO();
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 	{
@@ -94,12 +96,8 @@ void Editor::Update()
 
 	ImGui::End();
 
-
-
 	for (int i = 0; i < windows.size(); i++)
 		windows[i]->Update();
-
-
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

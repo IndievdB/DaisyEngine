@@ -18,7 +18,7 @@ public:
 
 		ImGuiIO io = ImGui::GetIO();
 
-		ImGui::Begin("Profiling", &isOpen);
+		ImGui::Begin(GetName(), &isOpen);
 		ImGui::Text("%f ms\n", io.DeltaTime * 1000.0f);
 		ImGui::Text("%f fps\n", io.Framerate);
 		ImGui::End();

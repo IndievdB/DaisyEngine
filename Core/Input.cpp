@@ -219,6 +219,16 @@ bool Input::GetKeyUp(KeyCode keycode)
 	return (keyStatus == -1);
 }
 
+bool Input::GetLeftMouseButton()
+{
+	return (glfwGetMouseButton(activeWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
+}
+
+bool Input::GetRightMouseButton()
+{
+	return (glfwGetMouseButton(activeWindow, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
+}
+
 bool Input::GetWindowCloseButton()
 {
 	return Input::GetKeyDown(KeyCode::WindowClose);

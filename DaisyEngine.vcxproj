@@ -188,8 +188,10 @@
     <ClInclude Include="Core\Math\Vector2.hpp" />
     <ClInclude Include="Core\Math\Vector3.hpp" />
     <ClInclude Include="Core\Math\Vector4.hpp" />
+    <ClInclude Include="Editor\ResourcesWindow.hpp" />
     <ClInclude Include="Editor\Editor.hpp" />
     <ClInclude Include="Editor\EditorWindow.hpp" />
+    <ClInclude Include="Editor\GameWindow.hpp" />
     <ClInclude Include="Editor\ProfilerWindow.hpp" />
     <ClInclude Include="Editor\SceneWindow.hpp" />
     <ClInclude Include="PBRDemo.hpp" />
@@ -300,6 +302,7 @@
     <ClInclude Include="Renderer\Shader.hpp" />
     <ClInclude Include="Physics\RigidBody.hpp" />
     <ClInclude Include="Physics\SphereCollider.hpp" />
+    <ClInclude Include="Vendor\nlohmann\json.hpp" />
     <ClInclude Include="Vendor\stb\stb_image.h" />
     <ClInclude Include="Renderer\Texture.hpp" />
     <ClInclude Include="Renderer\Window.hpp" />

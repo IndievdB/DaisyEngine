@@ -18,12 +18,13 @@ public:
 	static bool GetKeyDown(KeyCode keycode);
 	static bool GetKeyUp(KeyCode keycode);
 	static bool GetWindowCloseButton();
+	static bool GetLeftMouseButton();
+	static bool GetRightMouseButton();
 	static float GetScrollDelta();
 	static Vector2 GetMousePositionDelta();
 	static Vector2 GetMousePosition();
 
 	void RegisterWindowCloseCallback();
-	void RegisterSetCursorPosCallback();
 	void RegisterSetScrollCallback(float delta);
 	void RegisterKeyCallback(int key);
 	void RegisterSetCursorPosCallback(double x, double y);

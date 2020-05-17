@@ -13,16 +13,14 @@ class RenderSystem
 {
 public:
 	RenderSystem(std::shared_ptr<entt::registry> registry);
-	void RenderAll(std::shared_ptr<entt::registry> registry);
-	std::shared_ptr<Texture> GetOffscreenTexture();
+	void RenderAll(std::shared_ptr<Texture> renderTexture, std::shared_ptr<Renderbuffer> depthBuffer, std::shared_ptr<Transform> cameraTransform, std::shared_ptr<Camera> camera);
 private:
+	std::shared_ptr<entt::registry> registry;
 	ClusteredSettings* clusteredSettings;
 	ShadowSettings* shadowSettings;
 	PBRSettings pbrSettings;
 	Skybox skybox;
 	//
 	Framebuffer offscreenFramebuffer;
-	std::shared_ptr<Texture> offscreenTexture;
-	std::unique_ptr<Renderbuffer> offscreenDepthRenderbuffer;
 };
 

@@ -1,0 +1,7 @@
+{
+  "shader" : "Resources/transform.shader",
+  "textures" :
+  {
+    "mainTex" : "Resources/Prototype Gray.png",
+  }
+}

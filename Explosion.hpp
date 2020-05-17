@@ -10,8 +10,33 @@
 #include "Renderer/TextMesh.hpp"
 #include "Behaviour/LuaBehaviour.hpp"
 
+#include "Vendor/nlohmann/json.hpp"
+
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
+	//json j;
+
+	auto material = ResourceManager::GetInstance()->GetMaterial("GrayMat", "Resources/transform.shader");
+	material->SetTexture("mainTex", "Resources/Prototype Gray.png");
+
+	{
+		auto entity = registry->create();
+		Quaternion rotation = Quaternion(1, 0, 0, 0);
+		registry->assign<Transform>(entity, Vector3(0.0f, 5.0f, -25.0f), Vector3::one, rotation);
+		registry->assign<Camera>(entity);
+		registry->assign<LuaBehaviour>(entity, "Resources/FreeCam.lua");
+	}
+
+	{
+		auto entity = registry->create();
+		registry->assign<Transform>(entity, Vector3::zero, Vector3::one, Quaternion::identity);
+		registry->assign<MeshRenderer>(entity, "GrayMat", "Resources/plane.obj");
+		PlaneCollider& collider = registry->assign<PlaneCollider>(entity);
+		collider.normal = Vector3::up;
+		collider.offset = 0;
+	}
+
+	/*
 	auto arialFont = ResourceManager::GetInstance()->GetFont("Resources/fonts/arial.ttf");
 	auto material = ResourceManager::GetInstance()->GetMaterial("WhiteMat", "Resources/transform.shader");
 	material->SetTexture("mainTex", "Resources/Prototype White.png");
@@ -25,7 +50,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Quaternion rotation = Quaternion(1, 0, 0, 0);
 		registry->assign<Transform>(entity, Vector3(0.0f, 5.0f, -25.0f), Vector3::one, rotation);
 		registry->assign<Camera>(entity);
-		//registry->assign<LuaBehaviour>(entity, "Resources/FreeCam.lua");
+		registry->assign<LuaBehaviour>(entity, "Resources/FreeCam.lua");
 	}
 
 	{
@@ -106,5 +131,5 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		BoxCollider& collider = registry->assign<BoxCollider>(entity);
 		collider.halfSize = Vector3(0.5f, 0.5f, 0.5f);
 		//collider.isTrigger = true;
-	}
+	}*/
 }
