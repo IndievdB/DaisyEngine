@@ -9,6 +9,7 @@
 #include "Renderer/Camera.hpp"
 #include "Renderer/TextMesh.hpp"
 #include "Behaviour/LuaBehaviour.hpp"
+#include "Core/EntityName.hpp"
 
 #include "Vendor/nlohmann/json.hpp"
 
@@ -22,6 +23,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	{
 		auto entity = registry->create();
 		Quaternion rotation = Quaternion(1, 0, 0, 0);
+		registry->assign<EntityName>(entity, "Main Camera");
 		registry->assign<Transform>(entity, Vector3(0.0f, 5.0f, -25.0f), Vector3::one, rotation);
 		registry->assign<Camera>(entity);
 		registry->assign<LuaBehaviour>(entity, "Resources/FreeCam.lua");
@@ -29,6 +31,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	{
 		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Ground Plane");
 		registry->assign<Transform>(entity, Vector3::zero, Vector3::one, Quaternion::identity);
 		registry->assign<MeshRenderer>(entity, "GrayMat", "Resources/plane.obj");
 		PlaneCollider& collider = registry->assign<PlaneCollider>(entity);

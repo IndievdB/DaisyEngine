@@ -188,6 +188,9 @@
     <ClInclude Include="Core\Math\Vector2.hpp" />
     <ClInclude Include="Core\Math\Vector3.hpp" />
     <ClInclude Include="Core\Math\Vector4.hpp" />
+    <ClInclude Include="Core\EntityName.hpp" />
+    <ClInclude Include="Editor\HierarchyWindow.hpp" />
+    <ClInclude Include="Editor\InspectorWindow.hpp" />
     <ClInclude Include="Editor\ResourcesWindow.hpp" />
     <ClInclude Include="Editor\Editor.hpp" />
     <ClInclude Include="Editor\EditorWindow.hpp" />

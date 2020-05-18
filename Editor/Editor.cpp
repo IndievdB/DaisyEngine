@@ -6,18 +6,15 @@
 #include "GameWindow.hpp"
 #include "ProfilerWindow.hpp"
 #include "ResourcesWindow.hpp"
+#include "HierarchyWindow.hpp"
+#include "InspectorWindow.hpp"
 
 #include "../Vendor/imgui/imgui.h"
 #include "../Vendor/imgui/imgui_impl_glfw.h"
 #include "../Vendor/imgui/imgui_impl_opengl3.h"
 
-Editor::Editor(std::shared_ptr<entt::registry> registry, std::shared_ptr<RenderSystem> renderer, std::shared_ptr<PhysicsSystem> physicsSystem, std::shared_ptr<LuaSystem> luaSystem)
+Editor::Editor()
 {
-	windows.emplace_back(new ProfilerWindow);
-	windows.emplace_back(new ResourcesWindow);
-	windows.emplace_back(new SceneWindow(renderer));
-	windows.emplace_back(new GameWindow(renderer, registry, physicsSystem, luaSystem));
-
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
@@ -28,6 +25,16 @@ Editor::Editor(std::shared_ptr<entt::registry> registry, std::shared_ptr<RenderS
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(Window::GetInstance()->GetGLFWWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 150");
+}
+
+void Editor::AddWindows(std::shared_ptr<entt::registry> registry, std::shared_ptr<RenderSystem> renderer, std::shared_ptr<PhysicsSystem> physicsSystem, std::shared_ptr<LuaSystem> luaSystem)
+{
+	windows.emplace_back(new ProfilerWindow);
+	windows.emplace_back(new ResourcesWindow);
+	windows.emplace_back(new InspectorWindow(registry, shared_from_this()));
+	windows.emplace_back(new HierarchyWindow(registry, shared_from_this()));
+	windows.emplace_back(new SceneWindow(renderer));
+	windows.emplace_back(new GameWindow(renderer, registry, physicsSystem, luaSystem));
 }
 
 Editor::~Editor()
