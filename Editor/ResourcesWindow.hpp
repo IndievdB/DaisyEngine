@@ -13,7 +13,7 @@ class ResourcesWindow : public EditorWindow
 public:
 	const char* GetName() { return "Resources"; };
 
-	ResourcesWindow()
+	ResourcesWindow(std::shared_ptr<Editor> editor) : editor(editor)
 	{
 		rootFolder = currentFolder = std::make_shared<std::filesystem::path>("Resources");
 		folderImage = std::make_shared<Texture>("Resources/folder.png");
@@ -55,7 +55,7 @@ public:
 
 		ImGui::EndMenuBar();
 		
-		/*static std::string draggedPath;
+		static std::string draggedPath;
 		static int selected = -1;
 		int n = 0;
 
@@ -75,6 +75,11 @@ public:
 						currentFolder = std::make_shared<std::filesystem::path>(item.path());
 					}
 				}
+
+				if (!item.is_directory())
+				{
+					editor->FocusResource(item.path().string());
+				}
 			}
 
 			if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
@@ -86,12 +91,12 @@ public:
 			}
 
 			n++;
-		}*/
+		}
 
-		for (int i = 0; i < files.size(); i++)
+		/*for (int i = 0; i < files.size(); i++)
 		{
 			DisplayNode(files[i]);
-		}
+		}*/
 		
 		ImGui::End();
 	};
@@ -100,6 +105,7 @@ private:
 	std::shared_ptr<Texture> folderImage;
 	std::shared_ptr<std::filesystem::path> currentFolder;
 	std::shared_ptr<std::filesystem::path> rootFolder;
+	std::shared_ptr<Editor> editor;
 
 	struct Node
 	{

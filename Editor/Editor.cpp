@@ -13,7 +13,8 @@
 #include "../Vendor/imgui/imgui_impl_glfw.h"
 #include "../Vendor/imgui/imgui_impl_opengl3.h"
 
-Editor::Editor()
+Editor::Editor(std::shared_ptr<entt::registry> registry, std::shared_ptr<RenderSystem> renderer, std::shared_ptr<PhysicsSystem> physicsSystem, std::shared_ptr<LuaSystem> luaSystem) :
+	registry(registry), renderer(renderer), physicsSystem(physicsSystem), luaSystem(luaSystem)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -27,14 +28,14 @@ Editor::Editor()
 	ImGui_ImplOpenGL3_Init("#version 150");
 }
 
-void Editor::AddWindows(std::shared_ptr<entt::registry> registry, std::shared_ptr<RenderSystem> renderer, std::shared_ptr<PhysicsSystem> physicsSystem, std::shared_ptr<LuaSystem> luaSystem)
+void Editor::AddWindows()
 {
 	windows.emplace_back(new ProfilerWindow);
-	windows.emplace_back(new ResourcesWindow);
-	windows.emplace_back(new InspectorWindow(registry, shared_from_this()));
-	windows.emplace_back(new HierarchyWindow(registry, shared_from_this()));
-	windows.emplace_back(new SceneWindow(renderer));
-	windows.emplace_back(new GameWindow(renderer, registry, physicsSystem, luaSystem));
+	windows.emplace_back(new ResourcesWindow(shared_from_this()));
+	windows.emplace_back(new InspectorWindow(shared_from_this()));
+	windows.emplace_back(new HierarchyWindow(shared_from_this()));
+	windows.emplace_back(new SceneWindow(shared_from_this()));
+	windows.emplace_back(new GameWindow(shared_from_this()));
 }
 
 Editor::~Editor()
@@ -108,4 +109,16 @@ void Editor::Update()
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Editor::FocusEntity(entt::entity& entity)
+{
+	for (auto& f : OnFocusEntity)
+		f(entity);
+}
+
+void Editor::FocusResource(std::string resource)
+{
+	for (auto& f : OnFocusResource)
+		f(resource);
 }

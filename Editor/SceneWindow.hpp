@@ -15,7 +15,7 @@
 class SceneWindow : public EditorWindow
 {
 public:
-	SceneWindow(std::shared_ptr<RenderSystem> renderer) : renderer(renderer)
+	SceneWindow(std::shared_ptr<Editor> editor) : editor(editor)
 	{
 		camera = std::make_shared<Camera>();
 		cameraTransform = std::make_shared<Transform>(Vector3(0.0f, 5.0f, -25.0f), Vector3::one, Quaternion::identity);
@@ -81,14 +81,14 @@ public:
 		Window::GetInstance()->SetViewportDimensions(size.x, size.y);
 		renderTexture->Reformat(Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight(), GL_RGB32F, GL_RGB);
 		depthRenderbuffer->Reformat(GL_DEPTH_COMPONENT24, Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight());
-		renderer->RenderAll(renderTexture, depthRenderbuffer, cameraTransform, camera);
+		editor->renderer->RenderAll(renderTexture, depthRenderbuffer, cameraTransform, camera);
 		ImGui::Image((void*)renderTexture->GetTextureID(), size, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
 	};
 private:
 	std::shared_ptr<Texture> renderTexture;
 	std::shared_ptr<Renderbuffer> depthRenderbuffer;
-	std::shared_ptr<RenderSystem> renderer;
+	std::shared_ptr<Editor> editor;
 	std::shared_ptr<Camera> camera;
 	std::shared_ptr<Transform> cameraTransform;
 	float cameraPitch = 0;

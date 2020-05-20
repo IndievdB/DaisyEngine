@@ -28,9 +28,8 @@ int main()
 	std::shared_ptr <PhysicsSystem> physicsSystem = std::make_shared<PhysicsSystem>();
 	std::shared_ptr <LuaSystem> luaSystem = std::make_shared<LuaSystem>(registry);
 	std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(registry);
-	//luaSystem.Intialize();
-	std::shared_ptr<Editor> editor = std::make_shared<Editor>();
-	editor->AddWindows(registry, renderSystem, physicsSystem, luaSystem);
+	std::shared_ptr<Editor> editor = std::make_shared<Editor>(registry, renderSystem, physicsSystem, luaSystem);
+	editor->AddWindows();
 
 	while (window.isOpen)
 	{

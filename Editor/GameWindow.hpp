@@ -11,8 +11,7 @@
 class GameWindow : public EditorWindow
 {
 public:
-	GameWindow(std::shared_ptr<RenderSystem> renderer, std::shared_ptr<entt::registry> registry, std::shared_ptr<PhysicsSystem> physicsSystem, std::shared_ptr<LuaSystem> luaSystem)
-		: renderer(renderer), registry(registry), physicsSystem(physicsSystem), luaSystem(luaSystem)
+	GameWindow(std::shared_ptr<Editor> editor) : editor(editor)
 	{
 		renderTexture = std::make_shared<Texture>(Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight(), GL_RGB32F, GL_RGB);
 		depthRenderbuffer = std::make_shared<Renderbuffer>(GL_DEPTH_COMPONENT24, Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight());
@@ -79,7 +78,7 @@ public:
 
 		if (isPlaying)
 		{
-			physicsSystem->RunPhysics(registry);
+			editor->physicsSystem->RunPhysics(editor->registry);
 		}
 
 
@@ -87,7 +86,7 @@ public:
 		std::shared_ptr<Transform> cameraTransform;
 		std::shared_ptr<Camera> camera;
 
-		registry->view<Transform, Camera>().each([&cameraTransform, &camera](auto& transform, auto& cam)
+		editor->registry->view<Transform, Camera>().each([&cameraTransform, &camera](auto& transform, auto& cam)
 		{
 				cameraTransform = std::make_shared<Transform>(transform);
 				camera = std::make_shared<Camera>(cam);
@@ -102,7 +101,7 @@ public:
 		Window::GetInstance()->SetViewportDimensions(size.x, size.y);
 		renderTexture->Reformat(Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight(), GL_RGB32F, GL_RGB);
 		depthRenderbuffer->Reformat(GL_DEPTH_COMPONENT24, Window::GetInstance()->GetViewportWidth(), Window::GetInstance()->GetViewportHeight());
-		renderer->RenderAll(renderTexture, depthRenderbuffer, cameraTransform, camera);
+		editor->renderer->RenderAll(renderTexture, depthRenderbuffer, cameraTransform, camera);
 		ImGui::Image((void*)renderTexture->GetTextureID(), size, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
 	};
@@ -110,8 +109,5 @@ private:
 	bool isPlaying = false;
 	std::shared_ptr<Texture> renderTexture;
 	std::shared_ptr<Renderbuffer> depthRenderbuffer;
-	std::shared_ptr<entt::registry> registry;
-	std::shared_ptr<RenderSystem> renderer;
-	std::shared_ptr<PhysicsSystem> physicsSystem;
-	std::shared_ptr<LuaSystem> luaSystem;
+	std::shared_ptr<Editor> editor;
 };
