@@ -15,7 +15,11 @@ public:
 
 	ResourcesWindow()
 	{
-		for (const auto& entry : std::filesystem::directory_iterator("Resources"))
+		rootFolder = currentFolder = std::make_shared<std::filesystem::path>("Resources");
+		folderImage = std::make_shared<Texture>("Resources/folder.png");
+		fileImage = std::make_shared<Texture>("Resources/file.png");
+
+		for (const auto& entry : std::filesystem::directory_iterator(*rootFolder))
 		{
 			Node rootNode(entry);
 			FillNode(rootNode);
@@ -28,20 +32,75 @@ public:
 		if (!isOpen)
 			return;
 
-		ImGuiIO io = ImGui::GetIO();
+		ImGui::Begin(GetName(), &isOpen, ImGuiWindowFlags_MenuBar);
 
-		ImGui::Begin(GetName(), &isOpen);
+		std::vector <std::filesystem::path> parentPaths;
+		parentPaths.push_back(*currentFolder);
 
-		/*for (int i = 0; i < files.size(); i++)
+		while (parentPaths.back() != *rootFolder)
+			parentPaths.push_back(parentPaths.back().parent_path());
+
+		ImGui::BeginMenuBar();
+
+		for (int i = parentPaths.size() - 1; i >= 0; i--)
 		{
-			DisplayNode(files[i]);
+			if (ImGui::Button(parentPaths[i].filename().string().c_str()))
+			{
+				currentFolder = std::make_shared<std::filesystem::path>(parentPaths[i]);
+			}
+
+			if (i != 0)
+				ImGui::Text(">");
+		}
+
+		ImGui::EndMenuBar();
+		
+		/*static std::string draggedPath;
+		static int selected = -1;
+		int n = 0;
+
+		for (auto& item : std::filesystem::directory_iterator(*currentFolder))
+		{
+			//ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, 0);
+			ImGui::Image((void*)(item.is_directory() ? folderImage->GetTextureID() : fileImage->GetTextureID()), ImVec2(16,16), ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::SameLine();
+			if (ImGui::Selectable(item.path().filename().string().c_str(), selected == n, ImGuiSelectableFlags_AllowDoubleClick))
+			{
+				selected = n;
+
+				if (ImGui::IsMouseDoubleClicked(0))
+				{
+					if (item.is_directory())
+					{
+						currentFolder = std::make_shared<std::filesystem::path>(item.path());
+					}
+				}
+			}
+
+			if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+			{
+				draggedPath = item.path().string();
+				ImGui::SetDragDropPayload("DragResource", &draggedPath, sizeof(std::string));    // Set payload to carry the index of our item (could be anything)
+				ImGui::Text(item.path().filename().string().c_str());
+				ImGui::EndDragDropSource();
+			}
+
+			n++;
 		}*/
 
-		DragDropDemo();
-
+		for (int i = 0; i < files.size(); i++)
+		{
+			DisplayNode(files[i]);
+		}
+		
 		ImGui::End();
 	};
 private:
+	std::shared_ptr<Texture> fileImage;
+	std::shared_ptr<Texture> folderImage;
+	std::shared_ptr<std::filesystem::path> currentFolder;
+	std::shared_ptr<std::filesystem::path> rootFolder;
+
 	struct Node
 	{
 		std::filesystem::directory_entry entry;
@@ -51,22 +110,10 @@ private:
 
 	std::vector<Node> files;
 
-	void DisplayNode(Node& rootNode)
+	int NumberOfFilesInFilePath(std::shared_ptr<std::filesystem::path> path)
 	{
-		if (!rootNode.entry.is_directory())
-		{
-			ImGui::Text(rootNode.entry.path().filename().string().c_str());
-			return;
-		}
-		
-		if (ImGui::TreeNode(rootNode.entry.path().filename().string().c_str()))
-		{
-			for (int i = 0; i < rootNode.children.size(); i++)
-				DisplayNode(rootNode.children[i]);
-
-			ImGui::TreePop();
-		}
-		
+		using std::filesystem::directory_iterator;
+		return std::distance(directory_iterator(*path), directory_iterator{});
 	};
 
 	void FillNode(Node& rootNode)
@@ -82,64 +129,21 @@ private:
 		}
 	};
 
-	void DragDropDemo()
+	void DisplayNode(Node& rootNode)
 	{
-		if (ImGui::TreeNode("Drag and drop to copy/swap items"))
+		if (!rootNode.entry.is_directory())
 		{
-			enum Mode
-			{
-				Mode_Copy,
-				Mode_Move,
-				Mode_Swap
-			};
-			static int mode = 0;
-			if (ImGui::RadioButton("Copy", mode == Mode_Copy)) { mode = Mode_Copy; } ImGui::SameLine();
-			if (ImGui::RadioButton("Move", mode == Mode_Move)) { mode = Mode_Move; } ImGui::SameLine();
-			if (ImGui::RadioButton("Swap", mode == Mode_Swap)) { mode = Mode_Swap; }
-			static const char* names[9] = { "Bobby", "Beatrice", "Betty", "Brianna", "Barry", "Bernard", "Bibi", "Blaine", "Bryn" };
-			for (int n = 0; n < IM_ARRAYSIZE(names); n++)
-			{
-				ImGui::PushID(n);
-				if ((n % 3) != 0)
-					ImGui::SameLine();
-				ImGui::Button(names[n], ImVec2(60, 60));
+			ImGui::Text(rootNode.entry.path().filename().string().c_str());
+			return;
+		}
 
-				// Our buttons are both drag sources and drag targets here!
-				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
-				{
-					ImGui::SetDragDropPayload("DND_DEMO_CELL", &n, sizeof(int));    // Set payload to carry the index of our item (could be anything)
-					if (mode == Mode_Copy) { ImGui::Text("Copy %s", names[n]); }    // Display preview (could be anything, e.g. when dragging an image we could decide to display the filename and a small preview of the image, etc.)
-					if (mode == Mode_Move) { ImGui::Text("Move %s", names[n]); }
-					if (mode == Mode_Swap) { ImGui::Text("Swap %s", names[n]); }
-					ImGui::EndDragDropSource();
-				}
-				if (ImGui::BeginDragDropTarget())
-				{
-					if (const ImGuiPayload * payload = ImGui::AcceptDragDropPayload("DND_DEMO_CELL"))
-					{
-						IM_ASSERT(payload->DataSize == sizeof(int));
-						int payload_n = *(const int*)payload->Data;
-						if (mode == Mode_Copy)
-						{
-							names[n] = names[payload_n];
-						}
-						if (mode == Mode_Move)
-						{
-							names[n] = names[payload_n];
-							names[payload_n] = "";
-						}
-						if (mode == Mode_Swap)
-						{
-							const char* tmp = names[n];
-							names[n] = names[payload_n];
-							names[payload_n] = tmp;
-						}
-					}
-					ImGui::EndDragDropTarget();
-				}
-				ImGui::PopID();
-			}
+		if (ImGui::TreeNode(rootNode.entry.path().filename().string().c_str()))
+		{
+			for (int i = 0; i < rootNode.children.size(); i++)
+				DisplayNode(rootNode.children[i]);
+
 			ImGui::TreePop();
 		}
+
 	};
 };

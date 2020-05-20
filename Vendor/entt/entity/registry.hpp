@@ -1685,6 +1685,7 @@ public:
         }
     }
 
+
     /**
      * @brief Visits a registry and returns the types for its components.
      *
