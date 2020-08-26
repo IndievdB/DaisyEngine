@@ -12,6 +12,7 @@
 #include "../Vendor/imgui/imgui_impl_glfw.h"
 #include "../Vendor/imgui/imgui_impl_opengl3.h"
 
+#include <filesystem>
 #include <typeinfo>
 
 class InspectorWindow : public EditorWindow
@@ -33,7 +34,7 @@ public:
 
 		ImGui::Begin(GetName(), &isOpen);
 
-		if (selectedEntity != entt::null)
+		if (selectedEntity != entt::null && editor->registry->valid(selectedEntity))
 		{
 			InputEntityName(editor->registry->try_get<EntityName>(selectedEntity));
 			InputTransform(editor->registry->try_get<Transform>(selectedEntity));
@@ -47,6 +48,7 @@ private:
 	std::shared_ptr<Editor> editor;
 	std::unordered_map<std::string, Vector3> quaternionEulersCache;
 	std::unordered_map<std::string, Quaternion> quaternionsCache;
+	//std::unordered_map<std::string, std::string> MeshIDCache;
 	entt::entity selectedEntity;
 	std::string selectedResource;
 
@@ -54,13 +56,12 @@ private:
 	{
 		selectedResource = "";
 		selectedEntity = entity;
-		quaternionEulersCache.clear();
-		quaternionsCache.clear();
 	}
 
 	void ResourceSelected(std::string resource)
 	{
 		selectedEntity = entt::null;
+		selectedResource = resource;
 	}
 
 	void InputEntityName(EntityName* entityName)
@@ -90,34 +91,32 @@ private:
 		ImGui::PopItemWidth();
 	}
 
-	void InputQuaternion(std::string componentLabel, std::string label, Quaternion& quaternion)
+	void InputQuaternion(std::string quaternionID, std::string label, Quaternion& quaternion)
 	{
 		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
 		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 		float width = vMax.x - vMin.x;
 
-		std::string labelID = componentLabel + label;
+		quaternionEulersCache.insert(std::pair<std::string, Vector3>(quaternionID, quaternion.GetEulerAngles()));
+		quaternionsCache.insert(std::pair<std::string, Quaternion>(quaternionID, quaternion));
 
-		quaternionEulersCache.insert(std::pair<std::string, Vector3>(labelID, quaternion.GetEulerAngles()));
-		quaternionsCache.insert(std::pair<std::string, Quaternion>(labelID, quaternion));
-
-		if (quaternionsCache[labelID] != quaternion)
+		if (quaternionsCache[quaternionID] != quaternion)
 		{
-			quaternionsCache[labelID] = quaternion;
-			quaternionEulersCache[labelID] = quaternion.GetEulerAngles();
+			quaternionsCache[quaternionID] = quaternion;
+			quaternionEulersCache[quaternionID] = quaternion.GetEulerAngles();
 		}
 
 		ImGui::Text(label.c_str());
 		ImGui::PushItemWidth(width / 3.25f);
-		ImGui::DragFloat(("##" + labelID + "_x").c_str(), &(quaternionEulersCache[labelID].x), 0.005f);
+		ImGui::DragFloat(("##" + quaternionID + "_x").c_str(), &(quaternionEulersCache[quaternionID].x), 0.005f);
 		ImGui::SameLine();
-		ImGui::DragFloat(("##" + labelID + "_y").c_str(), &(quaternionEulersCache[labelID].y), 0.005f);
+		ImGui::DragFloat(("##" + quaternionID + "_y").c_str(), &(quaternionEulersCache[quaternionID].y), 0.005f);
 		ImGui::SameLine();
-		ImGui::DragFloat(("##" + labelID + "_z").c_str(), &(quaternionEulersCache[labelID].z), 0.005f);
+		ImGui::DragFloat(("##" + quaternionID + "_z").c_str(), &(quaternionEulersCache[quaternionID].z), 0.005f);
 		ImGui::PopItemWidth();
 		
-		quaternion.Set(quaternionEulersCache[labelID].x, quaternionEulersCache[labelID].y, quaternionEulersCache[labelID].z);
-		quaternionsCache[labelID] = quaternion;
+		quaternion.Set(quaternionEulersCache[quaternionID].x, quaternionEulersCache[quaternionID].y, quaternionEulersCache[quaternionID].z);
+		quaternionsCache[quaternionID] = quaternion;
 	}
 
 	void InputTransform(Transform* transform)
@@ -129,58 +128,62 @@ private:
 		{
 			InputVector3("Transform", "Position", transform->position);
 			InputVector3("Transform", "Scale", transform->scale);
-			InputQuaternion("Transform", "Rotation", transform->rotation);
+			InputQuaternion(std::to_string((uint32_t)selectedEntity) + "TransformRotation", "Rotation", transform->rotation);
 		}
 	}
 
-	void InputMesh(std::shared_ptr<Mesh>& mesh)
+	void InputMesh(std::string meshID, std::string label, std::shared_ptr<Mesh>& mesh)
 	{
-		ImGui::Text("Mesh");
-		/*if (ImGui::BeginDragDropTarget())
+		ImGui::Text(label.c_str());
+		
+		std::vector<std::string> meshURLs;
+		for (const auto& entry : std::filesystem::recursive_directory_iterator("Resources"))
+		{
+			if (entry.path().extension() == ".fbx" || entry.path().extension() == ".obj")
+				meshURLs.push_back(entry.path().string());
+		}
+
+		std::string meshPath = ResourceManager::GetInstance()->ResourcePathFromMesh(mesh).c_str();
+		
+		float width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+		ImGui::PushItemWidth(width);
+		if (ImGui::BeginCombo(("##" + meshID).c_str(), meshPath.c_str(), ImGuiComboFlags_NoArrowButton))
+		{
+			for (int i = 0; i < meshURLs.size(); i++)
+			{
+				bool is_selected = (meshPath == meshURLs[i]);
+
+				if (ImGui::Selectable(meshURLs[i].c_str(), is_selected))
+				{
+					//item_current = meshURLs[i];
+					mesh = ResourceManager::GetInstance()->GetMesh(meshURLs[i]);
+				}
+
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+		ImGui::PopItemWidth();
+
+		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload * payload = ImGui::AcceptDragDropPayload("DragResource"))
 			{
 				IM_ASSERT(payload->DataSize == sizeof(std::string));
 				std::string payload_n = *(const std::string*)payload->Data;
 				mesh = ResourceManager::GetInstance()->GetMesh(payload_n);
+
+				//meshPath = payload_n;
 			}
 			ImGui::EndDragDropTarget();
-		}*/
-
-		const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
-		static const char* item_current = items[0];            // Here our selection is a single pointer stored outside the object.
-		if (ImGui::BeginCombo("##ewggr", item_current, ImGuiComboFlags_NoArrowButton)) // The second parameter is the label previewed before opening the combo.
-		{
-			for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-			{
-				bool is_selected = (item_current == items[n]);
-				if (ImGui::Selectable(items[n], is_selected))
-					item_current = items[n];
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
-			}
-			ImGui::EndCombo();
 		}
 	}
 
 	void InputMaterial(std::shared_ptr<Material>& material)
 	{
 		ImGui::Text("Material");
-
-		const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
-		static const char* item_current = items[0];            // Here our selection is a single pointer stored outside the object.
-		if (ImGui::BeginCombo("##ewggr2", item_current, ImGuiComboFlags_NoArrowButton)) // The second parameter is the label previewed before opening the combo.
-		{
-			for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-			{
-				bool is_selected = (item_current == items[n]);
-				if (ImGui::Selectable(items[n], is_selected))
-					item_current = items[n];
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
-			}
-			ImGui::EndCombo();
-		}
 	}
 
 	void InputMeshRenderer(MeshRenderer* meshRenderer)
@@ -190,7 +193,7 @@ private:
 
 		if (ImGui::CollapsingHeader("Mesh Renderer"))
 		{
-			InputMesh(meshRenderer->mesh);
+			InputMesh(std::to_string((uint32_t)selectedEntity) + "MeshRendererMesh", "Mesh", meshRenderer->mesh);
 			InputMaterial(meshRenderer->material);
 		}
 	}

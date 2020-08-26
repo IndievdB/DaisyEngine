@@ -12,7 +12,7 @@
 
 //#include "PBRDemo.hpp"
 //#include "Clustered.hpp"
-#include "Explosion.hpp"
+//#include "Explosion.hpp"
 //#include "Animation.hpp"
 //#include "Shadows.hpp"
 
@@ -20,13 +20,13 @@ int main()
 {
 	ResourceManager resourceManager;
 	Input inputSystem;
-	Window window("Daisy", 1200, 700);
+	Window window("Daisy Engine", 1200, 700);
 	auto registry = std::make_shared<entt::registry>();
 	
-	LoadScene(registry);
+	//LoadScene(registry);
 
-	std::shared_ptr <PhysicsSystem> physicsSystem = std::make_shared<PhysicsSystem>();
-	std::shared_ptr <LuaSystem> luaSystem = std::make_shared<LuaSystem>(registry);
+	std::shared_ptr<PhysicsSystem> physicsSystem = std::make_shared<PhysicsSystem>();
+	std::shared_ptr<LuaSystem> luaSystem = std::make_shared<LuaSystem>(registry);
 	std::shared_ptr<RenderSystem> renderSystem = std::make_shared<RenderSystem>(registry);
 	std::shared_ptr<Editor> editor = std::make_shared<Editor>(registry, renderSystem, physicsSystem, luaSystem);
 	editor->AddWindows();

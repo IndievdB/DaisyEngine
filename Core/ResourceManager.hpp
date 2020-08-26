@@ -30,6 +30,8 @@ public:
 	std::shared_ptr<Mesh> GetMesh(std::string path);
 	std::shared_ptr<Font> GetFont(std::string path);
 
+	std::string ResourcePathFromMesh(std::shared_ptr<Mesh> mesh);
+
 private:
 	static ResourceManager* s_Instance;
 	std::map<std::string, std::shared_ptr<Texture>> textures;

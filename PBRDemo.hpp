@@ -9,6 +9,7 @@
 #include "Renderer/Camera.hpp"
 #include "Renderer/TextMesh.hpp"
 #include "Behaviour/LuaBehaviour.hpp"
+#include "Core/EntityName.hpp"
 
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
@@ -54,6 +55,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	
 	{
 		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Camera");
 		Quaternion rotation = Quaternion(1, 0, 0, 0);
 		registry->assign<Transform>(entity, Vector3(0.0f, 0.0f, -10.0f), Vector3::one, rotation);
 		registry->assign<Camera>(entity);
@@ -62,6 +64,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	
 	{
 		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Iron Sphere");
 		Vector3 position = Vector3(-4.0f,0,0);
 		float diameter = 1.0f;
 		Vector3 scale(diameter, diameter, diameter);
@@ -72,6 +75,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 	
 	{
 		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Gold Sphere");
 		Vector3 position = Vector3(-2.0f, 0, 0);
 		float diameter = 1.0f;
 		Vector3 scale(diameter, diameter, diameter);
@@ -82,6 +86,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	{
 		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Grass Sphere");
 		Vector3 position = Vector3(0, 0, 0);
 		float diameter = 1.0f;
 		Vector3 scale(diameter, diameter, diameter);
@@ -92,6 +97,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	{
 		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Plastic Sphere");
 		Vector3 position = Vector3(2.0f, 0, 0);
 		float diameter = 1.0f;
 		Vector3 scale(diameter, diameter, diameter);
@@ -102,6 +108,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	{
 		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Brick Sphere");
 		Vector3 position = Vector3(4.0f, 0, 0);
 		float diameter = 1.0f;
 		Vector3 scale(diameter, diameter, diameter);
@@ -112,6 +119,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	{
 		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Point Light");
 		registry->assign<Transform>(entity, Vector3(0, 3, 0), Vector3::one, Quaternion::identity);
 		registry->assign<PointLight>(entity, Vector4(1, 0, 0, 1), 100, 15);
 	}

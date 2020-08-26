@@ -19,6 +19,8 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	auto material = ResourceManager::GetInstance()->GetMaterial("GrayMat", "Resources/transform.shader");
 	material->SetTexture("mainTex", "Resources/Prototype Gray.png");
+	material = ResourceManager::GetInstance()->GetMaterial("BlueMat", "Resources/transform.shader");
+	material->SetTexture("mainTex", "Resources/Prototype Blue.png");
 
 	{
 		auto entity = registry->create();
@@ -37,6 +39,37 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		PlaneCollider& collider = registry->assign<PlaneCollider>(entity);
 		collider.normal = Vector3::up;
 		collider.offset = 0;
+	}
+
+	{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Cube");
+		Vector3 position = Vector3(0, 5, 0);
+		Vector3 scale = Vector3(2,1,1);
+		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
+		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
+		registry->assign<MeshRenderer>(entity, "BlueMat", "Resources/cube.obj");
+		//registry->assign<LuaBehaviour>(entity, "Resources/CollisionTest.lua");
+
+		RigidBody& rb = registry->assign<RigidBody>(entity);
+		Vector3 halfSize = Vector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f);
+		float mass = halfSize.x * halfSize.y * halfSize.z * 8.0f; rb.setMass(mass);
+
+		Matrix3x3 tensor;
+		Vector3 squares = Vector3(halfSize.x * halfSize.x, halfSize.y * halfSize.y, halfSize.z * halfSize.z);
+		tensor.SetDiagonal(0.3f * mass * (squares.y + squares.z), 0.3f * mass * (squares.x + squares.z), 0.3f * mass * (squares.x + squares.y));
+		rb.setInertiaTensor(tensor);
+
+		rb.setLinearDamping(0.95f);
+		rb.setAngularDamping(0.8f);
+		rb.clearAccumulators();
+		rb.setAcceleration(0, -10.0f, 0);
+		rb.setAwake();
+		rb.calculateDerivedData(transform);
+
+		BoxCollider& collider = registry->assign<BoxCollider>(entity);
+		collider.halfSize = Vector3(0.5f, 0.5f, 0.5f);
+		//collider.isTrigger = true;
 	}
 
 	/*

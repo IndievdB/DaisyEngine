@@ -90,6 +90,16 @@ void Editor::Update()
 
 	if (ImGui::BeginMenuBar())
 	{
+		if (ImGui::BeginMenu("Create"))
+		{
+			if (ImGui::MenuItem("Entity"))
+			{
+				CreateEntity();
+			}
+
+			ImGui::EndMenu();
+		}
+
 		if (ImGui::BeginMenu("Windows"))
 		{
 			for (int i = 0; i < windows.size(); i++)
@@ -97,7 +107,7 @@ void Editor::Update()
 
 			ImGui::EndMenu();
 		}
-		HelpMarker("help!");
+		//HelpMarker("help!");
 
 		ImGui::EndMenuBar();
 	}
@@ -121,4 +131,10 @@ void Editor::FocusResource(std::string resource)
 {
 	for (auto& f : OnFocusResource)
 		f(resource);
+}
+
+void Editor::CreateEntity()
+{
+	auto entity = registry->create();
+	registry->assign<EntityName>(entity, "New Entity");
 }

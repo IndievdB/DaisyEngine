@@ -24,6 +24,7 @@ public:
 
 	void FocusEntity(entt::entity& entity);
 	void FocusResource(std::string resource);
+	void CreateEntity();
 
 	std::vector<std::function<void(entt::entity&)>> OnFocusEntity;
 	std::vector<std::function<void(std::string)>> OnFocusResource;
