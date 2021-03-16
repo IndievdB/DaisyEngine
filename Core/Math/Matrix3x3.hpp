@@ -32,7 +32,8 @@ public:
     void GetAxisAngle( Vector3& axis, float& angle );
     Vector3 GetColumn( unsigned int i ) const;
     void GetColumns( Vector3& col1, Vector3& col2, Vector3& col3 ) const;
-    Vector3 GetEulerAngles() const;
+    Vector3 GetEulerAnglesXYZ() const;
+    Vector3 GetEulerAnglesZYX() const;
     Vector3 GetRow( unsigned int i ) const;
     void GetRows( Vector3& row1, Vector3& row2, Vector3& row3 ) const;
     void Identity();

@@ -76,12 +76,17 @@ public:
 		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 		ImVec2 size = ImVec2(vMax.x - vMin.x, vMax.y - vMin.y);
 
+		if (isPlaying && !hasStarted)
+		{
+			editor->luaSystem->Intialize();
+			hasStarted = true;
+		}
+
 		if (isPlaying)
 		{
 			editor->physicsSystem->RunPhysics(editor->registry);
+			editor->luaSystem->Update();
 		}
-
-
 
 		std::shared_ptr<Transform> cameraTransform;
 		std::shared_ptr<Camera> camera;
@@ -107,6 +112,7 @@ public:
 	};
 private:
 	bool isPlaying = false;
+	bool hasStarted = false;
 	std::shared_ptr<Texture> renderTexture;
 	std::shared_ptr<Renderbuffer> depthRenderbuffer;
 	std::shared_ptr<Editor> editor;

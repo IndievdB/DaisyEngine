@@ -35,7 +35,8 @@ public:
     void GetAxisAngle( Vector3& axis, float& angle );
     Vector4 GetColumn( unsigned int i ) const;
     void GetColumns( Vector4& col1, Vector4& col2, Vector4& col3, Vector4& col4 ) const;
-    Vector3 GetEulerAngles() const;
+    Vector3 GetEulerAnglesXYZ() const;
+    Vector3 GetEulerAnglesZYX() const;
     Vector4 GetRow( unsigned int i ) const;
     void GetRows( Vector4& row1, Vector4& row2, Vector4& row3, Vector4& row4 ) const;
     void Identity();

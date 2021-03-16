@@ -102,7 +102,7 @@ void Matrix4x4::GetColumns( Vector4& col1, Vector4& col2, Vector4& col3, Vector4
     col4.w = mV[15];
 }
 
-Vector3 Matrix4x4::GetEulerAngles() const
+Vector3 Matrix4x4::GetEulerAnglesXYZ() const
 {
     float Cx, Sx;
     float Cy, Sy;
@@ -130,6 +130,27 @@ Vector3 Matrix4x4::GetEulerAngles() const
     }
     
     return Vector3(atan2f( Sx, Cx ), atan2f( Sy, Cy ), atan2f( Sz, Cz ));
+}
+
+Vector3 Matrix4x4::GetEulerAnglesZYX() const
+{
+    Vector3 output(0, 0, 0);
+
+    output.y = asin(Mathf::Clamp(mV[2], -1, 1));
+
+    if (fabs(mV[2]) < 0.9999999)
+    {
+        output.x = atan2(mV[5], mV[8]);
+        output.z = atan2(mV[1], mV[0]);
+
+    }
+    else
+    {
+        output.x = 0;
+        output.z = atan2(-mV[3], mV[4]);
+    }
+
+    return output;
 }
 
 Vector4 Matrix4x4::GetRow( unsigned int i ) const

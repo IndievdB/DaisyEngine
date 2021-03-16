@@ -74,8 +74,8 @@
     <IncludePath>C:\Users\Indie\source\repos\ThirdParty\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\Indie\source\repos\ThirdParty\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Indie\source\repos\ThirdParty\Libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Jarrett\source\repos\ThirdParty\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Jarrett\source\repos\ThirdParty\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -213,6 +213,7 @@
     <ClInclude Include="Shadows.hpp" />
     <ClInclude Include="Renderer\Skybox.hpp" />
     <ClInclude Include="Renderer\TextMesh.hpp" />
+    <ClInclude Include="SimpleMove.hpp" />
     <ClInclude Include="Vendor\imgui\imconfig.h" />
     <ClInclude Include="Vendor\imgui\imgui.h" />
     <ClInclude Include="Vendor\imgui\imgui_impl_glfw.h" />

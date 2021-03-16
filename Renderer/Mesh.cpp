@@ -42,6 +42,9 @@ Mesh::Mesh(const std::string& filename) : m_FilePath(filename)
 	importer = std::make_unique<Assimp::Importer>();
 	const aiScene* scene = importer->ReadFile(filename, s_MeshImportFlags);
 
+	if (scene == nullptr)
+		std::cout << "File: " << filename << " not found" << std::endl;
+
 	m_IsAnimated = scene->mAnimations != nullptr;
 	m_InverseTransform = Matrix4x4::AffineInverse(aiMatrix4x4ToDSY(scene->mRootNode->mTransformation));
 

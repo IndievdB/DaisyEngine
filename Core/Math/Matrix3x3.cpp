@@ -107,7 +107,7 @@ void Matrix3x3::GetColumns( Vector3& col1, Vector3& col2, Vector3& col3 ) const
     col3.z = mV[8];
 }
 
-Vector3 Matrix3x3::GetEulerAngles() const
+Vector3 Matrix3x3::GetEulerAnglesXYZ() const
 {
     float Cx, Sx;
     float Cy, Sy;
@@ -135,6 +135,44 @@ Vector3 Matrix3x3::GetEulerAngles() const
     }
 
     return Vector3(atan2f( Sx, Cx ), atan2f( Sy, Cy ), atan2f( Sz, Cz ));
+}
+
+Vector3 Matrix3x3::GetEulerAnglesZYX() const
+{
+    Vector3 output(0, 0, 0);
+
+    output.y = asin(Mathf::Clamp(mV[2], -1, 1));
+
+    if (fabs(mV[2]) < 0.9999999)
+    {
+        output.x = atan2(mV[5], mV[8]);
+        output.z = atan2(mV[1], mV[0]);
+
+    }
+    else
+    {
+        output.x = 0;
+        output.z = atan2(-mV[3], mV[4]);
+    }
+
+    return output;
+    
+    //float y = asin();// Math.asin(-clamp(m31, -1, 1));
+
+    /*if (Math.abs(m31) < 0.9999999) {
+
+        this._x = Math.atan2(m32, m33);
+        this._z = Math.atan2(m21, m11);
+
+    }
+    else {
+
+        this._x = 0;
+        this._z = Math.atan2(-m12, m22);
+
+    }
+
+    return Vector3(0, 0, 0);*/
 }
 
 Vector3 Matrix3x3::GetRow( unsigned int i ) const

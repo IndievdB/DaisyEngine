@@ -70,7 +70,7 @@ public:
 
 			cameraPitch += io.MouseDelta.y * 0.002f;
 			cameraYaw -= io.MouseDelta.x * 0.002f;
-			cameraTransform->rotation.Set(cameraPitch, cameraYaw, 0);
+			cameraTransform->rotation.SetZYX(cameraPitch, cameraYaw, 0);
 		}
 
 

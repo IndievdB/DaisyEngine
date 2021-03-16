@@ -47,7 +47,7 @@ public:
 private:
 	std::shared_ptr<Editor> editor;
 	std::unordered_map<std::string, Vector3> quaternionEulersCache;
-	std::unordered_map<std::string, Quaternion> quaternionsCache;
+	//std::unordered_map<std::string, Quaternion> quaternionsCache;
 	//std::unordered_map<std::string, std::string> MeshIDCache;
 	entt::entity selectedEntity;
 	std::string selectedResource;
@@ -75,20 +75,24 @@ private:
 		ImGui::Separator();
 	}
 
-	void InputVector3(std::string componentLabel, std::string label, Vector3& vector)
+	void InputVector3(std::string label, Vector3& vector)
 	{
+		ImGui::PushID(label.c_str());
+
 		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
 		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 		float width = vMax.x - vMin.x;
 
 		ImGui::Text(label.c_str());
 		ImGui::PushItemWidth(width / 3.25f);
-		ImGui::DragFloat(("##" + componentLabel + label + "_x").c_str(), &(vector.x), 0.005f);
+		ImGui::DragFloat("##x", &(vector.x), 0.005f);
 		ImGui::SameLine();
-		ImGui::DragFloat(("##" + componentLabel + label + "_y").c_str(), &(vector.y), 0.005f);
+		ImGui::DragFloat("##y", &(vector.y), 0.005f);
 		ImGui::SameLine();
-		ImGui::DragFloat(("##" + componentLabel + label + "_z").c_str(), &(vector.z), 0.005f);
+		ImGui::DragFloat("##z", &(vector.z), 0.005f);
 		ImGui::PopItemWidth();
+
+		ImGui::PopID();
 	}
 
 	void InputQuaternion(std::string quaternionID, std::string label, Quaternion& quaternion)
@@ -97,14 +101,14 @@ private:
 		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 		float width = vMax.x - vMin.x;
 
-		quaternionEulersCache.insert(std::pair<std::string, Vector3>(quaternionID, quaternion.GetEulerAngles()));
-		quaternionsCache.insert(std::pair<std::string, Quaternion>(quaternionID, quaternion));
+		quaternionEulersCache.insert(std::pair<std::string, Vector3>(quaternionID, quaternion.GetEulerAnglesZYX()));
+		//quaternionsCache.insert(std::pair<std::string, Quaternion>(quaternionID, quaternion));
 
-		if (quaternionsCache[quaternionID] != quaternion)
+		/*if (quaternionsCache[quaternionID] != quaternion)
 		{
 			quaternionsCache[quaternionID] = quaternion;
 			quaternionEulersCache[quaternionID] = quaternion.GetEulerAngles();
-		}
+		}*/
 
 		ImGui::Text(label.c_str());
 		ImGui::PushItemWidth(width / 3.25f);
@@ -115,8 +119,8 @@ private:
 		ImGui::DragFloat(("##" + quaternionID + "_z").c_str(), &(quaternionEulersCache[quaternionID].z), 0.005f);
 		ImGui::PopItemWidth();
 		
-		quaternion.Set(quaternionEulersCache[quaternionID].x, quaternionEulersCache[quaternionID].y, quaternionEulersCache[quaternionID].z);
-		quaternionsCache[quaternionID] = quaternion;
+		quaternion.SetZYX(quaternionEulersCache[quaternionID].x, quaternionEulersCache[quaternionID].y, quaternionEulersCache[quaternionID].z);
+		//quaternionsCache[quaternionID] = quaternion;
 	}
 
 	void InputTransform(Transform* transform)
@@ -126,9 +130,11 @@ private:
 
 		if (ImGui::CollapsingHeader("Transform"))
 		{
-			InputVector3("Transform", "Position", transform->position);
-			InputVector3("Transform", "Scale", transform->scale);
+			ImGui::PushID("Transform");
+			InputVector3("Position", transform->position);
+			InputVector3("Scale", transform->scale);
 			InputQuaternion(std::to_string((uint32_t)selectedEntity) + "TransformRotation", "Rotation", transform->rotation);
+			ImGui::PopID();
 		}
 	}
 

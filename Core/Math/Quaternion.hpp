@@ -39,7 +39,8 @@ public:
     
     void Clean();
     void GetAxisAngle( Vector3& axis, float& angle );
-    Vector3 GetEulerAngles() const;
+    Vector3 GetEulerAnglesXYZ() const;
+    Vector3 GetEulerAnglesZYX() const;
     void Invert();
     bool IsIdentity() const;
     bool IsUnit() const;
@@ -50,7 +51,8 @@ public:
     void Normalize();
     Quaternion Normalized() const;
     inline void Set( float _w, float _x, float _y, float _z );
-    void Set( float pitch, float yaw, float roll );
+    void SetXYZ( float xRot, float yRot, float zRot);
+    void SetZYX(float zRot, float yRot, float xRot);
     void Set( const Vector3& axis, float angle );
     void Set( const Vector3& from, const Vector3& to );
     void Set( const Matrix3x3& matrix );

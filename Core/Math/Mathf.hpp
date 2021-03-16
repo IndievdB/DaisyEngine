@@ -23,6 +23,11 @@ namespace Mathf
     {
         return (fabsf(a-b) <= epsilon*(fabsf(a) + fabsf(b) + 1.0f));
     }
+
+    inline bool Clamp(float value, float min, float max)
+    {
+        return (fmin(1, fmax(-1, value)));
+    }
 }
 
 #endif

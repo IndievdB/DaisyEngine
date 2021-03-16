@@ -81,7 +81,7 @@ void LuaSystem::RegisterAll(std::shared_ptr<lua_State*> L)
 		.addProperty("y", &Quaternion::y)
 		.addProperty("z", &Quaternion::z)
 		.addProperty("w", &Quaternion::w)
-		.addFunction("SetEuler", (void (Quaternion::*)(float, float, float)) &Quaternion::Set)
+		.addFunction("SetEuler", (void (Quaternion::*)(float, float, float)) &Quaternion::SetZYX)
 		.endClass();
 
 	getGlobalNamespace(*L)

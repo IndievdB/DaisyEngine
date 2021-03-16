@@ -14,9 +14,9 @@ Quaternion Quaternion::identity( 1.0f, 0.0f, 0.0f, 0.0f );
 // CONSTRUCTORS
 // ========================================================================
 
-Quaternion::Quaternion ( float zRot, float yRot, float xRot )
+Quaternion::Quaternion ( float xRot, float yRot, float zRot)
 {
-    Set ( zRot, yRot, xRot );
+    SetZYX (xRot, yRot, zRot);
 }
 
 Quaternion::Quaternion( const Vector3& axis, float angle )
@@ -74,9 +74,14 @@ void Quaternion::GetAxisAngle( Vector3& axis, float& angle )
     }
 }
 
-Vector3 Quaternion::GetEulerAngles() const
+Vector3 Quaternion::GetEulerAnglesXYZ() const
 {
-    return Matrix3x3 (*this).GetEulerAngles();
+    return Matrix3x3 (*this).GetEulerAnglesXYZ();
+}
+
+Vector3 Quaternion::GetEulerAnglesZYX() const
+{
+    return Matrix3x3(*this).GetEulerAnglesZYX();
 }
 
 void Quaternion::Invert()
@@ -156,25 +161,20 @@ Quaternion Quaternion::Normalized() const
     }
 }
 
-void Quaternion::Set( float pitch, float yaw, float roll )
-{    
-	pitch *= 0.5f;
-	yaw *= 0.5f;
-	roll *= 0.5f;
-    
-    float Cx = cosf(pitch);
-    float Sx = sinf(pitch);
-    
-    float Cy = cosf(yaw);
-    float Sy = sinf(yaw);
-    
-    float Cz = cosf(roll);
-    float Sz = sinf(roll);
+void Quaternion::SetXYZ( float xRot, float yRot, float zRot )
+{
+    Quaternion QuatAroundX = Quaternion(Vector3(1.0, 0.0, 0.0), xRot);
+    Quaternion QuatAroundY = Quaternion(Vector3(0.0, 1.0, 0.0), yRot);
+    Quaternion QuatAroundZ = Quaternion(Vector3(0.0, 0.0, 1.0), zRot);
+    *this = QuatAroundX * QuatAroundY * QuatAroundZ;
+}
 
-	x = Sx * Cy * Cz - Cx * Sy * Sz;
-	y = Cx * Sy * Cz + Sx * Cy * Sz;
-	z = Cx * Cy * Sz - Sx * Sy * Cx;
-	w = Cx * Cy * Cz + Sx * Sy * Sz;
+void Quaternion::SetZYX(float xRot, float yRot, float zRot)
+{
+    Quaternion QuatAroundX = Quaternion(Vector3(1.0, 0.0, 0.0), xRot);
+    Quaternion QuatAroundY = Quaternion(Vector3(0.0, 1.0, 0.0), yRot);
+    Quaternion QuatAroundZ = Quaternion(Vector3(0.0, 0.0, 1.0), zRot);
+    *this = QuatAroundZ * QuatAroundY * QuatAroundX;
 }
 
 void Quaternion::Set( const Vector3& axis, float angle )
