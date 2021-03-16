@@ -26,7 +26,7 @@ namespace Mathf
 
     inline bool Clamp(float value, float min, float max)
     {
-        return (fmin(1, fmax(-1, value)));
+        return (fmin(max, fmax(min, value)));
     }
 }
 

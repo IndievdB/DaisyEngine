@@ -139,40 +139,32 @@ Vector3 Matrix3x3::GetEulerAnglesXYZ() const
 
 Vector3 Matrix3x3::GetEulerAnglesZYX() const
 {
-    Vector3 output(0, 0, 0);
+    float Cx, Sx;
+    float Cy, Sy;
+    float Cz, Sz;
 
-    output.y = asin(Mathf::Clamp(mV[2], -1, 1));
+    Sy = -mV[2];
+    Cy = sqrtf(1.0f - Sy * Sy);
 
-    if (fabs(mV[2]) < 0.9999999)
+    // normal case
+    if (!Mathf::IsZero(Cy))
     {
-        output.x = atan2(mV[5], mV[8]);
-        output.z = atan2(mV[1], mV[0]);
-
+        float factor = 1.0f / Cy;
+        Sx = mV[1] * factor;
+        Cx = mV[0] * factor;
+        Sz = mV[5] * factor;
+        Cz = mV[8] * factor;
     }
+    // x and z axes aligned
     else
     {
-        output.x = 0;
-        output.z = atan2(-mV[3], mV[4]);
+        Sz = 0.0f;
+        Cz = 1.0f;
+        Sx = mV[3];
+        Cx = mV[4];
     }
 
-    return output;
-    
-    //float y = asin();// Math.asin(-clamp(m31, -1, 1));
-
-    /*if (Math.abs(m31) < 0.9999999) {
-
-        this._x = Math.atan2(m32, m33);
-        this._z = Math.atan2(m21, m11);
-
-    }
-    else {
-
-        this._x = 0;
-        this._z = Math.atan2(-m12, m22);
-
-    }
-
-    return Vector3(0, 0, 0);*/
+    return Vector3(atan2f(Sz, Cz), atan2f(Sy, Cy), atan2f(Sx, Cx));
 }
 
 Vector3 Matrix3x3::GetRow( unsigned int i ) const

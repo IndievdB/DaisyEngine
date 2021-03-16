@@ -134,23 +134,32 @@ Vector3 Matrix4x4::GetEulerAnglesXYZ() const
 
 Vector3 Matrix4x4::GetEulerAnglesZYX() const
 {
-    Vector3 output(0, 0, 0);
+    float Cx, Sx;
+    float Cy, Sy;
+    float Cz, Sz;
 
-    output.y = asin(Mathf::Clamp(mV[2], -1, 1));
+    Sy = -mV[2];
+    Cy = sqrtf(1.0f - Sy * Sy);
 
-    if (fabs(mV[2]) < 0.9999999)
+    // normal case
+    if (!Mathf::IsZero(Cy))
     {
-        output.x = atan2(mV[5], mV[8]);
-        output.z = atan2(mV[1], mV[0]);
-
+        float factor = 1.0f / Cy;
+        Sx = mV[1] * factor;
+        Cx = mV[0] * factor;
+        Sz = mV[6] * factor;
+        Cz = mV[10] * factor;
     }
+    // x and z axes aligned
     else
     {
-        output.x = 0;
-        output.z = atan2(-mV[3], mV[4]);
+        Sz = 0.0f;
+        Cz = 1.0f;
+        Sx = mV[4];
+        Cx = mV[5];
     }
 
-    return output;
+    return Vector3(atan2f(Sz, Cz), atan2f(Sy, Cy), atan2f(Sx, Cx));
 }
 
 Vector4 Matrix4x4::GetRow( unsigned int i ) const
