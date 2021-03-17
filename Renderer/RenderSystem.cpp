@@ -13,7 +13,6 @@
 #include "Window.hpp"
 #include "DirectionalLight.hpp"
 
-
 RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("Resources/PBR/Malibu_Overlook_3k.hdr"), registry(registry)
 {
 	pbrSettings.Setup(skybox.environmentCubemap);
@@ -48,6 +47,9 @@ void RenderSystem::RenderAll(std::shared_ptr<Texture> renderTexture, std::shared
 
 	registry->view<Transform, MeshRenderer>().each([&projection, &view, &cameraTransform, &directionalLight, &camera, this](auto& transform, auto& meshRenderer)
 		{
+			if (meshRenderer.material == nullptr || meshRenderer.mesh == nullptr)
+				return;
+
 			Matrix4x4 model = Matrix4x4::Transformation(transform);
 			std::shared_ptr<Shader> shader = meshRenderer.material->GetShader();
 

@@ -25,8 +25,7 @@ struct MaterialFloatProperty
 class Material
 {
 public:
-	Material(std::string shaderPath);
-	inline Material(std::shared_ptr<Shader> s) : shader(s) {};
+	Material(std::string filePath);
 	void SetTexture(std::string name, std::string texture);
 	void SetFloat(std::string name, float value);
 	std::shared_ptr<Shader> GetShader();

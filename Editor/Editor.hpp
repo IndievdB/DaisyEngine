@@ -26,7 +26,23 @@ public:
 	void FocusResource(std::string resource);
 	void CreateEntity();
 
+	template<typename T>
+	void AddComponent();
+
+	entt::entity selectedEntity = entt::null;
 	std::vector<std::function<void(entt::entity&)>> OnFocusEntity;
 	std::vector<std::function<void(std::string)>> OnFocusResource;
 };
+
+template<typename T>
+void Editor::AddComponent()
+{
+	if (selectedEntity == entt::null)
+		return;
+
+	if (registry->has<T>(selectedEntity))
+		return;
+
+	registry->assign<T>(selectedEntity);
+}
 

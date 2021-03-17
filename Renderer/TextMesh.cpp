@@ -5,7 +5,7 @@
 void TextMesh::Render(TextMesh textMesh, float x, float y)
 {
 	auto mesh = ResourceManager::GetInstance()->GetMesh("Resources/textQuad.obj");
-	auto material = ResourceManager::GetInstance()->GetMaterial("TextMat", "Resources/text.shader");
+	auto material = ResourceManager::GetInstance()->GetMaterial("Resources/text.shader");
 	Matrix4x4 projection = Matrix4x4::Orthographic(0, Window::GetInstance()->GetViewportWidth(), 0, Window::GetInstance()->GetViewportHeight(), -10.0f, 10.0f);
 	material->GetShader()->Use();
 	material->GetShader()->SetMatrix4x4("projection", projection);

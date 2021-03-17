@@ -7,9 +7,15 @@ struct MeshRenderer
 	std::shared_ptr<Material> material;
 	std::shared_ptr<Mesh> mesh;
 
-	MeshRenderer(std::string materialName, std::string meshPath)
+	MeshRenderer(std::string materialPath, std::string meshPath)
 	{
-		material = ResourceManager::GetInstance()->GetMaterial(materialName);
+		material = ResourceManager::GetInstance()->GetMaterial(materialPath);
 		mesh = ResourceManager::GetInstance()->GetMesh(meshPath);
+	};
+
+	MeshRenderer()
+	{
+		mesh = ResourceManager::GetInstance()->GetMesh("Resources/Engine/Meshes/DefaultCube.obj");
+		material = ResourceManager::GetInstance()->GetMaterial("Resources/Engine/Materials/DefaultGrayGrid.material");
 	};
 };

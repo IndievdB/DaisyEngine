@@ -14,7 +14,11 @@ class HierarchyWindow : public EditorWindow
 public:
 	const char* GetName() { return "Hierarchy"; };
 
-	HierarchyWindow(std::shared_ptr<Editor> editor) : editor(editor) {};
+	HierarchyWindow(std::shared_ptr<Editor> editor) : editor(editor)
+	{
+		editor->OnFocusEntity.push_back([=](entt::entity& e) { this->EntitySelected(e); });
+		editor->OnFocusResource.push_back([=](std::string r) { this->ResourceSelected(r); });
+	};
 
 	void Update()
 	{
@@ -25,15 +29,15 @@ public:
 
 		ImGui::Begin(GetName(), &isOpen);
 
-		static int selected = -1;
+		//static int selected = -1;
 		int n = 0;
 
 		editor->registry->view<EntityName>().each([this, &n](auto entity, auto& entityName)
 		{
-			if (ImGui::Selectable(entityName.name, selected == n, ImGuiSelectableFlags_AllowDoubleClick))
+			if (ImGui::Selectable(entityName.name, selectedIndex == n, ImGuiSelectableFlags_AllowDoubleClick))
 			{
 				editor->FocusEntity(entity);
-				selected = n;
+				selectedIndex = n;
 			}
 
 			n++;
@@ -43,4 +47,22 @@ public:
 	};
 private:
 	std::shared_ptr<Editor> editor;
+	int selectedIndex = -1;
+
+	void EntitySelected(entt::entity& entity)
+	{
+		int n = 0;
+		editor->registry->view<EntityName>().each([this, entity, &n](entt::entity e, auto& entityName)
+		{
+			if (entity == e)
+				selectedIndex = n;
+
+			n++;
+		});
+	}
+
+	void ResourceSelected(std::string resource)
+	{
+		selectedIndex = -1;
+	}
 };

@@ -90,11 +90,26 @@ void Editor::Update()
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("Create"))
+		if (ImGui::BeginMenu("Entity"))
 		{
-			if (ImGui::MenuItem("Entity"))
+			if (ImGui::MenuItem("Create"))
 			{
 				CreateEntity();
+			}
+
+			if (ImGui::BeginMenu("Add Component"))
+			{
+				if (ImGui::MenuItem("Transform"))
+				{
+					AddComponent<Transform>();
+				}
+
+				if (ImGui::MenuItem("Mesh Renderer"))
+				{
+					AddComponent<MeshRenderer>();
+				}
+
+				ImGui::EndMenu();
 			}
 
 			ImGui::EndMenu();
@@ -123,12 +138,16 @@ void Editor::Update()
 
 void Editor::FocusEntity(entt::entity& entity)
 {
+	selectedEntity = entity;
+
 	for (auto& f : OnFocusEntity)
 		f(entity);
 }
 
 void Editor::FocusResource(std::string resource)
 {
+	selectedEntity = entt::null;
+
 	for (auto& f : OnFocusResource)
 		f(resource);
 }
@@ -137,4 +156,5 @@ void Editor::CreateEntity()
 {
 	auto entity = registry->create();
 	registry->assign<EntityName>(entity, "New Entity");
+	FocusEntity(entity);
 }

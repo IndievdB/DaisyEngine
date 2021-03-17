@@ -47,19 +47,27 @@ public:
 private:
 	std::shared_ptr<Editor> editor;
 	std::unordered_map<std::string, Vector3> quaternionEulersCache;
-	//std::unordered_map<std::string, Quaternion> quaternionsCache;
-	//std::unordered_map<std::string, std::string> MeshIDCache;
+	std::unordered_map<std::string, Quaternion> quaternionCache;
 	entt::entity selectedEntity;
 	std::string selectedResource;
 
 	void EntitySelected(entt::entity& entity)
 	{
+		if (selectedEntity != entity)
+		{
+			quaternionEulersCache.clear();
+			quaternionCache.clear();
+		}
+
 		selectedResource = "";
 		selectedEntity = entity;
 	}
 
 	void ResourceSelected(std::string resource)
 	{
+		quaternionEulersCache.clear();
+		quaternionCache.clear();
+
 		selectedEntity = entt::null;
 		selectedResource = resource;
 	}
@@ -101,26 +109,35 @@ private:
 		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 		float width = vMax.x - vMin.x;
 
-		quaternionEulersCache.insert(std::pair<std::string, Vector3>(quaternionID, quaternion.GetEulerAnglesZYX()));
-		//quaternionsCache.insert(std::pair<std::string, Quaternion>(quaternionID, quaternion));
-
-		/*if (quaternionsCache[quaternionID] != quaternion)
+		// If no cache exists, setup cache
+		if (quaternionEulersCache.find(quaternionID) == quaternionEulersCache.end())
 		{
-			quaternionsCache[quaternionID] = quaternion;
-			quaternionEulersCache[quaternionID] = quaternion.GetEulerAngles();
-		}*/
+			quaternionEulersCache.insert(std::pair<std::string, Vector3>(quaternionID, quaternion.GetEulerAnglesZYX()));
+			quaternionCache.insert(std::pair<std::string, Quaternion>(quaternionID, quaternion));
+		}
+		else
+		{
+			Quaternion cacheQuaternion = quaternionCache[quaternionID];
 
+			// If the cache is out of date, update it
+			if (quaternion != cacheQuaternion)
+				quaternionEulersCache[quaternionID] = quaternion.GetEulerAnglesZYX();
+		}
+		
 		ImGui::Text(label.c_str());
 		ImGui::PushItemWidth(width / 3.25f);
-		ImGui::DragFloat(("##" + quaternionID + "_x").c_str(), &(quaternionEulersCache[quaternionID].x), 0.005f);
+		bool xUpdated = ImGui::DragFloat(("##" + quaternionID + "_x").c_str(), &(quaternionEulersCache[quaternionID].x), 0.005f);
 		ImGui::SameLine();
-		ImGui::DragFloat(("##" + quaternionID + "_y").c_str(), &(quaternionEulersCache[quaternionID].y), 0.005f);
+		bool yUpdated = ImGui::DragFloat(("##" + quaternionID + "_y").c_str(), &(quaternionEulersCache[quaternionID].y), 0.005f);
 		ImGui::SameLine();
-		ImGui::DragFloat(("##" + quaternionID + "_z").c_str(), &(quaternionEulersCache[quaternionID].z), 0.005f);
+		bool zUpdated = ImGui::DragFloat(("##" + quaternionID + "_z").c_str(), &(quaternionEulersCache[quaternionID].z), 0.005f);
 		ImGui::PopItemWidth();
 		
-		quaternion.SetZYX(quaternionEulersCache[quaternionID].x, quaternionEulersCache[quaternionID].y, quaternionEulersCache[quaternionID].z);
-		//quaternionsCache[quaternionID] = quaternion;
+		if (xUpdated || yUpdated || zUpdated)
+		{
+			quaternion.SetZYX(quaternionEulersCache[quaternionID].x, quaternionEulersCache[quaternionID].y, quaternionEulersCache[quaternionID].z);
+			quaternionCache[quaternionID] = quaternion;
+		}
 	}
 
 	void InputTransform(Transform* transform)
@@ -140,6 +157,9 @@ private:
 
 	void InputMesh(std::string meshID, std::string label, std::shared_ptr<Mesh>& mesh)
 	{
+		if (mesh.get() == nullptr)
+			return;
+		
 		ImGui::Text(label.c_str());
 		
 		std::vector<std::string> meshURLs;
@@ -161,7 +181,6 @@ private:
 
 				if (ImGui::Selectable(meshURLs[i].c_str(), is_selected))
 				{
-					//item_current = meshURLs[i];
 					mesh = ResourceManager::GetInstance()->GetMesh(meshURLs[i]);
 				}
 

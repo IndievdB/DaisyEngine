@@ -52,48 +52,22 @@ std::shared_ptr<Shader> ResourceManager::GetShader(std::string path)
 
 // Material
 
-void ResourceManager::LoadMaterial(std::string name, std::string shaderPath)
-{
-	if (materials.find(name) != materials.end())
-		return;
-
-	std::shared_ptr<Material> resourcePointer = std::make_shared<Material>(shaderPath);
-	materials.emplace(name, resourcePointer);
-}
-
-std::shared_ptr<Material> ResourceManager::GetMaterial(std::string name, std::string shaderPath)
-{
-	if (materials.find(name) == materials.end())
-		LoadMaterial(name, shaderPath);
-
-	return std::shared_ptr<Material>(materials.find(name)->second);
-}
-
-std::shared_ptr<Material> ResourceManager::GetMaterial(std::string name)
-{
-	if (materials.find(name) == materials.end())
-		return NULL;
-
-	return std::shared_ptr<Material>(materials.find(name)->second);
-}
-
-/*
 void ResourceManager::LoadMaterial(std::string path)
 {
 	if (materials.find(path) != materials.end())
 		return;
 
-	std::shared_ptr<DSY::Material> resourcePointer = std::make_shared<DSY::Material>(path);
+	std::shared_ptr<Material> resourcePointer = std::make_shared<Material>(path);
 	materials.emplace(path, resourcePointer);
 }
 
-std::shared_ptr<DSY::Material> ResourceManager::GetMaterial(std::string path)
+std::shared_ptr<Material> ResourceManager::GetMaterial(std::string path)
 {
 	if (materials.find(path) == materials.end())
 		LoadMaterial(path);
 
-	return std::shared_ptr<DSY::Material>(materials.find(path)->second);
-}*/
+	return std::shared_ptr<Material>(materials.find(path)->second);
+}
 
 // Mesh
 

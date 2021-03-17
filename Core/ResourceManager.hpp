@@ -19,14 +19,13 @@ public:
 
 	void LoadTexture(std::string path);
 	void LoadShader(std::string path);
-	void LoadMaterial(std::string name, std::string shaderPath);
+	void LoadMaterial(std::string path);
 	void LoadMesh(std::string path);
 	void LoadFont(std::string path);
 
 	std::shared_ptr<Texture> GetTexture(std::string path);
 	std::shared_ptr<Shader> GetShader(std::string path);
-	std::shared_ptr<Material> GetMaterial(std::string name, std::string shaderPath);
-	std::shared_ptr<Material> GetMaterial(std::string name);
+	std::shared_ptr<Material> GetMaterial(std::string path);
 	std::shared_ptr<Mesh> GetMesh(std::string path);
 	std::shared_ptr<Font> GetFont(std::string path);
 

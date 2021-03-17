@@ -17,10 +17,6 @@
 //#include "Shadows.hpp"
 //#include "SimpleMove.hpp"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/euler_angles.hpp>
-
 int main()
 {
 	ResourceManager resourceManager;

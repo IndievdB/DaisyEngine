@@ -1,24 +1,21 @@
 #include "Material.hpp"
 #include "../Core/ResourceManager.hpp"
+#include "../Vendor/nlohmann/json.hpp"
+#include <fstream>
 
-/*Material::Material(std::string name)
+Material::Material(std::string filePath)
 {
-	std::ifstream i(path);
-	json j;
-	i >> j;
+	std::ifstream fileStream(filePath);
+	nlohmann::json json;
+	fileStream >> json;
+	
+	shader = ResourceManager::GetInstance()->GetShader(json["shader"]);
 
-	shader = ResourceManager::GetInstance()->GetShader(j["shader"]);
-
-	for (auto const& entry : j["textures"].items())
+	for (auto const& entry : json["textures"].items())
 		SetTexture(entry.key(), entry.value());
 
-	for (auto const& entry : j["floats"].items())
+	for (auto const& entry : json["floats"].items())
 		SetFloat(entry.key(), entry.value());
-}*/
-
-Material::Material(std::string shaderPath)
-{
-	shader = ResourceManager::GetInstance()->GetShader(shaderPath);
 }
 
 void Material::SetTexture(std::string name, std::string value)

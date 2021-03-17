@@ -13,7 +13,7 @@ struct Transform
 	Vector3 scale;
 	Quaternion rotation;
 
-	Transform() {};
+	Transform() : scale(1.0f, 1.0f, 1.0f) {};
 	Transform(Vector3 p, Vector3 s, Quaternion r) : position(p), scale(s), rotation(r) {};
 
 	Vector3 GetForward()
