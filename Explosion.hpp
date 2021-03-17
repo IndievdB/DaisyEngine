@@ -13,8 +13,6 @@
 
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
-	auto material = ResourceManager::GetInstance()->GetMaterial("Resources/Engine/Materials/DefaultGrayGrid.material");
-
 	{
 		auto entity = registry->create();
 		Quaternion rotation = Quaternion(1, 0, 0, 0);
@@ -41,7 +39,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Vector3 scale = Vector3(2,1,1);
 		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
 		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
-		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultGrayGrid.material", "Resources/cube.obj");
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultBlueGrid.material", "Resources/cube.obj");
 		//registry->assign<LuaBehaviour>(entity, "Resources/CollisionTest.lua");
 
 		RigidBody& rb = registry->assign<RigidBody>(entity);

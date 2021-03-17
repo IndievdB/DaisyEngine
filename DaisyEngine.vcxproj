@@ -181,6 +181,7 @@
     <ClInclude Include="Behaviour\LuaBehaviour.hpp" />
     <ClInclude Include="Behaviour\LuaSystem.hpp" />
     <ClInclude Include="Clustered.hpp" />
+    <ClInclude Include="Core\HelperFunctions.hpp" />
     <ClInclude Include="Core\Math\Mathf.hpp" />
     <ClInclude Include="Core\Math\Matrix3x3.hpp" />
     <ClInclude Include="Core\Math\Matrix4x4.hpp" />

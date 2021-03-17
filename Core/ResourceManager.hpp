@@ -29,6 +29,7 @@ public:
 	std::shared_ptr<Mesh> GetMesh(std::string path);
 	std::shared_ptr<Font> GetFont(std::string path);
 
+	std::string ResourcePathFromMaterial(std::shared_ptr<Material> material);
 	std::string ResourcePathFromMesh(std::shared_ptr<Mesh> mesh);
 
 private:

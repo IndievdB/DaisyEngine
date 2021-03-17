@@ -1,0 +1,7 @@
+{
+  "shader" : "Resources/Engine/Shaders/UnlitTexture.shader",
+  "textures" :
+  {
+    "mainTex" : "Resources/Engine/Textures/DefaultBlueGrid.png"
+  }
+}

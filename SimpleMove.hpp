@@ -17,7 +17,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 {
 	//json j;
 
-	auto material = ResourceManager::GetInstance()->GetMaterial("Resources/Engine/Materials/DefaultGrayGrid.material");
+	auto material = ResourceManager::GetInstance()->GetMaterial("Resources/Engine/Materials/DefaultBlueGrid.material");
 
 	{
 		auto entity = registry->create();

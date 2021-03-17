@@ -12,6 +12,8 @@
 #include "../Vendor/imgui/imgui_impl_glfw.h"
 #include "../Vendor/imgui/imgui_impl_opengl3.h"
 
+#include "../Core/HelperFunctions.hpp"
+
 #include <filesystem>
 #include <typeinfo>
 
@@ -199,17 +201,63 @@ private:
 			{
 				IM_ASSERT(payload->DataSize == sizeof(std::string));
 				std::string payload_n = *(const std::string*)payload->Data;
-				mesh = ResourceManager::GetInstance()->GetMesh(payload_n);
-
-				//meshPath = payload_n;
+				
+				if (HelperFunctions::HasEnding(payload_n, ".obj") || HelperFunctions::HasEnding(payload_n, ".fbx"))
+					mesh = ResourceManager::GetInstance()->GetMesh(payload_n);
 			}
 			ImGui::EndDragDropTarget();
 		}
 	}
 
-	void InputMaterial(std::shared_ptr<Material>& material)
+	void InputMaterial(std::string materialID, std::string label, std::shared_ptr<Material>& material)
 	{
-		ImGui::Text("Material");
+		if (material.get() == nullptr)
+			return;
+
+		ImGui::Text(label.c_str());
+
+		std::vector<std::string> materialURLs;
+		for (const auto& entry : std::filesystem::recursive_directory_iterator("Resources"))
+		{
+			if (entry.path().extension() == ".material")
+				materialURLs.push_back(entry.path().string());
+		}
+
+		std::string materialPath = ResourceManager::GetInstance()->ResourcePathFromMaterial(material).c_str();
+
+		float width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+		ImGui::PushItemWidth(width);
+		if (ImGui::BeginCombo(("##" + materialID).c_str(), materialPath.c_str(), ImGuiComboFlags_NoArrowButton))
+		{
+			for (int i = 0; i < materialURLs.size(); i++)
+			{
+				bool is_selected = (materialPath == materialURLs[i]);
+
+				if (ImGui::Selectable(materialURLs[i].c_str(), is_selected))
+				{
+					material = ResourceManager::GetInstance()->GetMaterial(materialURLs[i]);
+				}
+
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+		ImGui::PopItemWidth();
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DragResource"))
+			{
+				IM_ASSERT(payload->DataSize == sizeof(std::string));
+				std::string payload_n = *(const std::string*)payload->Data;
+
+				if (HelperFunctions::HasEnding(payload_n, ".material"))
+					material = ResourceManager::GetInstance()->GetMaterial(payload_n);
+			}
+			ImGui::EndDragDropTarget();
+		}
 	}
 
 	void InputMeshRenderer(MeshRenderer* meshRenderer)
@@ -220,7 +268,7 @@ private:
 		if (ImGui::CollapsingHeader("Mesh Renderer"))
 		{
 			InputMesh(std::to_string((uint32_t)selectedEntity) + "MeshRendererMesh", "Mesh", meshRenderer->mesh);
-			InputMaterial(meshRenderer->material);
+			InputMaterial(std::to_string((uint32_t)selectedEntity) + "MeshRendererMaterial", "Material", meshRenderer->material);
 		}
 	}
 

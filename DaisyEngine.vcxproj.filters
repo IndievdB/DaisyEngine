@@ -539,6 +539,9 @@
     <ClInclude Include="SimpleMove.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\HelperFunctions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\CollisionTest.lua" />

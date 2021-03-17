@@ -107,6 +107,17 @@ std::shared_ptr<Font> ResourceManager::GetFont(std::string path)
 	return std::shared_ptr<Font>(fonts.find(path)->second);
 }
 
+std::string ResourceManager::ResourcePathFromMaterial(std::shared_ptr<Material> material)
+{
+	for (auto const& item : materials)
+	{
+		if (item.second == material)
+			return item.first;
+	}
+
+	return "unknown";
+}
+
 std::string ResourceManager::ResourcePathFromMesh(std::shared_ptr<Mesh> mesh)
 {
 	for (auto const& item : meshes)
