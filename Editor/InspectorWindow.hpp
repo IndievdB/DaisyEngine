@@ -112,7 +112,7 @@ private:
 		// If no cache exists, setup cache
 		if (quaternionEulersCache.find(quaternionID) == quaternionEulersCache.end())
 		{
-			quaternionEulersCache.insert(std::pair<std::string, Vector3>(quaternionID, quaternion.GetEulerAnglesZYX()));
+			quaternionEulersCache.insert(std::pair<std::string, Vector3>(quaternionID, quaternion.GetEulerAnglesZYX() * kRadToDeg));
 			quaternionCache.insert(std::pair<std::string, Quaternion>(quaternionID, quaternion));
 		}
 		else
@@ -121,21 +121,22 @@ private:
 
 			// If the cache is out of date, update it
 			if (quaternion != cacheQuaternion)
-				quaternionEulersCache[quaternionID] = quaternion.GetEulerAnglesZYX();
+				quaternionEulersCache[quaternionID] = quaternion.GetEulerAnglesZYX() * kRadToDeg;
 		}
-		
+
 		ImGui::Text(label.c_str());
 		ImGui::PushItemWidth(width / 3.25f);
-		bool xUpdated = ImGui::DragFloat(("##" + quaternionID + "_x").c_str(), &(quaternionEulersCache[quaternionID].x), 0.005f);
+		bool xUpdated = ImGui::DragFloat(("##" + quaternionID + "_x").c_str(), &(quaternionEulersCache[quaternionID].x), 0.1f);
 		ImGui::SameLine();
-		bool yUpdated = ImGui::DragFloat(("##" + quaternionID + "_y").c_str(), &(quaternionEulersCache[quaternionID].y), 0.005f);
+		bool yUpdated = ImGui::DragFloat(("##" + quaternionID + "_y").c_str(), &(quaternionEulersCache[quaternionID].y), 0.1f);
 		ImGui::SameLine();
-		bool zUpdated = ImGui::DragFloat(("##" + quaternionID + "_z").c_str(), &(quaternionEulersCache[quaternionID].z), 0.005f);
+		bool zUpdated = ImGui::DragFloat(("##" + quaternionID + "_z").c_str(), &(quaternionEulersCache[quaternionID].z), 0.1f);
 		ImGui::PopItemWidth();
 		
 		if (xUpdated || yUpdated || zUpdated)
 		{
-			quaternion.SetZYX(quaternionEulersCache[quaternionID].x, quaternionEulersCache[quaternionID].y, quaternionEulersCache[quaternionID].z);
+			Vector3 quaternionEuler = quaternionEulersCache[quaternionID] * kDegToRad;
+			quaternion.SetZYX(quaternionEuler.x, quaternionEuler.y, quaternionEuler.z);
 			quaternionCache[quaternionID] = quaternion;
 		}
 	}

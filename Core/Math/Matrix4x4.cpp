@@ -109,7 +109,7 @@ Vector3 Matrix4x4::GetEulerAnglesXYZ() const
     float Cz, Sz;
     
     Sy = mV[8];
-    Cy = sqrtf( 1.0f - Sy*Sy );
+    Cy = sqrtf( fmax(0.0f, 1.0f - Sy*Sy) );
     
     // normal case
     if ( !Mathf::IsZero( Cy ) )
@@ -139,7 +139,7 @@ Vector3 Matrix4x4::GetEulerAnglesZYX() const
     float Cz, Sz;
 
     Sy = -mV[2];
-    Cy = sqrtf(1.0f - Sy * Sy);
+    Cy = sqrtf(fmax(0.0f, 1.0f - Sy * Sy));
 
     // normal case
     if (!Mathf::IsZero(Cy))
