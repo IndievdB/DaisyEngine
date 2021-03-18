@@ -7,6 +7,7 @@
 #include "../Renderer/MeshRenderer.hpp"
 #include "../Renderer/Camera.hpp"
 #include "../Renderer/Texture.hpp"
+#include "../Renderer/PointLight.hpp"
 
 #include "../Vendor/imgui/imgui.h"
 #include "../Vendor/imgui/imgui_impl_glfw.h"
@@ -42,6 +43,7 @@ public:
 			InputTransform(editor->registry->try_get<Transform>(selectedEntity));
 			InputCamera(editor->registry->try_get<Camera>(selectedEntity));
 			InputMeshRenderer(editor->registry->try_get<MeshRenderer>(selectedEntity));
+			InputPointLight(editor->registry->try_get<PointLight>(selectedEntity));
 		}
 
 		ImGui::End();
@@ -285,6 +287,24 @@ private:
 			ImGui::DragFloat("##Camera_NearPlane", &(camera->nearPlane), 0.005f);
 			ImGui::Text("Far Plane");
 			ImGui::DragFloat("##Camera_FarPlane", &(camera->farPlane), 0.005f);
+		}
+	}
+
+	void InputPointLight(PointLight* pointLight)
+	{
+		if (pointLight == nullptr)
+			return;
+
+		if (ImGui::CollapsingHeader("Point Light"))
+		{
+			ImGui::PushID("Point Light");
+			ImGui::Text("Color");
+			ImGui::ColorEdit3("color", &(pointLight->color.x));
+			ImGui::Text("Radius");
+			ImGui::DragFloat("radius", &(pointLight->radius), 0.005f);
+			ImGui::Text("Intensity");
+			ImGui::DragFloat("intensity", &(pointLight->intensity), 0.005f);
+			ImGui::PopID();
 		}
 	}
 };
