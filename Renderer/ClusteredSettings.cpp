@@ -45,8 +45,10 @@ void ClusteredSettings::InitLightSSBO()
 		numLightsInScene++;
 	});
 
-	tilelightsSSBO.Initialize(3, sizeof(TileData), tileData);
-	lightDataSSBO.Initialize(1, sizeof(LightData) * NUM_LIGHTS, &lightData);
+	if (!tilelightsSSBO.initialized)
+		tilelightsSSBO.Initialize(2, sizeof(TileData), tileData);
+
+	lightDataSSBO.Set(1, sizeof(LightData) * NUM_LIGHTS, &lightData);
 }
 
 void ClusteredSettings::GenerateGrid()
@@ -105,8 +107,8 @@ void ClusteredSettings::GenerateGrid()
 
 void ClusteredSettings::InitGridSSBO()
 {
-	tileBoundsSSBO.Initialize(6, sizeof(TileBounds) * numTiles, tileBounds);
-	screenSpaceDataSSBO.Initialize(5, sizeof(ScreenSpaceData), &ssdata);
+	tileBoundsSSBO.Initialize(4, sizeof(TileBounds) * numTiles, tileBounds);
+	screenSpaceDataSSBO.Initialize(3, sizeof(ScreenSpaceData), &ssdata);
 
 	glGenBuffers(1, &countBuffer);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, countBuffer);
@@ -115,7 +117,7 @@ void ClusteredSettings::InitGridSSBO()
 	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, countBuffer);
 }
 
-void ClusteredSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far) const
+void ClusteredSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far)
 {
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, countBuffer);
 	glInvalidateBufferData(countBuffer);
@@ -123,6 +125,7 @@ void ClusteredSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x
 	glClearBufferData(GL_ATOMIC_COUNTER_BUFFER, GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, &zero);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 
+	InitLightSSBO();
 	PrepareDataGPU(projectionMatrix, viewMatrix, cameraPos, near, far);
 	FillTilesGPU(projectionMatrix, viewMatrix, cameraPos, near, far);
 }

@@ -1,0 +1,7 @@
+{
+  "shader" : "Resources/Clustered/debug.shader",
+  "textures" :
+  {
+    "mainTex" : "Resources/spnza_bricks_a_diff.tga"
+  }
+}

@@ -21,21 +21,21 @@ struct LightData
 	float fpadding[2];
 };
 
+layout(binding = 0) uniform atomic_uint count;
+
 //Shared with lighting shader
 layout(std430, binding = 1) buffer LightDataBuffer
 {
 	LightData lightData[];
 };
 
-layout(std430, binding = 5) buffer ScreenSpaceDataBuffer
+layout(std430, binding = 3) buffer ScreenSpaceDataBuffer
 {
 	float indexes[numLights];
 	float zRadius[numLights];
 	vec4 numLightsIn;
 	vec4 NDCCoords[];
 };
-
-layout(binding = 0) uniform atomic_uint count;
 
 #include Resources/Clustered/collisionFunctions.glsl
 
@@ -79,7 +79,6 @@ void main()
 		//vec4 projViewPosPlusRadius = projectionMatrix * viewPos;
 		//float radius = distance(projViewPos, S1);
 
-
 		vec4 clipPos = vec4(projViewPos.x * w, projViewPos.y * w, zCoord, radius);
 
 		uint currentLightCount = atomicCounterIncrement(count);
@@ -89,4 +88,3 @@ void main()
 		indexes[currentLightCount] = id;
 	}
 }
-

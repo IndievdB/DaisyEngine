@@ -24,8 +24,8 @@ float GetRandomFloat(const float min, const float max)
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
 	{
-		auto material = ResourceManager::GetInstance()->GetMaterial("BrickMat", "Resources/Clustered/debug.shader");
-		material->SetTexture("mainTex", "Resources/spnza_bricks_a_diff.tga");
+		//auto material = ResourceManager::GetInstance()->GetMaterial("BrickMat", "Resources/Clustered/debug.shader");
+		//material->SetTexture("mainTex", "Resources/spnza_bricks_a_diff.tga");
 
 		/*auto ironMat = ResourceManager::GetInstance()->GetMaterial("IronMat", "Resources/Clustered/debug.shader");
 		ironMat->SetTexture("albedoMap", "Resources/PBR/iron/albedo.png");
@@ -50,7 +50,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Vector3 scale(0.01f, 0.01f, 0.01f);
 		Quaternion rotation = Quaternion::identity;
 		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
-		registry->assign<MeshRenderer>(entity, "BrickMat", "Resources/testCube.obj");
+		registry->assign<MeshRenderer>(entity, "Resources/Clustered/debug.material", "Resources/testCube.obj");
 	}
 
 	{

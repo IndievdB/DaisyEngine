@@ -49,18 +49,21 @@ struct LightData
 };
 
 //Shared with lighting shader
+
+layout(binding = 0) uniform atomic_uint count;
+
 layout(std430, binding = 1) buffer LightDataBuffer
 {
 	LightData lightData[];
 };
 
-layout (std430, binding = 3) buffer TileLightsBuffer
+layout (std430, binding = 2) buffer TileLightsBuffer
 {
 	int lightIndexes[numTiles];
 	int tileLights[numTiles][numLights];
 };
 
-layout(std430, binding = 5) buffer ScreenSpaceDataBuffer
+layout(std430, binding = 3) buffer ScreenSpaceDataBuffer
 {
 	float indexes[numLights];
 	float zRadius[numLights];
@@ -68,12 +71,10 @@ layout(std430, binding = 5) buffer ScreenSpaceDataBuffer
 	vec4 NDCCoords[];
 };
 
-layout(std430, binding = 6) buffer TileBoundsBuffer
+layout(std430, binding = 4) buffer TileBoundsBuffer
 {
 	TileBounds tileBounds[];
 };
-
-layout(binding = 0) uniform atomic_uint count;
 
 #include Resources/Clustered/collisionFunctions.glsl
 

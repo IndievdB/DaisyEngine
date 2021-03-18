@@ -69,18 +69,18 @@ struct Tile
 	float _padding[6];
 };
 
+layout(binding = 0) uniform atomic_uint count;
+
 layout (std430, binding = 1) buffer LightDataBuffer
 {
 	LightData lightData[];
 };
 
-layout (std430, binding = 3) buffer TileLightsBuffer
+layout (std430, binding = 2) buffer TileLightsBuffer
 {
 	int lightIndexes[numTiles];
 	int tileLights[][numLights];
 };
-
-layout(binding = 0) uniform atomic_uint count;
 
 uniform float nearPlane;
 uniform float farPlane;
@@ -101,8 +101,6 @@ in vec2 TexCoords;
 in vec3 Normal;
 
 out vec4 FragColor;
-
-
 
 struct DirectionalLight
 {

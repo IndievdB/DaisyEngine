@@ -11,6 +11,8 @@
 #include "Behaviour/LuaBehaviour.hpp"
 #include "Core/EntityName.hpp"
 
+#include "Renderer/PointLight.hpp"
+
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
 	{
@@ -26,7 +28,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		auto entity = registry->create();
 		registry->assign<EntityName>(entity, "Ground Plane");
 		registry->assign<Transform>(entity, Vector3::zero, Vector3::one, Quaternion::identity);
-		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultGrayGrid.material", "Resources/plane.obj");
+		registry->assign<MeshRenderer>(entity, "Resources/Clustered/debug.material", "Resources/plane.obj");
 		PlaneCollider& collider = registry->assign<PlaneCollider>(entity);
 		collider.normal = Vector3::up;
 		collider.offset = 0;
@@ -39,7 +41,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Vector3 scale = Vector3(2,1,1);
 		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
 		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
-		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultBlueGrid.material", "Resources/cube.obj");
+		registry->assign<MeshRenderer>(entity, "Resources/Clustered/debug.material", "Resources/cube.obj");
 		//registry->assign<LuaBehaviour>(entity, "Resources/CollisionTest.lua");
 
 		RigidBody& rb = registry->assign<RigidBody>(entity);
@@ -61,6 +63,13 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		BoxCollider& collider = registry->assign<BoxCollider>(entity);
 		collider.halfSize = Vector3(0.5f, 0.5f, 0.5f);
 		//collider.isTrigger = true;
+	}
+
+	{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Light");
+		Transform transform = registry->assign<Transform>(entity, Vector3(0, 2.5f, 0), Vector3::one, Quaternion::identity);
+		registry->assign<PointLight>(entity);
 	}
 
 	/*

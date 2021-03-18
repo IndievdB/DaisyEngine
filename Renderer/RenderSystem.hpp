@@ -20,7 +20,6 @@ private:
 	ShadowSettings* shadowSettings;
 	PBRSettings pbrSettings;
 	Skybox skybox;
-	//
 	Framebuffer offscreenFramebuffer;
 };
 

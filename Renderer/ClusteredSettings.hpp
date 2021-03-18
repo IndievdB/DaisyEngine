@@ -56,7 +56,6 @@ public:
 		delete compute;
 	}
 
-
 	TileData* GetTileData() const
 	{
 		return tileData;
@@ -70,7 +69,7 @@ public:
 	void GenerateGrid();
 	void InitGridSSBO();
 
-	void Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far) const;
+	void Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const Vector3& cameraPos, const float near, const float far);
 
 	ComputeShader* dataPrep;
 	ComputeShader* compute;

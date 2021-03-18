@@ -109,6 +109,11 @@ void Editor::Update()
 					AddComponent<MeshRenderer>();
 				}
 
+				if (ImGui::MenuItem("PointLight"))
+				{
+					AddComponent<PointLight>();
+				}
+
 				ImGui::EndMenu();
 			}
 
