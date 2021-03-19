@@ -114,6 +114,11 @@ void Editor::Update()
 					AddComponent<PointLight>();
 				}
 
+				if (ImGui::MenuItem("Directional Light"))
+				{
+					AddComponent<DirectionalLight>();
+				}
+
 				ImGui::EndMenu();
 			}
 

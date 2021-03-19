@@ -27,6 +27,7 @@ ClusteredSettings::ClusteredSettings(std::shared_ptr<entt::registry> registry, i
 	dataPrep = new ComputeShader("Resources/Clustered/dataPrep.glsl");
 
 	tileData = new TileData();
+	directionalLightData = new DirectionalLightData();
 	GenerateGrid();
 	InitGridSSBO();
 	InitLightSSBO();
@@ -49,6 +50,19 @@ void ClusteredSettings::InitLightSSBO()
 		tilelightsSSBO.Initialize(2, sizeof(TileData), tileData);
 
 	lightDataSSBO.Set(1, sizeof(LightData) * NUM_LIGHTS, &lightData);
+
+	directionalLightData->numDirectionalLights = 0;
+
+	registry->view<Transform, DirectionalLight>().each([this](auto& transform, auto& directionalLight)
+	{
+		Vector3 forward = transform.GetForward();
+		directionalLightData->directionalLightsDirections[directionalLightData->numDirectionalLights] = Vector4(forward.x, forward.y, forward.z, 0);
+		directionalLightData->directionalLightsColors[directionalLightData->numDirectionalLights] = Vector4(directionalLight.color.x, directionalLight.color.y, directionalLight.color.z, 0);
+		directionalLightData->directionalLightsIntensities[directionalLightData->numDirectionalLights] = directionalLight.intensity;
+		directionalLightData->numDirectionalLights++;
+	});
+
+	DirectionalLightDataSSBO.Set(5, sizeof(DirectionalLightData), directionalLightData);
 }
 
 void ClusteredSettings::GenerateGrid()

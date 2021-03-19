@@ -13,16 +13,21 @@ uniform mat4 projection;
 
 out vec3 FragPos;
 out vec2 TexCoords;
-out vec3 Normal;
+out vec3 VSNormal;
+out vec3 WSNormal;
+out vec3 WorldPos;
 
 void main()
 {
+	WorldPos = vec3(model * vec4(aPos, 1.0));
+
 	vec4 viewPos = view * model * vec4(aPos, 1.0);
 	FragPos = viewPos.xyz;
 	TexCoords = aTexCoords;
 	
 	mat3 normalMatrix = transpose(inverse(mat3(view * model)));
-	Normal = normalMatrix * (vec4(aNormal, 1.0)).xyz;
+	VSNormal = normalMatrix * (vec4(aNormal, 1.0)).xyz;
+	WSNormal = mat3(transpose(inverse(model))) * aNormal;
 	
 	gl_Position = projection * viewPos;
 }
@@ -77,6 +82,16 @@ layout (std430, binding = 2) buffer TileLightsBuffer
 	int tileLights[][numLights];
 };
 
+layout(std430, binding = 5) buffer DirectionalLightDataBuffer
+{
+	vec4 directionalLightsDirections[numLights];
+	vec4 directionalLightsColors[numLights];
+	float directionalLightsIntensities[numLights];
+	int numDirectionalLights;
+	int _padding[3];
+};
+
+uniform int directionalLightCount;
 uniform float nearPlane;
 uniform float farPlane;
 uniform float screenWidth;
@@ -85,40 +100,54 @@ uniform float ambientLighting;
 uniform mat4 view;
 uniform sampler2D mainTex;
 
+in vec3 WorldPos;
 in vec3 FragPos;
 in vec2 TexCoords;
-in vec3 Normal;
+in vec3 VSNormal;
+in vec3 WSNormal;
 
 out vec4 FragColor;
 
 void AddBPLighting(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, inout vec4 lightResult)
 {
 	vec3 lightPosition = lightData[lightIndex].pos4.xyz;
-	vec3 lightPosView = vec3(view * vec4(lightPosition, 1.0));
-	float dist = length(lightPosView - position);
-	
+	float dist = length(lightPosition - position);
+
 	if (dist <= lightData[lightIndex].lightRadius)
 	{
-		//Diffuse
-		vec3 viewDir = normalize(-position);
-		vec3 lightDir = normalize(lightPosView - position);
+		vec3 lightDir = normalize(lightPosition - position);
 		vec3 diffuse = max(dot(normal, lightDir), 0.0) * albedoCol.rgb * lightData[lightIndex].lightColour.rgb;
-	
-		//Attenuation
 		float attenuation = 1.0 - clamp(dist / lightData[lightIndex].lightRadius, 0.0, 1.0);
+
 		attenuation *= lightData[lightIndex].intensity;
-		
 		diffuse *= attenuation;
-		
+
+		//float shadow = ShadowCalculationPoint(WorldPos, lightPosition, lightData[lightIndex].lightRadius);
+		//diffuse *= (1.0 - shadow);
+
 		lightResult.rgb += diffuse;
 	}
+}
+
+void AddDirectionalLight(vec3 normal, vec4 albedoCol, int lightIndex, inout vec4 lightResult)
+{
+	vec3 lightDir = normalize(-directionalLightsDirections[lightIndex].xyz);
+	float diff = max(dot(normal, lightDir), 0.0);
+	vec3 diffuse = directionalLightsColors[lightIndex].xyz * diff * albedoCol.rgb;
+	diffuse *= directionalLightsIntensities[lightIndex];
+
+	//float shadow = ShadowCalculation(light, WorldPosLightSpace);
+	//diffuse *= (1.0 - shadow);
+
+	lightResult.rgb += diffuse;
 }
 
 void main(void)
 {
 	vec2 screenSpacePosition = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 
-	vec3 normal = normalize(Normal);
+	vec3 VSnormal = normalize(VSNormal);
+	vec3 WSnormal = normalize(WSNormal);
 
 	vec4 col = texture2D(mainTex, TexCoords);
 
@@ -138,10 +167,16 @@ void main(void)
 	int tile = GetTileIndex(xIndex, yIndex, zIndex);
 
 	vec4 lightResult = vec4(0.0, 0.0, 0.0, 1.0);
+
 	for (int j = 0; j < lightIndexes[tile]; j++)
 	{
 		int lightIndex = tileLights[tile][j];
-		AddBPLighting(FragPos, normal, albedoCol, lightIndex, lightResult);
+		AddBPLighting(WorldPos, WSnormal, albedoCol, lightIndex, lightResult);
+	}
+
+	for (int j = 0; j < numDirectionalLights; j++)
+	{
+		AddDirectionalLight(WSnormal, albedoCol, j, lightResult);
 	}
 
 	lightResult.rgb += albedoCol.rgb * ambientLighting;

@@ -4,8 +4,9 @@
 
 struct DirectionalLight
 {
-	Vector3 direction;
 	Vector3 color;
+	float intensity;
 
-	DirectionalLight(Vector3 direction, Vector3 color) : direction(direction), color(color) {};
+	DirectionalLight(Vector3 color, int intensity) : color(color), intensity(intensity) {};
+	DirectionalLight() : color(1.0f, 1.0f, 1.0f), intensity(1.0f) {};
 };

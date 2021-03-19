@@ -12,6 +12,7 @@
 #include "Core/EntityName.hpp"
 
 #include "Renderer/PointLight.hpp"
+#include "Renderer/DirectionalLight.hpp"
 
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
@@ -65,12 +66,19 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		//collider.isTrigger = true;
 	}
 
-	{
+	/*{
 		auto entity = registry->create();
-		registry->assign<EntityName>(entity, "Light");
+		registry->assign<EntityName>(entity, " Point Light");
 		Transform transform = registry->assign<Transform>(entity, Vector3(0, 2.5f, 0), Vector3::one, Quaternion::identity);
 		registry->assign<PointLight>(entity);
-	}
+	}*/
+
+	/*{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Directional Light");
+		//Transform transform = registry->assign<Transform>(entity, Vector3(0, 2.5f, 0), Vector3::one, Quaternion::identity);
+		registry->assign<DirectionalLight>(entity, Vector3(0,-1,0), Vector3(1.0f, 1.0f, 1.0f));
+	}*/
 
 	/*
 	auto arialFont = ResourceManager::GetInstance()->GetFont("Resources/fonts/arial.ttf");

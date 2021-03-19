@@ -44,6 +44,7 @@ public:
 			InputCamera(editor->registry->try_get<Camera>(selectedEntity));
 			InputMeshRenderer(editor->registry->try_get<MeshRenderer>(selectedEntity));
 			InputPointLight(editor->registry->try_get<PointLight>(selectedEntity));
+			InputDirectionalLight(editor->registry->try_get<DirectionalLight>(selectedEntity));
 		}
 
 		ImGui::End();
@@ -304,6 +305,24 @@ private:
 			ImGui::DragFloat("radius", &(pointLight->radius), 0.005f);
 			ImGui::Text("Intensity");
 			ImGui::DragFloat("intensity", &(pointLight->intensity), 0.005f);
+			ImGui::PopID();
+		}
+	}
+
+	void InputDirectionalLight(DirectionalLight* directionalLight)
+	{
+		if (directionalLight == nullptr)
+			return;
+
+		if (ImGui::CollapsingHeader("Directional Light"))
+		{
+			ImGui::PushID("Directional Light");
+			ImGui::Text("Color");
+			ImGui::ColorEdit3("color", &(directionalLight->color.x));
+			//ImGui::Text("Direction");
+			//ImGui::DragFloat("radius", &(pointLight->radius), 0.005f);
+			ImGui::Text("Intensity");
+			ImGui::DragFloat("intensity", &(directionalLight->intensity), 0.005f);
 			ImGui::PopID();
 		}
 	}

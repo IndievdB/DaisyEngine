@@ -6,6 +6,7 @@
 #include "../Core/Math/Matrix4x4.hpp"
 
 #include "PointLight.hpp"
+#include "DirectionalLight.hpp"
 #include "ComputeShader.hpp"
 #include "Camera.hpp"
 #include "../Vendor/entt/entt.hpp"
@@ -40,10 +41,18 @@ struct LightData
 	float padding[2];
 };
 
+struct DirectionalLightData
+{
+	Vector4 directionalLightsDirections[NUM_LIGHTS];
+	Vector4 directionalLightsColors[NUM_LIGHTS];
+	float directionalLightsIntensities[NUM_LIGHTS];
+	int numDirectionalLights;
+	int padding[3];
+};
+
 struct TileBounds
 {
 	float left, right, top, bottom, front, back;
-
 	float padding[2];
 };
 
@@ -81,7 +90,6 @@ private:
 
 	std::shared_ptr<entt::registry> registry;
 	LightData lightData[NUM_LIGHTS];
-	//LightData* lightData;
 	Camera* camera;
 	Vector2 minCoord;
 
@@ -98,6 +106,7 @@ private:
 
 	//Cube screenCube;
 	TileData* tileData;
+	DirectionalLightData* directionalLightData;
 
 	Vector4 screenLightData[NUM_LIGHTS];
 	ScreenSpaceData ssdata;
@@ -111,6 +120,7 @@ private:
 	SSBO tilelightsSSBO;
 	SSBO tileBoundsSSBO;
 	SSBO lightDataSSBO;
+	SSBO DirectionalLightDataSSBO;
 
 	GLuint countBuffer;
 	GLuint count;

@@ -27,7 +27,7 @@ ShadowSettings::ShadowSettings(std::shared_ptr<entt::registry> registry)
 	shadowCubeMap = std::make_unique<Cubemap>(GL_LINEAR, 256, 256);
 }
 
-void ShadowSettings::TempDirectionalLight(std::shared_ptr<Camera> camera, Matrix4x4& view)
+/*void ShadowSettings::TempDirectionalLight(std::shared_ptr<Camera> camera, Matrix4x4& view)
 {
 	// 1. GET DIRECTIONAL LIGHT
 
@@ -130,7 +130,7 @@ void ShadowSettings::TempDirectionalLight(std::shared_ptr<Camera> camera, Matrix
 	quadShader.Use();
 	shadowMap->Bind(quadShader.GetTextureUnit("mainTex"));
 	quad.Render();
-}
+}*/
 
 void ShadowSettings::TempPointLight(std::shared_ptr<Camera> camera, Matrix4x4& view)
 {
@@ -214,7 +214,7 @@ void ShadowSettings::TempPointLight(std::shared_ptr<Camera> camera, Matrix4x4& v
 
 void ShadowSettings::Update(std::shared_ptr<Camera> camera, Matrix4x4& view)
 {
-	TempDirectionalLight(camera, view);
+	//TempDirectionalLight(camera, view);
 	TempPointLight(camera, view);
 }
 
