@@ -7,6 +7,7 @@
 
 #include "PointLight.hpp"
 #include "DirectionalLight.hpp"
+#include "SpotLight.hpp"
 #include "ComputeShader.hpp"
 #include "Camera.hpp"
 #include "../Vendor/entt/entt.hpp"
@@ -48,6 +49,17 @@ struct DirectionalLightData
 	float directionalLightsIntensities[NUM_LIGHTS];
 	int numDirectionalLights;
 	int padding[3];
+};
+
+struct SpotLightData
+{
+	Vector4 spotLightPositions[NUM_LIGHTS];
+	Vector4 spotLightDirections[NUM_LIGHTS];
+	Vector4 spotLightColors[NUM_LIGHTS];
+	float spotLightIntensities[NUM_LIGHTS];
+	float spotLightCutOffs[NUM_LIGHTS];
+	int numSpotLights;
+	int _spotLightDataBufferPadding[3];
 };
 
 struct TileBounds
@@ -107,6 +119,7 @@ private:
 	//Cube screenCube;
 	TileData* tileData;
 	DirectionalLightData* directionalLightData;
+	SpotLightData* spotLightData;
 
 	Vector4 screenLightData[NUM_LIGHTS];
 	ScreenSpaceData ssdata;
@@ -121,6 +134,7 @@ private:
 	SSBO tileBoundsSSBO;
 	SSBO lightDataSSBO;
 	SSBO DirectionalLightDataSSBO;
+	SSBO SpotLightDataSSBO;
 
 	GLuint countBuffer;
 	GLuint count;

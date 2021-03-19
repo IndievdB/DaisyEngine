@@ -45,6 +45,7 @@ public:
 			InputMeshRenderer(editor->registry->try_get<MeshRenderer>(selectedEntity));
 			InputPointLight(editor->registry->try_get<PointLight>(selectedEntity));
 			InputDirectionalLight(editor->registry->try_get<DirectionalLight>(selectedEntity));
+			InputSpotLight(editor->registry->try_get<SpotLight>(selectedEntity));
 		}
 
 		ImGui::End();
@@ -283,7 +284,7 @@ private:
 		if (ImGui::CollapsingHeader("Camera"))
 		{
 			ImGui::Text("FOV");
-			ImGui::DragFloat("##Camera_FOV", &(camera->fov), 0.005f);
+			ImGui::DragFloat("##Camera_FOV", &(camera->fov), 0.1f, 1.0f, 179.0f);
 			ImGui::Text("Near Plane");
 			ImGui::DragFloat("##Camera_NearPlane", &(camera->nearPlane), 0.005f);
 			ImGui::Text("Far Plane");
@@ -302,9 +303,9 @@ private:
 			ImGui::Text("Color");
 			ImGui::ColorEdit3("color", &(pointLight->color.x));
 			ImGui::Text("Radius");
-			ImGui::DragFloat("radius", &(pointLight->radius), 0.005f);
+			ImGui::DragFloat("radius", &(pointLight->radius), 0.005f, 0.0f, 100.0f);
 			ImGui::Text("Intensity");
-			ImGui::DragFloat("intensity", &(pointLight->intensity), 0.005f);
+			ImGui::DragFloat("intensity", &(pointLight->intensity), 0.005f, 0.0f, 100.0f);
 			ImGui::PopID();
 		}
 	}
@@ -322,7 +323,25 @@ private:
 			//ImGui::Text("Direction");
 			//ImGui::DragFloat("radius", &(pointLight->radius), 0.005f);
 			ImGui::Text("Intensity");
-			ImGui::DragFloat("intensity", &(directionalLight->intensity), 0.005f);
+			ImGui::DragFloat("intensity", &(directionalLight->intensity), 0.005f, 0.0f, 100.0f);
+			ImGui::PopID();
+		}
+	}
+
+	void InputSpotLight(SpotLight* spotLight)
+	{
+		if (spotLight == nullptr)
+			return;
+
+		if (ImGui::CollapsingHeader("Spot Light"))
+		{
+			ImGui::PushID("Spot Light");
+			ImGui::Text("Color");
+			ImGui::ColorEdit3("color", &(spotLight->color.x));
+			ImGui::Text("Intensity");
+			ImGui::DragFloat("intensity", &(spotLight->intensity), 0.005f, 0.0f, 100.0f);
+			ImGui::Text("Cut Off");
+			ImGui::DragFloat("cutoff", &(spotLight->cutOff), 0.1f, 0.01f, 90.0f);
 			ImGui::PopID();
 		}
 	}

@@ -34,11 +34,15 @@ public:
 
 		editor->registry->view<EntityName>().each([this, &n](auto entity, auto& entityName)
 		{
+			ImGui::PushID(n);
+
 			if (ImGui::Selectable(entityName.name, selectedIndex == n, ImGuiSelectableFlags_AllowDoubleClick))
 			{
 				editor->FocusEntity(entity);
 				selectedIndex = n;
 			}
+
+			ImGui::PopID();
 
 			n++;
 		});

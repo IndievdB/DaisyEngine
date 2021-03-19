@@ -119,6 +119,11 @@ void Editor::Update()
 					AddComponent<DirectionalLight>();
 				}
 
+				if (ImGui::MenuItem("Spot Light"))
+				{
+					AddComponent<SpotLight>();
+				}
+
 				ImGui::EndMenu();
 			}
 

@@ -28,6 +28,7 @@ ClusteredSettings::ClusteredSettings(std::shared_ptr<entt::registry> registry, i
 
 	tileData = new TileData();
 	directionalLightData = new DirectionalLightData();
+	spotLightData = new SpotLightData();
 	GenerateGrid();
 	InitGridSSBO();
 	InitLightSSBO();
@@ -35,6 +36,8 @@ ClusteredSettings::ClusteredSettings(std::shared_ptr<entt::registry> registry, i
 
 void ClusteredSettings::InitLightSSBO()
 {
+	//
+
 	numLightsInScene = 0;
 
 	registry->view<Transform, PointLight>().each([this](auto& transform, auto& pointLight)
@@ -51,6 +54,8 @@ void ClusteredSettings::InitLightSSBO()
 
 	lightDataSSBO.Set(1, sizeof(LightData) * NUM_LIGHTS, &lightData);
 
+	//
+
 	directionalLightData->numDirectionalLights = 0;
 
 	registry->view<Transform, DirectionalLight>().each([this](auto& transform, auto& directionalLight)
@@ -63,6 +68,23 @@ void ClusteredSettings::InitLightSSBO()
 	});
 
 	DirectionalLightDataSSBO.Set(5, sizeof(DirectionalLightData), directionalLightData);
+
+	//
+
+	spotLightData->numSpotLights = 0;
+
+	registry->view<Transform, SpotLight>().each([this](auto& transform, auto& spotLight)
+	{
+		Vector3 forward = transform.GetForward();
+		spotLightData->spotLightPositions[spotLightData->numSpotLights] = Vector4(transform.position.x, transform.position.y, transform.position.z, 0);
+		spotLightData->spotLightDirections[spotLightData->numSpotLights] = Vector4(forward.x, forward.y, forward.z, 0);
+		spotLightData->spotLightColors[spotLightData->numSpotLights] = Vector4(spotLight.color.x, spotLight.color.y, spotLight.color.z, 0);
+		spotLightData->spotLightIntensities[spotLightData->numSpotLights] = spotLight.intensity;
+		spotLightData->spotLightCutOffs[spotLightData->numSpotLights] = spotLight.cutOff;
+		spotLightData->numSpotLights++;
+	});
+
+	SpotLightDataSSBO.Set(6, sizeof(SpotLightData), spotLightData);
 }
 
 void ClusteredSettings::GenerateGrid()

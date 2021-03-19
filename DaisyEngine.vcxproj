@@ -210,6 +210,7 @@
     <ClInclude Include="Renderer\PointLight.hpp" />
     <ClInclude Include="Renderer\Renderbuffer.hpp" />
     <ClInclude Include="Renderer\ShadowSettings.hpp" />
+    <ClInclude Include="Renderer\SpotLight.hpp" />
     <ClInclude Include="Renderer\SSBO.hpp" />
     <ClInclude Include="Shadows.hpp" />
     <ClInclude Include="Renderer\Skybox.hpp" />

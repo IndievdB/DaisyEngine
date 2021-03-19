@@ -91,6 +91,19 @@ layout(std430, binding = 5) buffer DirectionalLightDataBuffer
 	int _padding[3];
 };
 
+layout(std430, binding = 6) buffer SpotLightDataBuffer
+{
+	vec4 spotLightPositions[numLights];
+	vec4 spotLightDirections[numLights];
+	vec4 spotLightColors[numLights];
+
+	float spotLightIntensities[numLights];
+	float spotLightCutOffs[numLights];
+
+	int numSpotLights;
+	int _spotLightDataBufferPadding[3];
+};
+
 uniform int directionalLightCount;
 uniform float nearPlane;
 uniform float farPlane;
@@ -142,6 +155,22 @@ void AddDirectionalLight(vec3 normal, vec4 albedoCol, int lightIndex, inout vec4
 	lightResult.rgb += diffuse;
 }
 
+void AddSpotLight(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, inout vec4 lightResult)
+{
+	vec3 lightPosition = spotLightPositions[lightIndex].xyz;
+	vec3 lightDir = normalize(lightPosition - position);
+	float theta = dot(lightDir, normalize(-spotLightDirections[lightIndex].xyz));
+
+	if (theta > cos(radians(spotLightCutOffs[lightIndex])))
+	{
+		float diff = max(dot(normal, lightDir), 0.0);
+		vec3 diffuse = spotLightColors[lightIndex].xyz * diff * albedoCol.rgb;
+		diffuse *= spotLightIntensities[lightIndex];
+
+		lightResult.rgb += diffuse;
+	}
+}
+
 void main(void)
 {
 	vec2 screenSpacePosition = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
@@ -177,6 +206,11 @@ void main(void)
 	for (int j = 0; j < numDirectionalLights; j++)
 	{
 		AddDirectionalLight(WSnormal, albedoCol, j, lightResult);
+	}
+
+	for (int j = 0; j < numSpotLights; j++)
+	{
+		AddSpotLight(WorldPos, WSnormal, albedoCol, j, lightResult);
 	}
 
 	lightResult.rgb += albedoCol.rgb * ambientLighting;
