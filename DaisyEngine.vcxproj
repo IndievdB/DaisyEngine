@@ -200,6 +200,7 @@
     <ClInclude Include="Editor\SceneWindow.hpp" />
     <ClInclude Include="PBRDemo.hpp" />
     <ClInclude Include="Physics\TriggerData.hpp" />
+    <ClInclude Include="Renderer\AmbientLight.hpp" />
     <ClInclude Include="Renderer\ClusteredSettings.hpp" />
     <ClInclude Include="Renderer\ComputeShader.hpp" />
     <ClInclude Include="Renderer\Cubemap.hpp" />

@@ -8,6 +8,7 @@
 #include "../Renderer/Camera.hpp"
 #include "../Renderer/Texture.hpp"
 #include "../Renderer/PointLight.hpp"
+#include "../Renderer/AmbientLight.hpp"
 
 #include "../Vendor/imgui/imgui.h"
 #include "../Vendor/imgui/imgui_impl_glfw.h"
@@ -46,6 +47,7 @@ public:
 			InputPointLight(editor->registry->try_get<PointLight>(selectedEntity));
 			InputDirectionalLight(editor->registry->try_get<DirectionalLight>(selectedEntity));
 			InputSpotLight(editor->registry->try_get<SpotLight>(selectedEntity));
+			InputAmbientLight(editor->registry->try_get<AmbientLight>(selectedEntity));
 		}
 
 		ImGui::End();
@@ -342,6 +344,22 @@ private:
 			ImGui::DragFloat("intensity", &(spotLight->intensity), 0.005f, 0.0f, 100.0f);
 			ImGui::Text("Cut Off");
 			ImGui::DragFloat("cutoff", &(spotLight->cutOff), 0.1f, 0.01f, 90.0f);
+			ImGui::PopID();
+		}
+	}
+
+	void InputAmbientLight(AmbientLight* ambientLight)
+	{
+		if (ambientLight == nullptr)
+			return;
+
+		if (ImGui::CollapsingHeader("Ambient Light"))
+		{
+			ImGui::PushID("Ambient Light");
+			ImGui::Text("Color");
+			ImGui::ColorEdit3("color", &(ambientLight->color.x));
+			ImGui::Text("Intensity");
+			ImGui::DragFloat("intensity", &(ambientLight->intensity), 0.005f, 0.0f, 1.0f);
 			ImGui::PopID();
 		}
 	}

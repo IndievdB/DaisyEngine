@@ -8,6 +8,7 @@
 #include "ResourcesWindow.hpp"
 #include "HierarchyWindow.hpp"
 #include "InspectorWindow.hpp"
+#include "../Renderer/AmbientLight.hpp"
 
 #include "../Vendor/imgui/imgui.h"
 #include "../Vendor/imgui/imgui_impl_glfw.h"
@@ -109,6 +110,11 @@ void Editor::Update()
 					AddComponent<MeshRenderer>();
 				}
 
+				if (ImGui::MenuItem("Ambient Light"))
+				{
+					AddComponent<AmbientLight>();
+				}
+
 				if (ImGui::MenuItem("Point Light"))
 				{
 					AddComponent<PointLight>();
@@ -122,6 +128,51 @@ void Editor::Update()
 				if (ImGui::MenuItem("Spot Light"))
 				{
 					AddComponent<SpotLight>();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Presets"))
+			{
+				if (ImGui::MenuItem("Ambient Light"))
+				{
+					auto entity = registry->create();
+					registry->assign<EntityName>(entity, registry, "Ambient Light");
+					registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion::identity);
+					registry->assign<AmbientLight>(entity);
+					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+					FocusEntity(entity);
+				}
+
+				if (ImGui::MenuItem("Point Light"))
+				{
+					auto entity = registry->create();
+					registry->assign<EntityName>(entity, registry, "Point Light");
+					registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion::identity);
+					registry->assign<PointLight>(entity);
+					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+					FocusEntity(entity);
+				}
+
+				if (ImGui::MenuItem("Directional Light"))
+				{
+					auto entity = registry->create();
+					registry->assign<EntityName>(entity, registry, "Directional Light");
+					registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion(0.523599f, 0.0f, 0.0f));
+					registry->assign<DirectionalLight>(entity);
+					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj");
+					FocusEntity(entity);
+				}
+
+				if (ImGui::MenuItem("Spot Light"))
+				{
+					auto entity = registry->create();
+					registry->assign<EntityName>(entity, registry, "Spot Light");
+					registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion(0.523599f, 0.0f, 0.0f));
+					registry->assign<SpotLight>(entity);
+					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj");
+					FocusEntity(entity);
 				}
 
 				ImGui::EndMenu();
@@ -170,6 +221,6 @@ void Editor::FocusResource(std::string resource)
 void Editor::CreateEntity()
 {
 	auto entity = registry->create();
-	registry->assign<EntityName>(entity, "New Entity");
+	registry->assign<EntityName>(entity, registry, "New Entity");
 	FocusEntity(entity);
 }

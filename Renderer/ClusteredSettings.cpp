@@ -28,6 +28,7 @@ ClusteredSettings::ClusteredSettings(std::shared_ptr<entt::registry> registry, i
 
 	tileData = new TileData();
 	directionalLightData = new DirectionalLightData();
+	ambientLightData = new AmbientLightData();
 	spotLightData = new SpotLightData();
 	GenerateGrid();
 	InitGridSSBO();
@@ -85,6 +86,19 @@ void ClusteredSettings::InitLightSSBO()
 	});
 
 	SpotLightDataSSBO.Set(6, sizeof(SpotLightData), spotLightData);
+
+	//
+
+	ambientLightData->numAmbientLights = 0;
+
+	registry->view<Transform, AmbientLight>().each([this](auto& transform, auto& ambientLight)
+	{
+		ambientLightData->ambientLightsColors[ambientLightData->numAmbientLights] = Vector4(ambientLight.color.x, ambientLight.color.y, ambientLight.color.z, 0);
+		ambientLightData->ambientLightsIntensities[ambientLightData->numAmbientLights] = ambientLight.intensity;
+		ambientLightData->numAmbientLights++;
+	});
+	
+	AmbientLightDataSSBO.Set(7, sizeof(AmbientLightData), ambientLightData);
 }
 
 void ClusteredSettings::GenerateGrid()

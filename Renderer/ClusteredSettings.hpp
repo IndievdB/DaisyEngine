@@ -5,6 +5,7 @@
 #include "../Core/Math/Vector4.hpp"
 #include "../Core/Math/Matrix4x4.hpp"
 
+#include "AmbientLight.hpp"
 #include "PointLight.hpp"
 #include "DirectionalLight.hpp"
 #include "SpotLight.hpp"
@@ -40,6 +41,14 @@ struct LightData
 	float intensity;
 
 	float padding[2];
+};
+
+struct AmbientLightData
+{
+	Vector4 ambientLightsColors[NUM_LIGHTS];
+	float ambientLightsIntensities[NUM_LIGHTS];
+	int numAmbientLights;
+	int padding[3];
 };
 
 struct DirectionalLightData
@@ -120,6 +129,7 @@ private:
 	TileData* tileData;
 	DirectionalLightData* directionalLightData;
 	SpotLightData* spotLightData;
+	AmbientLightData* ambientLightData;
 
 	Vector4 screenLightData[NUM_LIGHTS];
 	ScreenSpaceData ssdata;
@@ -135,6 +145,7 @@ private:
 	SSBO lightDataSSBO;
 	SSBO DirectionalLightDataSSBO;
 	SSBO SpotLightDataSSBO;
+	SSBO AmbientLightDataSSBO;
 
 	GLuint countBuffer;
 	GLuint count;

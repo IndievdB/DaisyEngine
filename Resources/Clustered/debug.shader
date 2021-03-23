@@ -104,6 +104,14 @@ layout(std430, binding = 6) buffer SpotLightDataBuffer
 	int _spotLightDataBufferPadding[3];
 };
 
+layout(std430, binding = 7) buffer AmbientLightDataBuffer
+{
+	vec4 ambientLightsColors[numLights];
+	float ambientLightsIntensities[numLights];
+	int numAmbientLights;
+	int _ambientLightDataBufferPadding[3];
+};
+
 uniform int directionalLightCount;
 uniform float nearPlane;
 uniform float farPlane;
@@ -171,6 +179,13 @@ void AddSpotLight(vec3 position, vec3 normal, vec4 albedoCol, int lightIndex, in
 	}
 }
 
+void AddAmbientLight(vec4 albedoCol, int lightIndex, inout vec4 lightResult)
+{
+	vec3 diffuse = ambientLightsColors[lightIndex].rgb * albedoCol.rgb;
+	diffuse *= ambientLightsIntensities[lightIndex];
+	lightResult.rgb += diffuse;
+}
+
 void main(void)
 {
 	vec2 screenSpacePosition = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
@@ -213,7 +228,11 @@ void main(void)
 		AddSpotLight(WorldPos, WSnormal, albedoCol, j, lightResult);
 	}
 
-	lightResult.rgb += albedoCol.rgb * ambientLighting;
+	for (int j = 0; j < numAmbientLights; j++)
+	{
+		AddAmbientLight(albedoCol, j, lightResult);
+	}
+
 	lightResult.a = albedoCol.a;
 	FragColor = lightResult;
 }
