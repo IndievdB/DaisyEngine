@@ -172,6 +172,12 @@ void Shader::SetFloat(std::string name, float value) const
 	glUniform1f(glGetUniformLocation(shaderProgramID, name.c_str()), value);
 }
 
+void Shader::SetVector2(std::string name, float x, float y) const
+{
+	glUseProgram(shaderProgramID);
+	glUniform2f(glGetUniformLocation(shaderProgramID, name.c_str()), x, y);
+}
+
 void Shader::SetVector3(std::string name, float x, float y, float z) const
 {
 	glUseProgram(shaderProgramID);

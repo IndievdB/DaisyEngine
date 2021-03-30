@@ -33,6 +33,14 @@ public:
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	};
 
+	template <class T>
+	void Get(size_t size, T* data)
+	{
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ID);
+		glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, data);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	};
+
 	bool initialized = false;
 private:
 	GLuint ID;

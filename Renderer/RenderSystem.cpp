@@ -16,8 +16,9 @@
 RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("Resources/PBR/Malibu_Overlook_3k.hdr"), registry(registry)
 {
 	//pbrSettings.Setup(skybox.environmentCubemap);
-	clusteredSettings = new ClusteredSettings(registry, NUM_LIGHTS);
+	//clusteredSettings = new ClusteredSettings(registry, NUM_LIGHTS);
 	//shadowSettings = new ShadowSettings(registry);
+	lightSettings = new LightSettings(registry);
 }
 
 void RenderSystem::RenderAll(std::shared_ptr<Texture> renderTexture, std::shared_ptr<Renderbuffer> depthBuffer, std::shared_ptr<Transform> cameraTransform, std::shared_ptr<Camera> camera)
@@ -29,7 +30,8 @@ void RenderSystem::RenderAll(std::shared_ptr<Texture> renderTexture, std::shared
 	Vector3 up = rotationMatrix * Vector3::up;
 	Matrix4x4 view = Matrix4x4::LookAt(cameraTransform->position, cameraTransform->position + forward, up);
 
-	clusteredSettings->Update(projection, view, cameraTransform->position, camera->nearPlane, camera->farPlane);
+	lightSettings->Update(projection, view, camera->nearPlane, camera->farPlane);
+	//clusteredSettings->Update(projection, view, cameraTransform->position, camera->nearPlane, camera->farPlane, Window::GetInstance()->GetViewportHeight() / Window::GetInstance()->GetViewportWidth());
 
 	/*std::shared_ptr<DirectionalLight> directionalLight;
 	registry->view<Transform, DirectionalLight>().each([&directionalLight](auto& transform, auto& light)
@@ -63,6 +65,10 @@ void RenderSystem::RenderAll(std::shared_ptr<Texture> renderTexture, std::shared
 			shader->SetFloat("screenWidth", Window::GetInstance()->GetViewportWidth());
 			shader->SetFloat("screenHeight", Window::GetInstance()->GetViewportHeight());
 			shader->SetFloat("ambientLighting", 0.05f);
+
+			shader->SetVector2("clusterScreenSpaceSize",
+				std::ceil((float)Window::GetInstance()->GetViewportWidth() / (float)8),
+				std::ceil((float)Window::GetInstance()->GetViewportHeight() / (float)8));
 
 			//pbrSettings.Bind(shader);
 

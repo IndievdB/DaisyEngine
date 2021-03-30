@@ -28,6 +28,11 @@ namespace Mathf
     {
         return (fmin(max, fmax(min, value)));
     }
+
+    inline float Lerp(float a, float b, float t)
+    {
+        return a + t * (b - a);
+    }
 }
 
 #endif

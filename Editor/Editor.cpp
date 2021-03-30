@@ -149,7 +149,7 @@ void Editor::Update()
 				{
 					auto entity = registry->create();
 					registry->assign<EntityName>(entity, registry, "Point Light");
-					registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion::identity);
+					registry->assign<Transform>(entity, Vector3::zero, Vector3::one * 0.25f, Quaternion::identity);
 					registry->assign<PointLight>(entity);
 					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
 					FocusEntity(entity);

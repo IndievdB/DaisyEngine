@@ -36,11 +36,28 @@ void ComputeShader::Use()
 	glUseProgram(program);
 }
 
+const char* GetGLErrorStr(GLenum err)
+{
+	switch (err)
+	{
+	case GL_NO_ERROR:          return "No error";
+	case GL_INVALID_ENUM:      return "Invalid enum";
+	case GL_INVALID_VALUE:     return "Invalid value";
+	case GL_INVALID_OPERATION: return "Invalid operation";
+	case GL_STACK_OVERFLOW:    return "Stack overflow";
+	case GL_STACK_UNDERFLOW:   return "Stack underflow";
+	case GL_OUT_OF_MEMORY:     return "Out of memory";
+	default:                   return "Unknown error";
+	}
+}
+
 void ComputeShader::Dispatch(int x, int y, int z)
 {
+	//std::cout << GetGLErrorStr(glGetError()) << std::endl;
 	Use();
 	glDispatchCompute(x, y, z);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	//std::cout << GetGLErrorStr(glGetError()) << std::endl;
 }
 
 int ComputeShader::GenerateShader(std::string filePath)
@@ -132,6 +149,18 @@ void ComputeShader::SetFloat(std::string name, float value) const
 {
 	glUseProgram(program);
 	glUniform1f(glGetUniformLocation(program, name.c_str()), value);
+}
+
+void ComputeShader::SetUVector3(std::string name, uint32_t x, uint32_t y, uint32_t z) const
+{
+	glUseProgram(program);
+	glUniform3ui(glGetUniformLocation(program, name.c_str()), x, y, z);
+}
+
+void ComputeShader::SetVector2(std::string name, float x, float y) const
+{
+	glUseProgram(program);
+	glUniform2f(glGetUniformLocation(program, name.c_str()), x, y);
 }
 
 void ComputeShader::SetVector3(std::string name, float x, float y, float z) const

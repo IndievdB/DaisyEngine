@@ -25,18 +25,17 @@ struct Tile
 };
 
 //faces - xyz is normal, w is distance from origin
-struct CubePlanes
+struct GridCube
 {
-	vec4 faces[6];
-	vec4 positions[6];
+	vec4 planes[6];
 };
 
-struct TileBounds
+/*struct TileBounds
 {
 	float left, right, top, bottom, front, back;
 
 	float padding[2];
-};
+};*/
 
 struct LightData
 {
@@ -48,32 +47,58 @@ struct LightData
 	float fpadding[2];
 };
 
+struct SpotLightData
+{
+	vec4 lightPosition;
+	vec4 lightDirection;
+	vec4 lightColor;
+	float intensity;
+	float cutOff;
+	float range;
+	float sl_padding[1];
+};
+
 //Shared with lighting shader
 
 layout(binding = 0) uniform atomic_uint count;
+layout(binding = 0, offset = 4) uniform atomic_uint spotLightCount;
 
 layout(std430, binding = 1) buffer LightDataBuffer
 {
 	LightData lightData[];
 };
 
+layout(std430, binding = 6) buffer SpotLightDataBuffer
+{
+	SpotLightData spotLightData[];
+};
+
 layout (std430, binding = 2) buffer TileLightsBuffer
 {
 	int lightIndexes[numTiles];
 	int tileLights[numTiles][numLights];
+
+	int spotLightIndexes[numTiles];
+	int tileSpotLights[numTiles][numLights];
 };
 
 layout(std430, binding = 3) buffer ScreenSpaceDataBuffer
 {
 	float indexes[numLights];
 	float zRadius[numLights];
-	vec4 numLightsIn;
-	vec4 NDCCoords[];
+	vec4 NDCCoords[numLights];
+
+	float indexesSL[numLights];
 };
 
-layout(std430, binding = 4) buffer TileBoundsBuffer
+/*layout(std430, binding = 4) buffer TileBoundsBuffer
 {
 	TileBounds tileBounds[];
+};*/
+
+layout(std430, binding = 4) buffer GridCubesBuffer
+{
+	GridCube gridCubes[];
 };
 
 #include Resources/Clustered/collisionFunctions.glsl
@@ -92,10 +117,17 @@ void main()
 	for (int i = 0; i < lightsOnScreen; i++)
 	{
 		int lightIndex = int(indexes[i]);
-		TileBounds bounds = tileBounds[index];
+		//TileBounds bounds = tileBounds[index];
+		//GridCube cube = gridCubes[index];
 
-		//if (CollideTest(cubePlanes[index].faces, NDCCoords[i], zRadius[i]))
-		if (CollideTest2(bounds.left, bounds.right, bounds.bottom, bounds.top, bounds.front, bounds.back, NDCCoords[i], zRadius[i]))
+		vec4 worldPos = lightData[lightIndex].pos4;
+		vec4 viewPos = viewMatrix * lightData[lightIndex].pos4;
+
+		if (PointlightInCube(gridCubes[index].planes, viewPos))
+		//if (PointlightInCube(gridCubes[index].planes, NDCCoords[i]))
+		//if (true)
+		//if (PointLightInCluster(NDCCoords[i], zRadius[i], bounds.left, bounds.right, bounds.bottom, bounds.top, bounds.front, bounds.back))
+		//if (CollideTest2(bounds.left, bounds.right, bounds.bottom, bounds.top, bounds.front, bounds.back, NDCCoords[i], zRadius[i]))
 		{
 			tileLights[index][intersections] = lightIndex;
 			++intersections;
@@ -103,4 +135,23 @@ void main()
 	}
 
 	lightIndexes[index] = intersections;
+
+	// spot lights
+
+	/*int spotLightIntersections = 0;
+
+	uint spotLightsOnScreen = atomicCounter(spotLightCount);
+	for (int i = 0; i < spotLightsOnScreen; i++)
+	{
+		int lightIndex = int(indexesSL[i]);
+		//TileBounds bounds = tileBounds[index];
+
+		if (true) // spot light in tile
+		{
+			tileSpotLights[index][spotLightIntersections] = lightIndex;
+			++spotLightIntersections;
+		}
+	}
+
+	spotLightIndexes[index] = spotLightIntersections;*/
 }

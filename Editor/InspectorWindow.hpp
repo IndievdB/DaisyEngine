@@ -9,6 +9,8 @@
 #include "../Renderer/Texture.hpp"
 #include "../Renderer/PointLight.hpp"
 #include "../Renderer/AmbientLight.hpp"
+#include "../Renderer/DirectionalLight.hpp"
+#include "../Renderer/SpotLight.hpp"
 
 #include "../Vendor/imgui/imgui.h"
 #include "../Vendor/imgui/imgui_impl_glfw.h"
@@ -101,11 +103,11 @@ private:
 
 		ImGui::Text(label.c_str());
 		ImGui::PushItemWidth(width / 3.25f);
-		ImGui::DragFloat("##x", &(vector.x), 0.005f);
+		ImGui::DragFloat("##x", &(vector.x), 0.01f);
 		ImGui::SameLine();
-		ImGui::DragFloat("##y", &(vector.y), 0.005f);
+		ImGui::DragFloat("##y", &(vector.y), 0.01f);
 		ImGui::SameLine();
-		ImGui::DragFloat("##z", &(vector.z), 0.005f);
+		ImGui::DragFloat("##z", &(vector.z), 0.01f);
 		ImGui::PopItemWidth();
 
 		ImGui::PopID();
@@ -344,6 +346,8 @@ private:
 			ImGui::DragFloat("intensity", &(spotLight->intensity), 0.005f, 0.0f, 100.0f);
 			ImGui::Text("Cut Off");
 			ImGui::DragFloat("cutoff", &(spotLight->cutOff), 0.1f, 0.01f, 90.0f);
+			ImGui::Text("Range");
+			ImGui::DragFloat("range", &(spotLight->range), 0.1f, 0.01f, 100.0f);
 			ImGui::PopID();
 		}
 	}

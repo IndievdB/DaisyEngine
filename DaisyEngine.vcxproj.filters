@@ -138,6 +138,9 @@
     <ClCompile Include="Editor\Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\LightSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer\Shader.hpp">
@@ -548,11 +551,21 @@
     <ClInclude Include="Renderer\AmbientLight.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\AtomicCounterBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\LightSettings.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\CollisionTest.lua" />
     <None Include="Resources\text.shader" />
     <None Include="Resources\lambert.shader" />
     <None Include="Resources\PBR\pbr.shader" />
+    <None Include="Resources\Engine\Shaders\LambertNoShadows.shader" />
+    <None Include="Resources\Engine\Shaders\UnlitTexture.shader" />
+    <None Include="Resources\Engine\Compute\BuildLightGrid.glsl" />
+    <None Include="Resources\Engine\Compute\CullLights.glsl" />
   </ItemGroup>
 </Project>
