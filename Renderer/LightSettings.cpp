@@ -14,12 +14,17 @@ LightSettings::LightSettings(std::shared_ptr<entt::registry> registry)
 	clustersSSBO.Initialize(0, sizeof(Cluster) * CLUSTER_COUNT, &clusterData);
 	pointLightData = new PointLightData();
 	spotLightData = new SpotLightData();
+	testData = new TestData();
 }
 
 bool once = false;
 
 void LightSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const float near, const float far)
 {
+	// Setup Test Data
+
+	testDataSSBO.Set(6, sizeof(TestData), testData);
+
 	// Build Grid
 
 	buildLightGrid->Use();
@@ -55,7 +60,7 @@ void LightSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& v
 
 	int numSpotLightsInScene = 0;
 
-	registry->view<Transform, SpotLight>().each([this, &numSpotLightsInScene](auto& transform, auto& spotLight)
+	registry->view<Transform, SpotLight>().each([this, &numSpotLightsInScene, &viewMatrix](auto& transform, auto& spotLight)
 	{
 		Vector3 forward = transform.GetForward();
 		spotLightData->spotLights[numSpotLightsInScene].position = Vector4(transform.position.x, transform.position.y, transform.position.z, 1);
@@ -77,4 +82,6 @@ void LightSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& v
 	cullLights->SetInt("numSpotLights", numSpotLightsInScene);
 	cullLights->SetMatrix4x4("view", viewMatrix);
 	cullLights->Dispatch(CLUSTERS_X, CLUSTERS_Y, CLUSTERS_Z);
+
+	testDataSSBO.Get(sizeof(TestData), testData);
 }

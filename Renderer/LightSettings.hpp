@@ -4,6 +4,7 @@
 #include "../Vendor/entt/entt.hpp"
 #include "ComputeShader.hpp"
 #include "SSBO.hpp"
+#include "../Core/Math/Vector3.hpp"
 
 struct Cluster
 {
@@ -48,6 +49,14 @@ struct SpotLightData
 	int clusterSpotLightIndices[NUM_TILES][NUM_LIGHTS];
 };
 
+struct TestData
+{
+	Vector4 p;
+	Vector4 d;
+	Vector4 viewP;
+	Vector4 viewD;
+};
+
 class LightSettings
 {
 public:
@@ -71,4 +80,7 @@ private:
 
 	SpotLightData* spotLightData;
 	SSBO spotLightSSBO;
+
+	TestData* testData;
+	SSBO testDataSSBO;
 };

@@ -31,13 +31,6 @@ void RenderSystem::RenderAll(std::shared_ptr<Texture> renderTexture, std::shared
 	Matrix4x4 view = Matrix4x4::LookAt(cameraTransform->position, cameraTransform->position + forward, up);
 
 	lightSettings->Update(projection, view, camera->nearPlane, camera->farPlane);
-	//clusteredSettings->Update(projection, view, cameraTransform->position, camera->nearPlane, camera->farPlane, Window::GetInstance()->GetViewportHeight() / Window::GetInstance()->GetViewportWidth());
-
-	/*std::shared_ptr<DirectionalLight> directionalLight;
-	registry->view<Transform, DirectionalLight>().each([&directionalLight](auto& transform, auto& light)
-	{
-		directionalLight = std::make_shared<DirectionalLight>(light);
-	});*/
 
 	//shadowSettings->Update(camera, view);
 	

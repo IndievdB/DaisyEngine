@@ -13,6 +13,7 @@
 
 #include "Renderer/PointLight.hpp"
 #include "Renderer/DirectionalLight.hpp"
+#include "Renderer/SpotLight.hpp"
 
 void LoadScene(std::shared_ptr<entt::registry> registry)
 {
@@ -24,6 +25,35 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		registry->assign<Camera>(entity);
 		registry->assign<LuaBehaviour>(entity, "Resources/FreeCam.lua");
 	}
+
+	{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, registry, "Spot Light");
+		registry->assign<Transform>(entity, Vector3::up * 5.0f, Vector3::one * 0.25f, Quaternion(kDegToRad * 55.0f, 0.0f, 0.0f));
+		registry->assign<SpotLight>(entity);
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj");
+	}/*
+
+	{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Cube");
+		Transform transform = registry->assign<Transform>(entity, Vector3::zero, Vector3::one, Quaternion::identity);
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/LambertNoShadows.material", "Resources/Engine/Meshes/DefaultCube.obj");
+	}
+
+	{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Min");
+		Transform transform = registry->assign<Transform>(entity, Vector3(-0.5f, -0.5f, -0.5f), Vector3::one * 0.5f, Quaternion::identity);
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/LambertNoShadows.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+	}
+
+	{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, "Max");
+		Transform transform = registry->assign<Transform>(entity, Vector3(0.5f, 0.5f, 0.5f), Vector3::one * 0.5f, Quaternion::identity);
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/LambertNoShadows.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+	}*/
 
 	{
 		auto entity = registry->create();

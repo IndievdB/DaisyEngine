@@ -133,9 +133,23 @@ void main(void)
 	uint clusterIndex = GetClusterIndex(gl_FragCoord);
 	Cluster cluster = clusters[clusterIndex];
 
+	vec4 albedoColor = texture2D(mainTex, TexCoords);
 	vec3 lighting = vec3(0, 0, 0);
 
-	for (int i=0; i < clusterPointLightCount[clusterIndex]; i++)
+	// Ambient Light
+
+	if (true)
+	{
+		vec3 diffuse = vec3(1,1,1) * albedoColor.rgb;
+		diffuse *= 0.1f;
+		lighting.rgb += diffuse;
+	}
+
+	// Directional Light
+
+	// Point Light
+
+	/*for (int i=0; i < clusterPointLightCount[clusterIndex]; i++)
 	{
 		int pointLightIndex = clusterPointLightIndices[clusterIndex][i];
 		PointLight light = pointLights[pointLightIndex];
@@ -147,7 +161,9 @@ void main(void)
 
 		if (isLit)
 			lighting += vec3(1, 0, 0);
-	}
+	}*/
+
+	// Spot Light
 
 	for (int i = 0; i < clusterSpotLightCount[clusterIndex]; i++)
 	{
@@ -156,19 +172,18 @@ void main(void)
 
 		float dist = length(light.position.xyz - WorldPos);
 
-		lighting += vec3(0.1, 0.1, 0.1);
-
 		if (dist > light.range)
-		{
 			continue;
-		}
 
 		vec3 lightDir = normalize(light.position.xyz - WorldPos);
 		float theta = dot(lightDir, normalize(-light.direction.xyz));
 
 		if (theta > cos(radians(light.cutOff)))
 		{
-			lighting += vec3(1, 1, 1);
+			float diff = max(dot(WSNormal, lightDir), 0.0);
+			vec3 diffuse = light.color.rgb * diff * albedoColor.rgb;
+			diffuse *= light.intensity;
+			lighting += diffuse;
 		}
 	}
 
