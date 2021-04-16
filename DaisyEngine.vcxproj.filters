@@ -111,9 +111,6 @@
     <ClCompile Include="Renderer\ComputeShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer\ClusteredSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Vendor\imgui\imgui_draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -465,9 +462,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\ComputeShader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\ClusteredSettings.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Animation.hpp">

@@ -12,6 +12,7 @@
 #include "Core/EntityName.hpp"
 
 #include "Renderer/PointLight.hpp"
+#include "Renderer/AmbientLight.hpp"
 #include "Renderer/DirectionalLight.hpp"
 #include "Renderer/SpotLight.hpp"
 
@@ -28,12 +29,21 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 
 	{
 		auto entity = registry->create();
-		registry->assign<EntityName>(entity, registry, "Spot Light");
-		registry->assign<Transform>(entity, Vector3::up * 5.0f, Vector3::one * 0.25f, Quaternion(kDegToRad * 55.0f, 0.0f, 0.0f));
-		registry->assign<SpotLight>(entity);
-		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj");
-	}/*
+		registry->assign<EntityName>(entity, registry, "Ambient Light");
+		registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion::identity);
+		registry->assign<AmbientLight>(entity);
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+	}
 
+	{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, registry, "Directional Light");
+		registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion(0.523599f, 0.0f, 0.0f));
+		registry->assign<DirectionalLight>(entity);
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj");
+	}
+
+	/*
 	{
 		auto entity = registry->create();
 		registry->assign<EntityName>(entity, "Cube");

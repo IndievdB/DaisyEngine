@@ -24,13 +24,6 @@ struct PointLightGLSL
 	float padding[2];
 };
 
-struct PointLightData
-{
-	PointLightGLSL pointLights[NUM_LIGHTS];
-	int clusterPointLightCount[NUM_TILES];
-	int clusterPointLightIndices[NUM_TILES][NUM_LIGHTS];
-};
-
 struct SpotLightGLSL
 {
 	Vector4 position;
@@ -42,6 +35,28 @@ struct SpotLightGLSL
 	float padding[1];
 };
 
+struct AmbientLightGLSL
+{
+	Vector4 color;
+	float intensity;
+	float padding[3];
+};
+
+struct DirectionalLightGLSL
+{
+	Vector4 direction;
+	Vector4 color;
+	float intensity;
+	float padding[3];
+};
+
+struct PointLightData
+{
+	PointLightGLSL pointLights[NUM_LIGHTS];
+	int clusterPointLightCount[NUM_TILES];
+	int clusterPointLightIndices[NUM_TILES][NUM_LIGHTS];
+};
+
 struct SpotLightData
 {
 	SpotLightGLSL spotLights[NUM_LIGHTS];
@@ -49,12 +64,13 @@ struct SpotLightData
 	int clusterSpotLightIndices[NUM_TILES][NUM_LIGHTS];
 };
 
-struct TestData
+struct GlobalLightData
 {
-	Vector4 p;
-	Vector4 d;
-	Vector4 viewP;
-	Vector4 viewD;
+	AmbientLightGLSL ambientLights[NUM_LIGHTS];
+	DirectionalLightGLSL directionalLights[NUM_LIGHTS];
+	int numberOfAmbientLights;
+	int numberOfDirectionalLights;
+	int padding[2];
 };
 
 class LightSettings
@@ -81,6 +97,6 @@ private:
 	SpotLightData* spotLightData;
 	SSBO spotLightSSBO;
 
-	TestData* testData;
-	SSBO testDataSSBO;
+	GlobalLightData* globalLightData;
+	SSBO globalLightSSBO;
 };

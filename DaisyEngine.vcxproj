@@ -147,7 +147,6 @@
     <ClCompile Include="Physics\IntersectionTests.cpp" />
     <ClCompile Include="Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Physics\Contact.cpp" />
-    <ClCompile Include="Renderer\ClusteredSettings.cpp" />
     <ClCompile Include="Renderer\ComputeShader.cpp" />
     <ClCompile Include="Renderer\Cubemap.cpp" />
     <ClCompile Include="Renderer\Font.cpp" />
@@ -203,7 +202,6 @@
     <ClInclude Include="Physics\TriggerData.hpp" />
     <ClInclude Include="Renderer\AmbientLight.hpp" />
     <ClInclude Include="Renderer\AtomicCounterBuffer.hpp" />
-    <ClInclude Include="Renderer\ClusteredSettings.hpp" />
     <ClInclude Include="Renderer\ComputeShader.hpp" />
     <ClInclude Include="Renderer\Cubemap.hpp" />
     <ClInclude Include="Renderer\DirectionalLight.hpp" />

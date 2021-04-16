@@ -48,14 +48,6 @@ layout(std430, binding = 2) buffer SpotLightBuffer
 	int clusterSpotLightIndices[numClusters][numLights];
 };
 
-layout(std430, binding = 6) buffer TestDataBuffer
-{
-	vec4 p;
-	vec4 d;
-	vec4 viewP;
-	vec4 viewD;
-};
-
 uniform uvec3 clusterSizes;
 uniform int numPointLights;
 uniform int numSpotLights;

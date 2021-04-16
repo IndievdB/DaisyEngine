@@ -3,6 +3,8 @@
 
 #include "PointLight.hpp"
 #include "SpotLight.hpp"
+#include "AmbientLight.hpp"
+#include "DirectionalLight.hpp"
 #include "../Core/Transform.hpp"
 
 LightSettings::LightSettings(std::shared_ptr<entt::registry> registry)
@@ -14,17 +16,13 @@ LightSettings::LightSettings(std::shared_ptr<entt::registry> registry)
 	clustersSSBO.Initialize(0, sizeof(Cluster) * CLUSTER_COUNT, &clusterData);
 	pointLightData = new PointLightData();
 	spotLightData = new SpotLightData();
-	testData = new TestData();
+	globalLightData = new GlobalLightData();
 }
 
 bool once = false;
 
 void LightSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& viewMatrix, const float near, const float far)
 {
-	// Setup Test Data
-
-	testDataSSBO.Set(6, sizeof(TestData), testData);
-
 	// Build Grid
 
 	buildLightGrid->Use();
@@ -60,7 +58,7 @@ void LightSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& v
 
 	int numSpotLightsInScene = 0;
 
-	registry->view<Transform, SpotLight>().each([this, &numSpotLightsInScene, &viewMatrix](auto& transform, auto& spotLight)
+	registry->view<Transform, SpotLight>().each([this, &numSpotLightsInScene](auto& transform, auto& spotLight)
 	{
 		Vector3 forward = transform.GetForward();
 		spotLightData->spotLights[numSpotLightsInScene].position = Vector4(transform.position.x, transform.position.y, transform.position.z, 1);
@@ -74,6 +72,30 @@ void LightSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& v
 
 	spotLightSSBO.Set(2, sizeof(SpotLightData), spotLightData);
 
+	// Fill Global Light Buffer
+
+	globalLightData->numberOfAmbientLights = 0;
+
+	registry->view<Transform, AmbientLight>().each([this](auto& transform, auto& ambientLight)
+	{
+		globalLightData->ambientLights[globalLightData->numberOfAmbientLights].color = Vector4(ambientLight.color.x, ambientLight.color.y, ambientLight.color.z,1);
+		globalLightData->ambientLights[globalLightData->numberOfAmbientLights].intensity = ambientLight.intensity;
+		globalLightData->numberOfAmbientLights++;
+	});
+
+	globalLightData->numberOfDirectionalLights = 0;
+
+	registry->view<Transform, DirectionalLight>().each([this](auto& transform, auto& directionalLight)
+	{
+		Vector3 forward = transform.GetForward();
+		globalLightData->directionalLights[globalLightData->numberOfDirectionalLights].direction = Vector4(forward.x, forward.y, forward.z, 0);
+		globalLightData->directionalLights[globalLightData->numberOfDirectionalLights].color = Vector4(directionalLight.color.x, directionalLight.color.y, directionalLight.color.z, 1);
+		globalLightData->directionalLights[globalLightData->numberOfDirectionalLights].intensity = directionalLight.intensity;
+		globalLightData->numberOfDirectionalLights++;
+	});
+
+	globalLightSSBO.Set(3, sizeof(GlobalLightData), globalLightData);
+
 	// Cull Lights
 
 	cullLights->Use();
@@ -82,6 +104,4 @@ void LightSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& v
 	cullLights->SetInt("numSpotLights", numSpotLightsInScene);
 	cullLights->SetMatrix4x4("view", viewMatrix);
 	cullLights->Dispatch(CLUSTERS_X, CLUSTERS_Y, CLUSTERS_Z);
-
-	testDataSSBO.Get(sizeof(TestData), testData);
 }
