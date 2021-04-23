@@ -323,6 +323,8 @@
     <None Include="Resources\Engine\Compute\CullLights.glsl" />
     <None Include="Resources\Engine\Shaders\Lambert.shader" />
     <None Include="Resources\Engine\Shaders\LambertNoShadows.shader" />
+    <None Include="Resources\Engine\Shaders\Skybox.shader" />
+    <None Include="Resources\Engine\Shaders\UnlitColor.shader" />
     <None Include="Resources\Engine\Shaders\UnlitTexture.shader" />
     <None Include="Resources\lambert.shader" />
     <None Include="Resources\PBR\pbr.shader" />

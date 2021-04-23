@@ -141,7 +141,7 @@ void Editor::Update()
 					registry->assign<EntityName>(entity, registry, "Ambient Light");
 					registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion::identity);
 					registry->assign<AmbientLight>(entity);
-					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj", false);
 					FocusEntity(entity);
 				}
 
@@ -151,7 +151,7 @@ void Editor::Update()
 					registry->assign<EntityName>(entity, registry, "Point Light");
 					registry->assign<Transform>(entity, Vector3::zero, Vector3::one * 0.25f, Quaternion::identity);
 					registry->assign<PointLight>(entity);
-					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj", false);
 					FocusEntity(entity);
 				}
 
@@ -161,7 +161,7 @@ void Editor::Update()
 					registry->assign<EntityName>(entity, registry, "Directional Light");
 					registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion(0.523599f, 0.0f, 0.0f));
 					registry->assign<DirectionalLight>(entity);
-					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj");
+					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj", false);
 					FocusEntity(entity);
 				}
 
@@ -171,7 +171,7 @@ void Editor::Update()
 					registry->assign<EntityName>(entity, registry, "Spot Light");
 					registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion(0.523599f, 0.0f, 0.0f));
 					registry->assign<SpotLight>(entity);
-					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj");
+					registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj", false);
 					FocusEntity(entity);
 				}
 

@@ -49,6 +49,7 @@ void LightSettings::Update(const Matrix4x4& projectionMatrix, const Matrix4x4& v
 		pointLightData->pointLights[numPointLightsInScene].color = pointLight.color;
 		pointLightData->pointLights[numPointLightsInScene].radius = pointLight.radius;
 		pointLightData->pointLights[numPointLightsInScene].intensity = pointLight.intensity;
+		pointLightData->pointLights[numPointLightsInScene].castsShadows = pointLight.castsShadows;
 		numPointLightsInScene++;
 	});
 

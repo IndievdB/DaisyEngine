@@ -46,30 +46,6 @@ Shader::Shader(const std::string& shaderPath)
 		while (index != 0 && vertexSource[index - 1] != '\n') index--;
 		vertexSource.insert(index, "layout(location = 4) ");
 	}
-
-	/*index = vertexSource.find(" : COLOR");
-	if (index != std::string::npos)
-	{
-		vertexSource.replace(index, 8, "");
-		while (index != 0 && vertexSource[index - 1] != '\n') index--;
-		vertexSource.insert(index, "layout(location = 1) ");
-	}
-
-	index = vertexSource.find(" : TEXCOORD");
-	if (index != std::string::npos)
-	{
-		vertexSource.replace(index, 11, "");
-		while (index != 0 && vertexSource[index - 1] != '\n') index--;
-		vertexSource.insert(index, "layout(location = 2) ");
-	}
-
-	index = vertexSource.find(" : NORMAL");
-	if (index != std::string::npos)
-	{
-		vertexSource.replace(index, 9, "");
-		while (index != 0 && vertexSource[index - 1] != '\n') index--;
-		vertexSource.insert(index, "layout(location = 3) ");
-	}*/
 	
 	Compile(vertexSource, fragementSource);
 }
@@ -154,47 +130,144 @@ void Shader::CheckCompileErrors(unsigned int shader, std::string type)
 	}
 }
 
-void Shader::SetBool(std::string name, bool value) const
+void Shader::SetBool(std::string name, bool value)
 {
 	glUseProgram(shaderProgramID);
-	glUniform1i(glGetUniformLocation(shaderProgramID, name.c_str()), (int)value);
+
+	auto iterator = uniformMap.find(name);
+	int uniformLocation;
+
+	if (iterator == uniformMap.end())
+	{
+		uniformLocation = glGetUniformLocation(shaderProgramID, name.c_str());
+		uniformMap.emplace(name, uniformLocation);
+	}
+	else
+	{
+		uniformLocation = iterator->second;
+	}
+
+	glUniform1i(uniformLocation, (int)value);
 }
 
-void Shader::SetInt(std::string name, int value) const
+void Shader::SetInt(std::string name, int value)
 {
 	glUseProgram(shaderProgramID);
-	glUniform1i(glGetUniformLocation(shaderProgramID, name.c_str()), value);
+
+	auto iterator = uniformMap.find(name);
+	int uniformLocation;
+
+	if (iterator == uniformMap.end())
+	{
+		uniformLocation = glGetUniformLocation(shaderProgramID, name.c_str());
+		uniformMap.emplace(name, uniformLocation);
+	}
+	else
+	{
+		uniformLocation = iterator->second;
+	}
+
+	glUniform1i(uniformLocation, value);
 }
 
-void Shader::SetFloat(std::string name, float value) const
+void Shader::SetFloat(std::string name, float value)
 {
 	glUseProgram(shaderProgramID);
-	glUniform1f(glGetUniformLocation(shaderProgramID, name.c_str()), value);
+
+	auto iterator = uniformMap.find(name);
+	int uniformLocation;
+
+	if (iterator == uniformMap.end())
+	{
+		uniformLocation = glGetUniformLocation(shaderProgramID, name.c_str());
+		uniformMap.emplace(name, uniformLocation);
+	}
+	else
+	{
+		uniformLocation = iterator->second;
+	}
+
+	glUniform1f(uniformLocation, value);
 }
 
-void Shader::SetVector2(std::string name, float x, float y) const
+void Shader::SetVector2(std::string name, float x, float y)
 {
 	glUseProgram(shaderProgramID);
-	glUniform2f(glGetUniformLocation(shaderProgramID, name.c_str()), x, y);
+
+	auto iterator = uniformMap.find(name);
+	int uniformLocation;
+
+	if (iterator == uniformMap.end())
+	{
+		uniformLocation = glGetUniformLocation(shaderProgramID, name.c_str());
+		uniformMap.emplace(name, uniformLocation);
+	}
+	else
+	{
+		uniformLocation = iterator->second;
+	}
+
+	glUniform2f(uniformLocation, x, y);
 }
 
-void Shader::SetVector3(std::string name, float x, float y, float z) const
+void Shader::SetVector3(std::string name, float x, float y, float z)
 {
 	glUseProgram(shaderProgramID);
-	glUniform3f(glGetUniformLocation(shaderProgramID, name.c_str()), x, y, z);
+
+	auto iterator = uniformMap.find(name);
+	int uniformLocation;
+
+	if (iterator == uniformMap.end())
+	{
+		uniformLocation = glGetUniformLocation(shaderProgramID, name.c_str());
+		uniformMap.emplace(name, uniformLocation);
+	}
+	else
+	{
+		uniformLocation = iterator->second;
+	}
+
+	glUniform3f(uniformLocation, x, y, z);
 }
 
-void Shader::SetVector4(std::string name, float x, float y, float z, float w) const
+void Shader::SetVector4(std::string name, float x, float y, float z, float w)
 {
 	glUseProgram(shaderProgramID);
-	glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), x, y, z, w);
+
+	auto iterator = uniformMap.find(name);
+	int uniformLocation;
+
+	if (iterator == uniformMap.end())
+	{
+		uniformLocation = glGetUniformLocation(shaderProgramID, name.c_str());
+		uniformMap.emplace(name, uniformLocation);
+	}
+	else
+	{
+		uniformLocation = iterator->second;
+	}
+
+	glUniform4f(uniformLocation, x, y, z, w);
 }
 
-void Shader::SetMatrix4x4(std::string name, Matrix4x4 matrix) const
+void Shader::SetMatrix4x4(std::string name, Matrix4x4 matrix)
 {
 	glUseProgram(shaderProgramID);
-	unsigned int transformLoc = glGetUniformLocation(shaderProgramID, name.c_str());
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, matrix.mV);
+
+	auto iterator = uniformMap.find(name);
+	int uniformLocation;
+
+	if (iterator == uniformMap.end())
+	{
+		uniformLocation = glGetUniformLocation(shaderProgramID, name.c_str());
+		uniformMap.emplace(name, uniformLocation);
+	}
+	else
+	{
+		uniformLocation = iterator->second;
+	}
+
+	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, matrix.mV);
 }
 
 bool Shader::HasUniform(std::string name)

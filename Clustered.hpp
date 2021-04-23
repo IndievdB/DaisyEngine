@@ -85,7 +85,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 					Vector3 pos(xCoord, yCoord, zCoord);
 					auto entity = registry->create();
 					registry->assign<Transform>(entity, Vector3 (xCoord, yCoord, zCoord), Vector3::one, Quaternion::identity);
-					registry->assign<PointLight>(entity, Vector4(r, g, b, 1), radius, intensity);
+					registry->assign<PointLight>(entity, Vector4(r, g, b, 1), radius, intensity, false);
 					++lightCount;
 				}
 			}

@@ -19,11 +19,9 @@ ShadowSettings::ShadowSettings(std::shared_ptr<entt::registry> registry)
 	cubeShader = new Shader("Resources/cubecube.shader");
 	shadowCubeMapArray = std::make_unique<CubemapArray>(256);
 
-	/*shadowMap = new Texture(1024, 1024, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_NEAREST, GL_CLAMP_TO_BORDER);
+	/*
+	shadowMap = new Texture(1024, 1024, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_NEAREST, GL_CLAMP_TO_BORDER);
 	shadowMap->AddBorder(1, 1, 1, 1);
-
-
-	//
 
 	cube = new Mesh("Resources/sphere.obj");
 	cubeShader = new Shader("Resources/cubecube.shader");
@@ -143,6 +141,12 @@ void ShadowSettings::RenderPointLightShadows(std::shared_ptr<Camera> camera, Mat
 	int pointLightIndex = 0;
 	registry->view<Transform, PointLight>().each([&offscreenFramebuffer, &pointLightIndex, this](auto& trans, auto& light)
 	{
+		if (!light.castsShadows)
+		{
+			pointLightIndex++;
+			return;
+		}
+
 		GLenum err;
 
 		Matrix4x4 captureProjection = Matrix4x4::Perspective(90.0f * kDegToRad, 1.0f, 0.01f, light.radius);
@@ -173,11 +177,14 @@ void ShadowSettings::RenderPointLightShadows(std::shared_ptr<Camera> camera, Mat
 		
 			Window::GetInstance()->Clear();
 			registry->view<Transform, MeshRenderer>().each([&depthShader](auto& transform, auto& meshRenderer)
-				{
-					Matrix4x4 model = Matrix4x4::Transformation(transform);
-					depthShader->SetMatrix4x4("model", model);
-					meshRenderer.mesh->Render(depthShader, 0.01f);
-				});
+			{
+				if (!meshRenderer.castsShadows)
+					return;
+
+				Matrix4x4 model = Matrix4x4::Transformation(transform);
+				depthShader->SetMatrix4x4("model", model);
+				meshRenderer.mesh->Render(depthShader, 0.01f);
+			});
 		}
 
 		Framebuffer::Unbind();

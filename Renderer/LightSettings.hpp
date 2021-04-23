@@ -21,7 +21,8 @@ struct PointLightGLSL
 	Vector4 color;
 	float radius;
 	float intensity;
-	float padding[2];
+	bool castsShadows;
+	float padding[1];
 };
 
 struct SpotLightGLSL

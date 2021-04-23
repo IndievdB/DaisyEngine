@@ -47,8 +47,8 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		auto entity = registry->create();
 		registry->assign<EntityName>(entity, registry, "Point Light");
 		registry->assign<Transform>(entity, Vector3::up * 8, Vector3::one * 0.25f, Quaternion::identity);
-		registry->assign<PointLight>(entity, Vector4::one, 15.0f, 5.0f);
-		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+		registry->assign<PointLight>(entity, Vector4::one, 15.0f, 5.0f, true);
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj", false);
 	}
 
 	for (int i = 0; i < 10; i++)
@@ -65,8 +65,8 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 			auto entity = registry->create();
 			registry->assign<EntityName>(entity, registry, "Point Light");
 			registry->assign<Transform>(entity, Vector3(x,y,z), Vector3::one * 0.25f, Quaternion::identity);
-			registry->assign<PointLight>(entity, Vector4(r,g,b,1), 15.0f, 5.0f);
-			registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+			registry->assign<PointLight>(entity, Vector4(r,g,b,1), 15.0f, 5.0f, false);
+			registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj", false);
 		}
 	}
 

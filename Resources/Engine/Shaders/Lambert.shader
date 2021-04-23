@@ -72,7 +72,8 @@ struct PointLight
 	vec4 color;
 	float radius;
 	float intensity;
-	float pl_padding[2];
+	bool castsShadows;
+	float pl_padding[1];
 };
 
 struct SpotLight
@@ -237,9 +238,12 @@ vec3 GetLighting(vec4 fragCoord)
 			attenuation = clamp(attenuation * light.intensity, 0.0, 1.0);
 			diffuse *= attenuation;
 
-			float shadow = ShadowCalculationPoint(WorldPos, light.position.xyz, light.radius, pointLightIndex);
-			diffuse *= (1.0 - shadow);
-
+			if (light.castsShadows)
+			{
+				float shadow = ShadowCalculationPoint(WorldPos, light.position.xyz, light.radius, pointLightIndex);
+				diffuse *= (1.0 - shadow);
+			}
+			
 			lighting.rgb += diffuse;
 		}
 	}

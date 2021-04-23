@@ -568,5 +568,7 @@
     <None Include="Resources\Engine\Compute\BuildLightGrid.glsl" />
     <None Include="Resources\Engine\Compute\CullLights.glsl" />
     <None Include="Resources\Engine\Shaders\Lambert.shader" />
+    <None Include="Resources\Engine\Shaders\Skybox.shader" />
+    <None Include="Resources\Engine\Shaders\UnlitColor.shader" />
   </ItemGroup>
 </Project>

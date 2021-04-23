@@ -277,6 +277,7 @@ private:
 		{
 			InputMesh(std::to_string((uint32_t)selectedEntity) + "MeshRendererMesh", "Mesh", meshRenderer->mesh);
 			InputMaterial(std::to_string((uint32_t)selectedEntity) + "MeshRendererMaterial", "Material", meshRenderer->material);
+			ImGui::Checkbox("Casts Shadows", &(meshRenderer->castsShadows));
 		}
 	}
 
@@ -310,6 +311,7 @@ private:
 			ImGui::DragFloat("radius", &(pointLight->radius), 0.005f, 0.0f, 100.0f);
 			ImGui::Text("Intensity");
 			ImGui::DragFloat("intensity", &(pointLight->intensity), 0.005f, 0.0f, 100.0f);
+			ImGui::Checkbox("Casts Shadows", &(pointLight->castsShadows));
 			ImGui::PopID();
 		}
 	}

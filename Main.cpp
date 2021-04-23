@@ -32,8 +32,15 @@ int main()
 	std::shared_ptr<Editor> editor = std::make_shared<Editor>(registry, renderSystem, physicsSystem, luaSystem);
 	editor->AddWindows();
 
+	bool runDebug = false;
+
 	while (window.isOpen)
 	{
+		if (inputSystem.GetKeyDown(KeyCode::F))
+		{
+			runDebug = true;
+		}
+
 		inputSystem.Update();
 		window.ProcessInput();
 		window.Clear();
@@ -41,5 +48,10 @@ int main()
 		editor->Update();
 
 		window.SwapBuffers();
+
+		if (inputSystem.GetKeyDown(KeyCode::G))
+		{
+			runDebug = false;
+		}
 	}
 }
