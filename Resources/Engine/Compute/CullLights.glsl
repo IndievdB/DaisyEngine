@@ -1,6 +1,6 @@
 #version 430 core
 
-const int numLights = 512;
+const int numLights = 256;
 const int numClusters = 512;
 
 struct Cluster

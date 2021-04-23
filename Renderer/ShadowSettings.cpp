@@ -14,8 +14,12 @@
 ShadowSettings::ShadowSettings(std::shared_ptr<entt::registry> registry)
 {
 	this->registry = registry;
+	shadowCubeMap = std::make_unique<Cubemap>(GL_LINEAR, 256, 256);
+	cube = new Mesh("Resources/sphere.obj");
+	cubeShader = new Shader("Resources/cubecube.shader");
+	shadowCubeMapArray = std::make_unique<CubemapArray>(256);
 
-	shadowMap = new Texture(1024, 1024, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_NEAREST, GL_CLAMP_TO_BORDER);
+	/*shadowMap = new Texture(1024, 1024, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_NEAREST, GL_CLAMP_TO_BORDER);
 	shadowMap->AddBorder(1, 1, 1, 1);
 
 
@@ -24,7 +28,7 @@ ShadowSettings::ShadowSettings(std::shared_ptr<entt::registry> registry)
 	cube = new Mesh("Resources/sphere.obj");
 	cubeShader = new Shader("Resources/cubecube.shader");
 	skybox = new Skybox("Resources/PBR/Malibu_Overlook_3k.hdr");
-	shadowCubeMap = std::make_unique<Cubemap>(GL_LINEAR, 256, 256);
+	*/
 }
 
 /*void ShadowSettings::TempDirectionalLight(std::shared_ptr<Camera> camera, Matrix4x4& view)
@@ -132,94 +136,67 @@ ShadowSettings::ShadowSettings(std::shared_ptr<entt::registry> registry)
 	quad.Render();
 }*/
 
-void ShadowSettings::TempPointLight(std::shared_ptr<Camera> camera, Matrix4x4& view)
+void ShadowSettings::RenderPointLightShadows(std::shared_ptr<Camera> camera, Matrix4x4& view)
 {
-	// 1. GET POINT LIGHT
-
-	std::shared_ptr<PointLight> pointLight;
-	std::shared_ptr<Transform> transform;
-	registry->view<Transform, PointLight>().each([&transform, &pointLight](auto& trans, auto& light)
-	{
-		transform = std::make_shared<Transform>(trans);
-		pointLight = std::make_shared<PointLight>(light);
-	});
-
-	if (pointLight == nullptr)
-		return;
-
-	// 2. CREATE FRAMEBUFFER
-
 	Framebuffer offscreenFramebuffer;
-	offscreenFramebuffer.Bind();
-	
-	Renderbuffer offscreenDepthRenderbuffer(GL_DEPTH_COMPONENT24, 256, 256);
-	offscreenFramebuffer.AttachRenderbuffer(offscreenDepthRenderbuffer, GL_DEPTH_ATTACHMENT);
-	
-	// 3. RENDER SCENE FROM LIGHTS PERSPECTIVE
 
-	Matrix4x4 captureProjection = Matrix4x4::Perspective(90.0f * kDegToRad, 1.0f, camera->nearPlane, pointLight->radius);
-	Matrix4x4 captureViews[] =
+	int pointLightIndex = 0;
+	registry->view<Transform, PointLight>().each([&offscreenFramebuffer, &pointLightIndex, this](auto& trans, auto& light)
 	{
-		Matrix4x4::LookAt(transform->position, transform->position + Vector3(1.0f,  0.0f,  0.0f), Vector3(0.0f, -1.0f,  0.0f)),
-		Matrix4x4::LookAt(transform->position, transform->position + Vector3(-1.0f,  0.0f,  0.0f), Vector3(0.0f, -1.0f,  0.0f)),
-		Matrix4x4::LookAt(transform->position, transform->position + Vector3(0.0f,  1.0f,  0.0f), Vector3(0.0f,  0.0f,  1.0f)),
-		Matrix4x4::LookAt(transform->position, transform->position + Vector3(0.0f, -1.0f,  0.0f), Vector3(0.0f,  0.0f, -1.0f)),
-		Matrix4x4::LookAt(transform->position, transform->position + Vector3(0.0f,  0.0f,  1.0f), Vector3(0.0f, -1.0f,  0.0f)),
-		Matrix4x4::LookAt(transform->position, transform->position + Vector3(0.0f,  0.0f, -1.0f), Vector3(0.0f, -1.0f,  0.0f))
-	};
-	
-	glViewport(0, 0, 256, 256);
-	Window::GetInstance()->Clear();
-	
-	for (unsigned int i = 0; i < 6; i++)
-	{
-		Matrix4x4 pointMatrix = captureProjection * captureViews[i];
-		std::shared_ptr<Shader> depthShader = ResourceManager::GetInstance()->GetShader("Resources/Clustered/pointShadowDepth.shader");
-		depthShader->Use();
-		depthShader->SetMatrix4x4("lightSpaceMatrix", pointMatrix);
-		depthShader->SetVector3("lightPos", transform->position.x, transform->position.y, transform->position.z);
-		depthShader->SetFloat("lightRadius", pointLight->radius);
+		GLenum err;
 
-		offscreenFramebuffer.AttachCubemapFace(*shadowCubeMap, i, GL_COLOR_ATTACHMENT0, 0);
-		Window::GetInstance()->Clear();
-		//offscreenFramebuffer.AttachCubemapFace(*shadowCubeMap, i, GL_DEPTH_ATTACHMENT, 0);
-		//Window::GetInstance()->Clear();
-
-		registry->view<Transform, MeshRenderer>().each([&depthShader](auto& transform, auto& meshRenderer)
+		Matrix4x4 captureProjection = Matrix4x4::Perspective(90.0f * kDegToRad, 1.0f, 0.01f, light.radius);
+		Matrix4x4 captureViews[] =
 		{
-			Matrix4x4 model = Matrix4x4::Transformation(transform);
-			depthShader->SetMatrix4x4("model", model);
-			meshRenderer.mesh->Render(depthShader, 0.01f);
-		});
-	}
-	
-	Framebuffer::Unbind();
-	Window::GetInstance()->ResetDimensions();
-	Window::GetInstance()->Clear();
+			Matrix4x4::LookAt(trans.position, trans.position + Vector3(1.0f,  0.0f,  0.0f), Vector3(0.0f, -1.0f,  0.0f)),
+			Matrix4x4::LookAt(trans.position, trans.position + Vector3(-1.0f,  0.0f,  0.0f), Vector3(0.0f, -1.0f,  0.0f)),
+			Matrix4x4::LookAt(trans.position, trans.position + Vector3(0.0f,  1.0f,  0.0f), Vector3(0.0f,  0.0f,  1.0f)),
+			Matrix4x4::LookAt(trans.position, trans.position + Vector3(0.0f, -1.0f,  0.0f), Vector3(0.0f,  0.0f, -1.0f)),
+			Matrix4x4::LookAt(trans.position, trans.position + Vector3(0.0f,  0.0f,  1.0f), Vector3(0.0f, -1.0f,  0.0f)),
+			Matrix4x4::LookAt(trans.position, trans.position + Vector3(0.0f,  0.0f, -1.0f), Vector3(0.0f, -1.0f,  0.0f))
+		};
 
-	// 4. OPTIONALLY RENDER SHADOW TEXTURE TO SCREEN
+		glViewport(0, 0, 256, 256);
+		Window::GetInstance()->Clear();
 
-	//return;
-	Matrix4x4 model = Matrix4x4::Transformation(*transform);
-	Matrix4x4 projection = Matrix4x4::Perspective(camera->fov * kDegToRad, Window::GetInstance()->GetViewportWidth()/ Window::GetInstance()->GetViewportHeight(), camera->nearPlane, camera->farPlane);
-	
-	cubeShader->Use();
-	cubeShader->SetMatrix4x4("model", model);
-	cubeShader->SetMatrix4x4("view", view);
-	cubeShader->SetMatrix4x4("projection", projection);
-	shadowCubeMap->Bind(cubeShader->GetTextureUnit("cubemap"));
+		for (unsigned int i = 0; i < 6; i++)
+		{
+			Matrix4x4 pointMatrix = captureProjection * captureViews[i];
+			std::shared_ptr<Shader> depthShader = ResourceManager::GetInstance()->GetShader("Resources/Engine/Shaders/Shadows/PointShadowDepth.shader");
+			depthShader->Use();
+			depthShader->SetMatrix4x4("lightSpaceMatrix", pointMatrix);
+			depthShader->SetVector3("lightPos", trans.position.x, trans.position.y, trans.position.z);
+			depthShader->SetFloat("lightRadius", light.radius);
 
-	cube->Render();
+			offscreenFramebuffer.AttachCubemapArrayFace(*shadowCubeMapArray, pointLightIndex, i, GL_DEPTH_ATTACHMENT, 0);
+			offscreenFramebuffer.Bind();
+		
+			Window::GetInstance()->Clear();
+			registry->view<Transform, MeshRenderer>().each([&depthShader](auto& transform, auto& meshRenderer)
+				{
+					Matrix4x4 model = Matrix4x4::Transformation(transform);
+					depthShader->SetMatrix4x4("model", model);
+					meshRenderer.mesh->Render(depthShader, 0.01f);
+				});
+		}
+
+		Framebuffer::Unbind();
+		Window::GetInstance()->ResetDimensions();
+		Window::GetInstance()->Clear();
+
+		pointLightIndex++;
+	});
 }
 
 void ShadowSettings::Update(std::shared_ptr<Camera> camera, Matrix4x4& view)
 {
 	//TempDirectionalLight(camera, view);
-	TempPointLight(camera, view);
+	//TempPointLight(camera, view);
+	RenderPointLightShadows(camera, view);
 }
 
 void ShadowSettings::Bind(std::shared_ptr<Shader> shader)
 {
-	shader->SetMatrix4x4("lightSpaceMatrix", lightSpaceMatrix);
-	shadowMap->Bind(shader->GetTextureUnit("shadowMap"));
+	//shader->SetMatrix4x4("lightSpaceMatrix", lightSpaceMatrix);
+	//shadowMap->Bind(shader->GetTextureUnit("shadowMap"));
 }

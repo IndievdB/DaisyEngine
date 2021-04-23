@@ -1,6 +1,7 @@
 #include "Framebuffer.hpp"
 
 #include <glad/glad.h>
+#include <iostream>
 
 Framebuffer::Framebuffer()
 {
@@ -30,9 +31,21 @@ void Framebuffer::AttachCubemapFace(Cubemap& cubemap, unsigned int face, GLenum 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, cubemap.GetCubemapID(), mipMapLevel);
 }
 
+void Framebuffer::AttachCubemapArrayFace(CubemapArray& cubemapArray, unsigned int index, unsigned int face, GLenum attachmentType, unsigned int mipMapLevel)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObjectID);
+	glFramebufferTextureLayer(GL_FRAMEBUFFER, attachmentType, cubemapArray.GetID(), mipMapLevel, (index*6) + face);
+	//glFramebufferTexture3D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, cubemapArray.GetID(), mipMapLevel, index);
+}
+
 void Framebuffer::Bind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObjectID);
+}
+
+int Framebuffer::GetID()
+{
+	return frameBufferObjectID;
 }
 
 void Framebuffer::Unbind()

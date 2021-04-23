@@ -54,10 +54,10 @@ Skybox::Skybox(std::string filePath)
 
 void Skybox::Render(const Matrix4x4& projection, const Matrix4x4& view)
 {
-	auto skyboxShader = ResourceManager::GetInstance()->GetShader("Resources/PBR/Skybox.shader");
+	auto skyboxShader = ResourceManager::GetInstance()->GetShader("Resources/Engine/Shaders/Skybox.shader");
 	skyboxShader->Use();
 	skyboxShader->SetMatrix4x4("projection", projection);
 	skyboxShader->SetMatrix4x4("view", view);
 	environmentCubemap->Bind(skyboxShader->GetTextureUnit("environmentMap"));
-	ResourceManager::GetInstance()->GetMesh("Resources/PBR/InvertedCube.obj")->Render();
+	ResourceManager::GetInstance()->GetMesh("Resources/Engine/Meshes/InvertedCube.obj")->Render();
 }

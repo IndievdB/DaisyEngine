@@ -149,6 +149,7 @@
     <ClCompile Include="Physics\Contact.cpp" />
     <ClCompile Include="Renderer\ComputeShader.cpp" />
     <ClCompile Include="Renderer\Cubemap.cpp" />
+    <ClCompile Include="Renderer\CubemapArray.cpp" />
     <ClCompile Include="Renderer\Font.cpp" />
     <ClCompile Include="Renderer\Framebuffer.cpp" />
     <ClCompile Include="Renderer\LightSettings.cpp" />
@@ -204,6 +205,7 @@
     <ClInclude Include="Renderer\AtomicCounterBuffer.hpp" />
     <ClInclude Include="Renderer\ComputeShader.hpp" />
     <ClInclude Include="Renderer\Cubemap.hpp" />
+    <ClInclude Include="Renderer\CubemapArray.hpp" />
     <ClInclude Include="Renderer\DirectionalLight.hpp" />
     <ClInclude Include="Renderer\Font.hpp" />
     <ClInclude Include="Renderer\Framebuffer.hpp" />
@@ -319,6 +321,7 @@
     <None Include="Resources\CollisionTest.lua" />
     <None Include="Resources\Engine\Compute\BuildLightGrid.glsl" />
     <None Include="Resources\Engine\Compute\CullLights.glsl" />
+    <None Include="Resources\Engine\Shaders\Lambert.shader" />
     <None Include="Resources\Engine\Shaders\LambertNoShadows.shader" />
     <None Include="Resources\Engine\Shaders\UnlitTexture.shader" />
     <None Include="Resources\lambert.shader" />

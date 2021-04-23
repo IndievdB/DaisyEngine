@@ -6,6 +6,7 @@
 #include "Shader.hpp"
 #include "Camera.hpp"
 #include "Cubemap.hpp"
+#include "CubemapArray.hpp"
 
 class Mesh;
 class Skybox;
@@ -21,7 +22,7 @@ private:
 	Matrix4x4 lightSpaceMatrix;
 	Texture* shadowMap;
 	void TempDirectionalLight(std::shared_ptr<Camera> camera, Matrix4x4& view);
-	void TempPointLight(std::shared_ptr<Camera> camera, Matrix4x4& view);
+	void RenderPointLightShadows(std::shared_ptr<Camera> camera, Matrix4x4& view);
 
 	//
 public:
@@ -29,4 +30,5 @@ public:
 	Shader* cubeShader;
 	Skybox* skybox;
 	std::unique_ptr<Cubemap> shadowCubeMap;
+	std::unique_ptr<CubemapArray> shadowCubeMapArray;
 };

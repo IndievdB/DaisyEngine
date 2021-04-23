@@ -1,0 +1,7 @@
+{
+  "shader" : "Resources/Engine/Shaders/Lambert.shader",
+  "textures" :
+  {
+    "mainTex" : "Resources/Engine/Textures/DefaultBlueGrid.png"
+  }
+}

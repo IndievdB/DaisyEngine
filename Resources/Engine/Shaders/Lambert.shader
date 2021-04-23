@@ -44,6 +44,8 @@ uniform float screenWidth;
 uniform float screenHeight;
 uniform mat4 view;
 uniform sampler2D mainTex;
+uniform samplerCube pointShadowMap;
+uniform samplerCubeArray shadowCubeMapArray;
 
 in vec3 WorldPos;
 in vec3 ViewPos;
@@ -152,6 +154,42 @@ uint GetClusterIndex(vec4 fragCoord)
 	return cluster;
 }
 
+vec3 gridSamplingDisk[20] = vec3[]
+(
+	vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+	vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+	vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+	vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+	vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
+);
+
+float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos, float lightRadius, int lightIndex)
+{
+	vec3 fragToLight = fragPos - lightPos;
+	float currentDepth = length(fragToLight);
+
+	float shadow = 0.0;
+	float bias = 0.15;
+	int samples = 20;
+	float viewDistance = length(ViewPos - fragPos);
+	float diskRadius = (1.0 + (viewDistance / farPlane)) / 25.0;
+
+	for (int i = 0; i < samples; ++i)
+	{
+		vec3 index = fragToLight + gridSamplingDisk[i] * diskRadius;
+		float closestDepth = texture(shadowCubeMapArray, vec4(index, lightIndex)).r;
+		//float closestDepth = texture(shadowCubeMapArray, vec4(index, 0)).r;
+		//float closestDepth = texture(pointShadowMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
+		closestDepth *= lightRadius;   // undo mapping [0;1]
+		if (currentDepth - bias > closestDepth)
+			shadow += 1.0;
+	}
+
+	shadow /= float(samples);
+
+	return shadow;
+}
+
 vec3 GetLighting(vec4 fragCoord)
 {
 	uint clusterIndex = GetClusterIndex(gl_FragCoord);
@@ -194,10 +232,13 @@ vec3 GetLighting(vec4 fragCoord)
 			vec3 lightDir = normalize(light.position.xyz - WorldPos);
 			float diff = max(dot(WSNormal, lightDir), 0.0);
 			vec3 diffuse = diff * light.color.rgb;
-			
+
 			float attenuation = clamp(1.0 - dist / light.radius, 0.0, 1.0); attenuation *= attenuation;
 			attenuation = clamp(attenuation * light.intensity, 0.0, 1.0);
 			diffuse *= attenuation;
+
+			float shadow = ShadowCalculationPoint(WorldPos, light.position.xyz, light.radius, pointLightIndex);
+			diffuse *= (1.0 - shadow);
 
 			lighting.rgb += diffuse;
 		}

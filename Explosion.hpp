@@ -27,21 +27,56 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		registry->assign<LuaBehaviour>(entity, "Resources/FreeCam.lua");
 	}
 
-	{
+	/*{
 		auto entity = registry->create();
 		registry->assign<EntityName>(entity, registry, "Ambient Light");
 		registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion::identity);
 		registry->assign<AmbientLight>(entity);
 		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
-	}
+	}*/
+
+	/*{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, registry, "Point Light");
+		registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion::identity);
+		registry->assign<PointLight>(entity);
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+	}*/
 
 	{
+		auto entity = registry->create();
+		registry->assign<EntityName>(entity, registry, "Point Light");
+		registry->assign<Transform>(entity, Vector3::up * 8, Vector3::one * 0.25f, Quaternion::identity);
+		registry->assign<PointLight>(entity, Vector4::one, 15.0f, 5.0f);
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		{
+			float x = rand() % 30 - 15;
+			float z = rand() % 30 - 15;
+			float y = rand() % 10;
+
+			float r = (double)rand() / (RAND_MAX);
+			float g = (double)rand() / (RAND_MAX);
+			float b = (double)rand() / (RAND_MAX);
+
+			auto entity = registry->create();
+			registry->assign<EntityName>(entity, registry, "Point Light");
+			registry->assign<Transform>(entity, Vector3(x,y,z), Vector3::one * 0.25f, Quaternion::identity);
+			registry->assign<PointLight>(entity, Vector4(r,g,b,1), 15.0f, 5.0f);
+			registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultSphere.obj");
+		}
+	}
+
+	/*{
 		auto entity = registry->create();
 		registry->assign<EntityName>(entity, registry, "Directional Light");
 		registry->assign<Transform>(entity, Vector3::up * 3, Vector3::one * 0.25f, Quaternion(0.523599f, 0.0f, 0.0f));
 		registry->assign<DirectionalLight>(entity);
 		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/DefaultWhiteGrid.material", "Resources/Engine/Meshes/DefaultArrow.obj");
-	}
+	}*/
 
 	/*
 	{
@@ -69,7 +104,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		auto entity = registry->create();
 		registry->assign<EntityName>(entity, "Ground Plane");
 		registry->assign<Transform>(entity, Vector3::zero, Vector3::one, Quaternion::identity);
-		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/LambertNoShadows.material", "Resources/plane.obj");
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/Lambert.material", "Resources/plane.obj");
 		PlaneCollider& collider = registry->assign<PlaneCollider>(entity);
 		collider.normal = Vector3::up;
 		collider.offset = 0;
@@ -82,7 +117,7 @@ void LoadScene(std::shared_ptr<entt::registry> registry)
 		Vector3 scale = Vector3(2,1,1);
 		Quaternion rotation = Quaternion(rand(), rand(), rand(), rand()); rotation.Normalize();
 		Transform transform = registry->assign<Transform>(entity, position, scale, rotation);
-		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/LambertNoShadows.material", "Resources/cube.obj");
+		registry->assign<MeshRenderer>(entity, "Resources/Engine/Materials/Lambert.material", "Resources/cube.obj");
 		//registry->assign<LuaBehaviour>(entity, "Resources/CollisionTest.lua");
 
 		RigidBody& rb = registry->assign<RigidBody>(entity);

@@ -17,7 +17,7 @@ RenderSystem::RenderSystem(std::shared_ptr<entt::registry> registry) : skybox ("
 {
 	//pbrSettings.Setup(skybox.environmentCubemap);
 	//clusteredSettings = new ClusteredSettings(registry, NUM_LIGHTS);
-	//shadowSettings = new ShadowSettings(registry);
+	shadowSettings = new ShadowSettings(registry);
 	lightSettings = new LightSettings(registry);
 }
 
@@ -31,8 +31,7 @@ void RenderSystem::RenderAll(std::shared_ptr<Texture> renderTexture, std::shared
 	Matrix4x4 view = Matrix4x4::LookAt(cameraTransform->position, cameraTransform->position + forward, up);
 
 	lightSettings->Update(projection, view, camera->nearPlane, camera->farPlane);
-
-	//shadowSettings->Update(camera, view);
+	shadowSettings->Update(camera, view);
 	
 	offscreenFramebuffer.Bind();
 	offscreenFramebuffer.AttachRenderbuffer(*depthBuffer, GL_DEPTH_ATTACHMENT);
@@ -41,42 +40,35 @@ void RenderSystem::RenderAll(std::shared_ptr<Texture> renderTexture, std::shared
 	Window::GetInstance()->Clear();
 
 	registry->view<Transform, MeshRenderer>().each([&projection, &view, &cameraTransform, &camera, this](auto& transform, auto& meshRenderer)
-		{
-			if (meshRenderer.material == nullptr || meshRenderer.mesh == nullptr)
-				return;
+	{
+		if (meshRenderer.material == nullptr || meshRenderer.mesh == nullptr)
+			return;
 
-			Matrix4x4 model = Matrix4x4::Transformation(transform);
-			std::shared_ptr<Shader> shader = meshRenderer.material->GetShader();
+		Matrix4x4 model = Matrix4x4::Transformation(transform);
+		std::shared_ptr<Shader> shader = meshRenderer.material->GetShader();
 
-			shader->Use();
-			shader->SetMatrix4x4("projection", projection);
-			shader->SetMatrix4x4("view", view);
-			shader->SetMatrix4x4("model", model);
-			shader->SetVector3("camPos", cameraTransform->position.x, cameraTransform->position.y, cameraTransform->position.z);
-			shader->SetFloat("nearPlane", camera->nearPlane);
-			shader->SetFloat("farPlane", camera->farPlane);
-			shader->SetFloat("screenWidth", Window::GetInstance()->GetViewportWidth());
-			shader->SetFloat("screenHeight", Window::GetInstance()->GetViewportHeight());
-			shader->SetFloat("ambientLighting", 0.05f);
+		shader->Use();
+		shader->SetMatrix4x4("projection", projection);
+		shader->SetMatrix4x4("view", view);
+		shader->SetMatrix4x4("model", model);
+		shader->SetVector3("camPos", cameraTransform->position.x, cameraTransform->position.y, cameraTransform->position.z);
+		shader->SetFloat("nearPlane", camera->nearPlane);
+		shader->SetFloat("farPlane", camera->farPlane);
+		shader->SetFloat("screenWidth", Window::GetInstance()->GetViewportWidth());
+		shader->SetFloat("screenHeight", Window::GetInstance()->GetViewportHeight());
+		shader->SetFloat("ambientLighting", 0.05f);
 
-			shader->SetVector2("clusterScreenSpaceSize",
-				std::ceil((float)Window::GetInstance()->GetViewportWidth() / (float)8),
-				std::ceil((float)Window::GetInstance()->GetViewportHeight() / (float)8));
+		shader->SetVector2("clusterScreenSpaceSize",
+			std::ceil((float)Window::GetInstance()->GetViewportWidth() / (float)8),
+			std::ceil((float)Window::GetInstance()->GetViewportHeight() / (float)8));
 
-			//pbrSettings.Bind(shader);
+		//pbrSettings.Bind(shader);
+		shadowSettings->shadowCubeMap->Bind(shader->GetTextureUnit("pointShadowMap"));
+		shadowSettings->shadowCubeMapArray->Bind(shader->GetTextureUnit("shadowCubeMapArray"));
 
-			/*if (directionalLight != nullptr)
-			{
-				shader->SetVector3("directionalLight.direction", directionalLight->direction.x, directionalLight->direction.y, directionalLight->direction.z);
-				shader->SetVector3("directionalLight.color", directionalLight->color.x, directionalLight->color.y, directionalLight->color.z);
-				shadowSettings->Bind(shader);
-			}*/
-
-			//shadowSettings->shadowCubeMap->Bind(shader->GetTextureUnit("pointShadowMap"));
-
-			meshRenderer.material->Bind();
-			meshRenderer.mesh->Render(shader, 0.01f);
-		});
+		meshRenderer.material->Bind();
+		meshRenderer.mesh->Render(shader, 0.01f);
+	});
 
 	skybox.Render(projection, view);
 
@@ -84,6 +76,19 @@ void RenderSystem::RenderAll(std::shared_ptr<Texture> renderTexture, std::shared
 	{
 		TextMesh::Render(textMesh, transform.position.x, transform.position.y);
 	});
+
+	// TEMP
+	/*Transform t(Vector3::up * 8, Vector3::one, Quaternion::identity);
+	Matrix4x4 model = Matrix4x4::Transformation(t);
+	std::shared_ptr<Shader> shader = ResourceManager::GetInstance()->GetShader("Resources/cubecube.shader");
+	shader->Use();
+	shader->SetMatrix4x4("projection", projection);
+	shader->SetMatrix4x4("view", view);
+	shader->SetMatrix4x4("model", model);
+	shadowSettings->shadowCubeMap->Bind(shader->GetTextureUnit("cubemap"));
+	shadowSettings->shadowCubeMapArray->Bind(shader->GetTextureUnit("cubemapArray"));
+	std::shared_ptr<Mesh> mesh = ResourceManager::GetInstance()->GetMesh("Resources/Engine/Meshes/DefaultCube.obj");
+	mesh->Render();*/
 
 	Framebuffer::Unbind();
 }

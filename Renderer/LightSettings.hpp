@@ -12,7 +12,7 @@ struct Cluster
 	Vector4 maxBounds;
 };
 
-static const int NUM_LIGHTS = 512;
+static const int NUM_LIGHTS = 256;
 static const int NUM_TILES = 512;
 
 struct PointLightGLSL
